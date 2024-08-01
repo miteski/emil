@@ -7,69 +7,140 @@
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="/" class="logo">emil</a>
-            <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/add-agent.html">Add Agent</a></li>
-                <li><a href="/view-agents.html">View Agents</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <h1>Add New Agent</h1>
-        <form id="agentForm">
-            <div class="form-section">
-                <h3>Agent Details</h3>
-                <label for="fullname">Full Name:</label>
-                <input type="text" id="fullname" name="fullname" required>
-                
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                
-                <label for="tenantId">Tenant:</label>
-                <select id="tenantId" name="tenantId" required>
-                    <option value="">Select Tenant</option>
-                </select>
-            </div>
+    <nav>
+        <a href="/" class="logo">emil</a>
+        <a href="/add-agent.html">Add Agent</a>
+        <a href="/view-agents.html">View Agents</a>
+    </nav>
+    <h1>Add New Agent</h1>
+    <form id="agentForm">
+        <div class="form-section">
+            <h3>Agent Details</h3>
+            <label for="fullname">Full Name:</label>
+            <input type="text" id="fullname" name="fullname" required>
             
-            <div class="form-section">
-                <h3>Payment Details</h3>
-                <label for="bankName">Bank Name:</label>
-                <input type="text" id="bankName" name="bankName" required>
-                
-                <label for="iban">IBAN:</label>
-                <input type="text" id="iban" name="iban" required>
-                
-                <label for="bic">BIC:</label>
-                <input type="text" id="bic" name="bic" required>
-                
-                <label for="accountHolderName">Account Holder Name:</label>
-                <input type="text" id="accountHolderName" name="accountHolderName" required>
-                
-                <label for="paymentMethod">Payment Method:</label>
-                <input type="text" id="paymentMethod" name="paymentMethod" required>
-            </div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
             
-            <div class="form-section">
-                <h3>Commission Rates</h3>
-                <div id="commissionRates">
-                    <!-- Commission rate inputs will be dynamically added here -->
-                </div>
-            </div>
+            <label for="tenantId">Tenant:</label>
+            <select id="tenantId" name="tenantId" required>
+                <option value="">Select Tenant</option>
+            </select>
+        </div>
+        
+        <div class="form-section">
+            <h3>Payment Details</h3>
+            <label for="bankName">Bank Name:</label>
+            <input type="text" id="bankName" name="bankName" required>
             
-            <button type="submit" class="btn btn-primary">Add Agent</button>
-        </form>
+            <label for="iban">IBAN:</label>
+            <input type="text" id="iban" name="iban" required>
+            
+            <label for="bic">BIC:</label>
+            <input type="text" id="bic" name="bic" required>
+            
+            <label for="accountHolderName">Account Holder Name:</label>
+            <input type="text" id="accountHolderName" name="accountHolderName" required>
+            
+            <label for="paymentMethod">Payment Method:</label>
+            <input type="text" id="paymentMethod" name="paymentMethod" required>
+        </div>
+        
+        <div class="form-section">
+            <h3>Commission Rates</h3>
+            <div id="commissionRates">
+                <!-- Commission rate inputs will be dynamically added here -->
+            </div>
+        </div>
+        
+        <button type="submit">Add Agent</button>
+    </form>
 
-        <div id="result"></div>
-    </main>
-    <footer>
-        <p>&copy; 2024 emil Insurance. All rights reserved.</p>
-    </footer>
+    <div id="result"></div>
 
     <script>
-    // ... (keep the existing JavaScript code) ...
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch and populate tenants
+        fetch('/api/tenants')
+            .then(response => response.json())
+            .then(tenants => {
+                const select = document.getElementById('tenantId');
+                tenants.forEach(tenant => {
+                    const option = document.createElement('option');
+                    option.value = tenant.TenantID;
+                    option.textContent = tenant.Name;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching tenants:', error);
+                showResult('Error fetching tenants. Please try again later.', true);
+            });
+
+        // Fetch and populate coverage types
+        fetch('/api/coverage-types')
+            .then(response => response.json())
+            .then(coverageTypes => {
+                const commissionRatesDiv = document.getElementById('commissionRates');
+                coverageTypes.forEach(type => {
+                    const label = document.createElement('label');
+                    label.textContent = `${type} Commission Rate (%):`;
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.name = `commission_${type}`;
+                    input.min = '0';
+                    input.max = '100';
+                    input.step = '0.01';
+                    input.required = true;
+                    commissionRatesDiv.appendChild(label);
+                    commissionRatesDiv.appendChild(input);
+                    commissionRatesDiv.appendChild(document.createElement('br'));
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching coverage types:', error);
+                showResult('Error fetching coverage types. Please try again later.', true);
+            });
+
+        // Form submission
+        document.getElementById('agentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const agentData = Object.fromEntries(formData.entries());
+
+            // Separate commission rates from other data
+            const commissionRates = {};
+            Object.keys(agentData).forEach(key => {
+                if (key.startsWith('commission_')) {
+                    commissionRates[key.replace('commission_', '')] = agentData[key];
+                    delete agentData[key];
+                }
+            });
+
+            agentData.commissionRates = commissionRates;
+
+            fetch('/api/agents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(agentData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                showResult('Agent added successfully!');
+            })
+            .catch(error => {
+                showResult('Error adding agent: ' + error.message, true);
+            });
+        });
+    });
+
+    function showResult(message, isError = false) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.textContent = message;
+        resultDiv.className = isError ? 'error' : 'success';
+    }
     </script>
 </body>
 </html>
