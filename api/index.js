@@ -1,49 +1,41 @@
 const express = require('express');
 const mysql = require('mysql2/promise');
-
 const app = express();
+
 app.use(express.json());
 
-// Create a MySQL pool
 const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQL_DATABASE,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
-
-// Root route
-app.get('/', (req, res) => {
-  res.send('Welcome to the Commission Calculator API');
-});
-
-// API route to calculate commission
-app.post('/api/calculate-commission', async (req, res) => {
-  const { policyId, premiumAmount } = req.body;
-  
-  try {
-    // Fetch the commission rate from the database
-    const [rows] = await pool.query('SELECT rate FROM commission_rates WHERE id = ?', [1]);
-    
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Commission rate not found' });
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+    ssl: {
+        rejectUnauthorized: false
     }
+});
 
-    const rate = rows[0].rate;
-    const commissionAmount = premiumAmount * rate;
+app.get('/api/tenants', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT TenantID, Name FROM Tenant');
+        res.json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching tenants' });
+    }
+});
 
-    res.json({
-      policyId,
-      commissionAmount,
-      rateUsed: rate
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+app.post('/api/agents', async (req, res) => {
+    const { fullname, email, tenantId } = req.body;
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO Agent (Fullname, Email, TenantID) VALUES (?, ?, ?)',
+            [fullname, email, tenantId]
+        );
+        res.status(201).json({ message: 'Agent added successfully', agentId: result.insertId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error adding agent' });
+    }
 });
 
 module.exports = app;
