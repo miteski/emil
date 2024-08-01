@@ -8,6 +8,7 @@
 <body>
     <h1>Add New Agent</h1>
     <form id="agentForm">
+        <h2>Agent Details</h2>
         <label for="fullname">Full Name:</label>
         <input type="text" id="fullname" name="fullname" required><br><br>
         
@@ -18,6 +19,27 @@
         <select id="tenantId" name="tenantId" required>
             <option value="">Select Tenant</option>
         </select><br><br>
+        
+        <h2>Payment Details</h2>
+        <label for="bankName">Bank Name:</label>
+        <input type="text" id="bankName" name="bankName" required><br><br>
+        
+        <label for="iban">IBAN:</label>
+        <input type="text" id="iban" name="iban" required><br><br>
+        
+        <label for="bic">BIC:</label>
+        <input type="text" id="bic" name="bic" required><br><br>
+        
+        <label for="accountHolderName">Account Holder Name:</label>
+        <input type="text" id="accountHolderName" name="accountHolderName" required><br><br>
+        
+        <label for="paymentMethod">Payment Method:</label>
+        <input type="text" id="paymentMethod" name="paymentMethod" required><br><br>
+        
+        <h2>Commission Rates</h2>
+        <div id="commissionRates">
+            <!-- Commission rate inputs will be dynamically added here -->
+        </div>
         
         <button type="submit">Add Agent</button>
     </form>
@@ -38,10 +60,42 @@
                 });
             });
 
+        fetch('/api/coverage-types')
+            .then(response => response.json())
+            .then(coverageTypes => {
+                const commissionRatesDiv = document.getElementById('commissionRates');
+                coverageTypes.forEach(type => {
+                    const label = document.createElement('label');
+                    label.textContent = `${type} Commission Rate (%):`;
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.name = `commission_${type}`;
+                    input.min = '0';
+                    input.max = '100';
+                    input.step = '0.01';
+                    input.required = true;
+                    commissionRatesDiv.appendChild(label);
+                    commissionRatesDiv.appendChild(input);
+                    commissionRatesDiv.appendChild(document.createElement('br'));
+                    commissionRatesDiv.appendChild(document.createElement('br'));
+                });
+            });
+
         document.getElementById('agentForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new FormData(this);
             const agentData = Object.fromEntries(formData.entries());
+
+            // Separate commission rates from other data
+            const commissionRates = {};
+            Object.keys(agentData).forEach(key => {
+                if (key.startsWith('commission_')) {
+                    commissionRates[key.replace('commission_', '')] = agentData[key];
+                    delete agentData[key];
+                }
+            });
+
+            agentData.commissionRates = commissionRates;
 
             fetch('/api/agents', {
                 method: 'POST',
