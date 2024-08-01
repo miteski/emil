@@ -1,147 +1,75 @@
-:root {
-    --emil-blue: #0066b3;
-    --emil-light-blue: #e6f2fa;
-    --emil-dark-gray: #333333;
-    --emil-light-gray: #f5f5f5;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Agent - Insurance Management System</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" class="logo">emil</a>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/add-agent.html">Add Agent</a></li>
+                <li><a href="/view-agents.html">View Agents</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h1>Add New Agent</h1>
+        <form id="agentForm">
+            <div class="form-section">
+                <h3>Agent Details</h3>
+                <label for="fullname">Full Name:</label>
+                <input type="text" id="fullname" name="fullname" required>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                
+                <label for="tenantId">Tenant:</label>
+                <select id="tenantId" name="tenantId" required>
+                    <option value="">Select Tenant</option>
+                </select>
+            </div>
+            
+            <div class="form-section">
+                <h3>Payment Details</h3>
+                <label for="bankName">Bank Name:</label>
+                <input type="text" id="bankName" name="bankName" required>
+                
+                <label for="iban">IBAN:</label>
+                <input type="text" id="iban" name="iban" required>
+                
+                <label for="bic">BIC:</label>
+                <input type="text" id="bic" name="bic" required>
+                
+                <label for="accountHolderName">Account Holder Name:</label>
+                <input type="text" id="accountHolderName" name="accountHolderName" required>
+                
+                <label for="paymentMethod">Payment Method:</label>
+                <input type="text" id="paymentMethod" name="paymentMethod" required>
+            </div>
+            
+            <div class="form-section">
+                <h3>Commission Rates</h3>
+                <div id="commissionRates">
+                    <!-- Commission rate inputs will be dynamically added here -->
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Add Agent</button>
+        </form>
 
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    color: var(--emil-dark-gray);
-    margin: 0;
-    padding: 0;
-    background-color: #ffffff;
-}
+        <div id="result"></div>
+    </main>
+    <footer>
+        <p>&copy; 2024 emil Insurance. All rights reserved.</p>
+    </footer>
 
-header {
-    background-color: var(--emil-blue);
-    padding: 1rem;
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.logo {
-    color: #ffffff;
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-nav ul {
-    list-style-type: none;
-    display: flex;
-    margin: 0;
-    padding: 0;
-}
-
-nav ul li {
-    margin-left: 1rem;
-}
-
-nav ul li a {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-main {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-}
-
-h1, h2, h3 {
-    color: var(--emil-blue);
-}
-
-.btn {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.3s;
-}
-
-.btn-primary {
-    background-color: var(--emil-blue);
-    color: #ffffff;
-}
-
-.btn-primary:hover {
-    background-color: #005092;
-}
-
-.btn-secondary {
-    background-color: var(--emil-light-gray);
-    color: var(--emil-dark-gray);
-}
-
-.btn-secondary:hover {
-    background-color: #e0e0e0;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    text-align: left;
-}
-
-th {
-    background-color: var(--emil-light-blue);
-    color: var(--emil-blue);
-}
-
-.search-box {
-    margin-bottom: 1rem;
-}
-
-.search-box input {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 1rem;
-}
-
-.pagination button {
-    margin: 0 0.5rem;
-}
-
-.pagination span {
-    margin: 0 0.5rem;
-}
-
-footer {
-    background-color: var(--emil-light-gray);
-    color: var(--emil-dark-gray);
-    text-align: center;
-    padding: 1rem;
-    margin-top: 2rem;
-}
-
-.cta-buttons {
-    margin-top: 2rem;
-}
-
-.cta-buttons .btn {
-    margin-right: 1rem;
-}
+    <script>
+    // ... (keep the existing JavaScript code) ...
+    </script>
+</body>
+</html>
