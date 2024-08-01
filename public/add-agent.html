@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Agent</title>
+</head>
+<body>
+    <h1>Add New Agent</h1>
+    <form id="agentForm">
+        <label for="fullname">Full Name:</label>
+        <input type="text" id="fullname" name="fullname" required><br><br>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        
+        <label for="tenantId">Tenant ID:</label>
+        <select id="tenantId" name="tenantId" required>
+            <option value="">Select Tenant</option>
+        </select><br><br>
+        
+        <button type="submit">Add Agent</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/tenants')
+            .then(response => response.json())
+            .then(tenants => {
+                const select = document.getElementById('tenantId');
+                tenants.forEach(tenant => {
+                    const option = document.createElement('option');
+                    option.value = tenant.TenantID;
+                    option.textContent = tenant.Name;
+                    select.appendChild(option);
+                });
+            });
+
+        document.getElementById('agentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const agentData = Object.fromEntries(formData.entries());
+
+            fetch('/api/agents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(agentData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').textContent = 'Agent added successfully!';
+            })
+            .catch(error => {
+                document.getElementById('result').textContent = 'Error adding agent: ' + error.message;
+            });
+        });
+    });
+    </script>
+</body>
+</html>
