@@ -1,76 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Agent - Insurance Management System</title>
-    <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-    <h1>Insurance Management System</h1>
-    <h2>Add New Agent</h2>
-    <form id="agentForm">
-        <div class="form-section">
-            <h3>Agent Details</h3>
-            <label for="fullname">Full Name:</label>
-            <input type="text" id="fullname" name="fullname" required>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            
-            <label for="tenantId">Tenant:</label>
-            <select id="tenantId" name="tenantId" required>
-                <option value="">Select Tenant</option>
-            </select>
-        </div>
-        
-        <div class="form-section">
-            <h3>Payment Details</h3>
-            <label for="bankName">Bank Name:</label>
-            <input type="text" id="bankName" name="bankName" required>
-            
-            <label for="iban">IBAN:</label>
-            <input type="text" id="iban" name="iban" required>
-            
-            <label for="bic">BIC:</label>
-            <input type="text" id="bic" name="bic" required>
-            
-            <label for="accountHolderName">Account Holder Name:</label>
-            <input type="text" id="accountHolderName" name="accountHolderName" required>
-            
-            <label for="paymentMethod">Payment Method:</label>
-            <input type="text" id="paymentMethod" name="paymentMethod" required>
-        </div>
-        
-        <div class="form-section">
-            <h3>Commission Rates</h3>
-            <div id="commissionRates">
-                <!-- Commission rate inputs will be dynamically added here -->
-            </div>
-        </div>
-        
-        <button type="submit">Add Agent</button>
-    </form>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch and populate tenants
+    fetch('/api/tenants')
+        .then(response => response.json())
+        .then(tenants => {
+            const select = document.getElementById('tenantId');
+            tenants.forEach(tenant => {
+                const option = document.createElement('option');
+                option.value = tenant.TenantID;
+                option.textContent = tenant.Name;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching tenants:', error);
+            showResult('Error fetching tenants. Please try again later.', true);
+        });
 
-    <div id="result"></div>
+    // Fetch and populate coverage types
+    fetch('/api/coverage-types')
+        .then(response => response.json())
+        .then(coverageTypes => {
+            const commissionRatesDiv = document.getElementById('commissionRates');
+            coverageTypes.forEach(type => {
+                const label = document.createElement('label');
+                label.textContent = `${type} Commission Rate (%):`;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.name = `commission_${type}`;
+                input.min = '0';
+                input.max = '100';
+                input.step = '0.01';
+                input.required = true;
+                commissionRatesDiv.appendChild(label);
+                commissionRatesDiv.appendChild(input);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching coverage types:', error);
+            showResult('Error fetching coverage types. Please try again later.', true);
+        });
 
-    <script>
-    // ... (keep the existing JavaScript code) ...
-    
-    // Update the result display
-    function showResult(message, isError = false) {
-        const resultDiv = document.getElementById('result');
-        resultDiv.textContent = message;
-        resultDiv.className = isError ? 'error' : 'success';
-    }
+    // Form submission
+    document.getElementById('agentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const agentData = Object.fromEntries(formData.entries());
 
-    // In the form submit event listener, update these lines:
-    .then(data => {
-        showResult('Agent added successfully!');
-    })
-    .catch(error => {
-        showResult('Error adding agent: ' + error.message, true);
+        // Separate commission rates from other data
+        const commissionRates = {};
+        Object.keys(agentData).forEach(key => {
+            if (key.startsWith('commission_')) {
+                commissionRates[key.replace('commission_', '')] = agentData[key];
+                delete agentData[key];
+            }
+        });
+
+        agentData.commissionRates = commissionRates;
+
+        fetch('/api/agents', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(agentData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            showResult('Agent added successfully!');
+        })
+        .catch(error => {
+            showResult('Error adding agent: ' + error.message, true);
+        });
     });
-    </script>
-</body>
-</html>
+});
+
+function showResult(message, isError = false) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.textContent = message;
+    resultDiv.className = isError ? 'error' : 'success';
+}
+</script>
