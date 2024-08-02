@@ -1,31 +1,155 @@
-// Update the fetch calls in the script section:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Agent - Insurance Management System</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <nav>
+        <a href="/" class="logo">emil</a>
+        <a href="/add-agent.html">Add Agent</a>
+        <a href="/view-agents.html">View Agents</a>
+    </nav>
+    <h1>Add New Agent</h1>
+    <form id="agentForm">
+        <div class="form-section">
+            <h3>Agent Details</h3>
+            <label for="fullname">Full Name:</label>
+            <input type="text" id="fullname" name="fullname" required>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="tenantId">Tenant:</label>
+            <select id="tenantId" name="tenantId" required>
+                <option value="">Select Tenant</option>
+            </select>
+        </div>
+        
+        <div class="form-section">
+            <h3>Payment Details</h3>
+            <label for="bankName">Bank Name:</label>
+            <input type="text" id="bankName" name="bankName" required>
+            
+            <label for="iban">IBAN:</label>
+            <input type="text" id="iban" name="iban" required>
+            
+            <label for="bic">BIC:</label>
+            <input type="text" id="bic" name="bic" required>
+            
+            <label for="accountHolderName">Account Holder Name:</label>
+            <input type="text" id="accountHolderName" name="accountHolderName" required>
+            
+            <label for="paymentMethod">Payment Method:</label>
+            <input type="text" id="paymentMethod" name="paymentMethod" required>
+        </div>
+        
+        <div class="form-section">
+            <h3>Commission Rates</h3>
+            <div id="commissionRates">
+                <!-- Commission rate inputs will be dynamically added here -->
+            </div>
+        </div>
+        
+        <button type="submit">Add Agent</button>
+    </form>
 
-fetch('/api/tenants')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(tenants => {
-        // ... (existing code)
-    })
-    .catch(error => {
-        console.error('Error fetching tenants:', error);
-        showResult('Error fetching tenants. Please try again later.', true);
+    <div id="result"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/tenants')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(tenants => {
+                console.log('Tenants received:', tenants);
+                const select = document.getElementById('tenantId');
+                tenants.forEach(tenant => {
+                    const option = document.createElement('option');
+                    option.value = tenant.TenantID;
+                    option.textContent = tenant.Name;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching tenants:', error);
+                showResult('Error fetching tenants. Please try again later.', true);
+            });
+
+        fetch('/api/coverage-types')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(coverageTypes => {
+                console.log('Coverage types received:', coverageTypes);
+                const commissionRatesDiv = document.getElementById('commissionRates');
+                coverageTypes.forEach(type => {
+                    const label = document.createElement('label');
+                    label.textContent = `${type} Commission Rate (%):`;
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.name = `commission_${type}`;
+                    input.min = '0';
+                    input.max = '100';
+                    input.step = '0.01';
+                    input.required = true;
+                    commissionRatesDiv.appendChild(label);
+                    commissionRatesDiv.appendChild(input);
+                    commissionRatesDiv.appendChild(document.createElement('br'));
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching coverage types:', error);
+                showResult('Error fetching coverage types. Please try again later.', true);
+            });
+
+        document.getElementById('agentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const agentData = Object.fromEntries(formData.entries());
+
+            // Separate commission rates from other data
+            const commissionRates = {};
+            Object.keys(agentData).forEach(key => {
+                if (key.startsWith('commission_')) {
+                    commissionRates[key.replace('commission_', '')] = agentData[key];
+                    delete agentData[key];
+                }
+            });
+
+            agentData.commissionRates = commissionRates;
+
+            fetch('/api/agents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(agentData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                showResult('Agent added successfully!');
+            })
+            .catch(error => {
+                showResult('Error adding agent: ' + error.message, true);
+            });
+        });
     });
 
-fetch('/api/coverage-types')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(coverageTypes => {
-        // ... (existing code)
-    })
-    .catch(error => {
-        console.error('Error fetching coverage types:', error);
-        showResult('Error fetching coverage types. Please try again later.', true);
-    });
+    function showResult(message, isError = false) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.textContent = message;
+        resultDiv.className = isError ? 'error' : 'success';
+    }
+    </script>
+</body>
+</html>
