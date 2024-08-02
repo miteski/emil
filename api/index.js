@@ -14,45 +14,26 @@ const pool = mysql.createPool({
     }
 });
 
-// ... (keep your existing endpoints) ...
-
-app.get('/api/agents', async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 10;
-    const search = req.query.search || '';
-    const offset = (page - 1) * pageSize;
-
+app.get('/api/tenants', async (req, res) => {
     try {
-        let query = `
-            SELECT a.AgentID, a.Fullname, a.Email, t.Name AS TenantName
-            FROM Agent a
-            JOIN Tenant t ON a.TenantID = t.TenantID
-            WHERE a.Fullname LIKE ? OR a.Email LIKE ?
-            LIMIT ? OFFSET ?
-        `;
-        let countQuery = `
-            SELECT COUNT(*) AS total
-            FROM Agent a
-            WHERE a.Fullname LIKE ? OR a.Email LIKE ?
-        `;
-
-        const searchParam = `%${search}%`;
-        const [agents] = await pool.query(query, [searchParam, searchParam, pageSize, offset]);
-        const [countResult] = await pool.query(countQuery, [searchParam, searchParam]);
-
-        const totalAgents = countResult[0].total;
-        const totalPages = Math.ceil(totalAgents / pageSize);
-
-        res.json({
-            agents,
-            currentPage: page,
-            totalPages,
-            totalAgents
-        });
+        const [rows] = await pool.query('SELECT TenantID, Name FROM Tenant');
+        res.json(rows);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching agents' });
+        res.status(500).json({ error: 'Error fetching tenants' });
     }
 });
+
+app.get('/api/coverage-types', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT DISTINCT CoverageType FROM Coverage_Item');
+        res.json(rows.map(row => row.CoverageType));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching coverage types' });
+    }
+});
+
+// ... (keep other existing endpoints) ...
 
 module.exports = app;
