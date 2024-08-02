@@ -6,7 +6,7 @@ body {
 }
 
 header {
-    background: url('https://images.unsplash.com/photo-1503264116251-35a269479413') no-repeat center center/cover;
+    background: url('https://emil-tan.vercel.app/images/header-background.jpg') no-repeat center center/cover; /* Ensure the image is available at this URL */
     color: #fff;
     padding: 50px 0;
     text-align: center;
