@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Payment Details - Insurance Management System</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <nav>
+        <div class="container">
+            <a href="/" class="logo">emil</a>
+            <div>
+                <a href="/add-agent.html">Add Agent</a>
+                <a href="/view-agents.html">View Agents</a>
+                <a href="/upload-csv.html">Upload CSV</a>
+                <a href="/payment-details.html">Add Payment Details</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>Add Payment Details</h1>
+        
+        <form id="paymentDetailsForm">
+            <label for="agentId">Agent ID:</label>
+            <input type="number" id="agentId" name="agentId" required>
+
+            <label for="bankName">Bank Name:</label>
+            <input type="text" id="bankName" name="bankName" required>
+            
+            <label for="iban">IBAN:</label>
+            <input type="text" id="iban" name="iban" required>
+            
+            <label for="bic">BIC:</label>
+            <input type="text" id="bic" name="bic" required>
+            
+            <label for="accountHolderName">Account Holder Name:</label>
+            <input type="text" id="accountHolderName" name="accountHolderName" required>
+            
+            <label for="paymentMethod">Payment Method:</label>
+            <input type="text" id="paymentMethod" name="paymentMethod" required>
+            
+            <button type="submit">Add Payment Details</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+    document.getElementById('paymentDetailsForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const paymentData = Object.fromEntries(formData.entries());
+
+        fetch('/api/payment-details', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(paymentData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('result').textContent = 'Payment details added successfully!';
+            document.getElementById('result').className = 'success';
+        })
+        .catch(error => {
+            document.getElementById('result').textContent = 'Error adding payment details: ' + error.message;
+            document.getElementById('result').className = 'error';
+        });
+    });
+    </script>
+</body>
+</html>
