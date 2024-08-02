@@ -8,24 +8,31 @@
 </head>
 <body>
     <nav>
-        <a href="/" class="logo">emil</a>
-        <a href="/add-agent.html">Add Agent</a>
-        <a href="/view-agents.html">View Agents</a>
-        <a href="/upload-csv.html">Upload CSV</a>
+        <div class="container">
+            <a href="/" class="logo">emil</a>
+            <div>
+                <a href="/add-agent.html">Add Agent</a>
+                <a href="/view-agents.html">View Agents</a>
+                <a href="/upload-csv.html">Upload CSV</a>
+            </div>
+        </div>
     </nav>
-    <h1>Upload CSV</h1>
     
-    <form id="csvUploadForm">
-        <input type="file" id="csvFile" accept=".csv" required>
-        <button type="submit">Upload and Parse</button>
-    </form>
+    <div class="container">
+        <h1>Upload CSV</h1>
+        
+        <form id="csvUploadForm">
+            <input type="file" id="csvFile" accept=".csv" required>
+            <button type="submit">Upload and Parse</button>
+        </form>
 
-    <div id="result"></div>
+        <div id="result"></div>
 
-    <table id="csvTable" style="display:none;">
-        <thead id="csvTableHead"></thead>
-        <tbody id="csvTableBody"></tbody>
-    </table>
+        <table id="csvTable" style="display:none;">
+            <thead id="csvTableHead"></thead>
+            <tbody id="csvTableBody"></tbody>
+        </table>
+    </div>
 
     <script>
     document.getElementById('csvUploadForm').addEventListener('submit', function(e) {
@@ -45,6 +52,7 @@
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('result').textContent = 'Error uploading file: ' + error.message;
+            document.getElementById('result').className = 'error';
         });
     });
 
@@ -80,6 +88,7 @@
         // Show the table
         table.style.display = 'table';
         document.getElementById('result').textContent = 'CSV file parsed successfully!';
+        document.getElementById('result').className = 'success';
     }
     </script>
 </body>
