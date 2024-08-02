@@ -61,4 +61,131 @@ app.get('/api/agents', async (req, res) => {
         `;
 
         const searchParam = `%${search}%`;
-        const [agents] = await pool.query(query, [searc
+        const [agents] = await pool.query(query, [searchParam, searchParam, pageSize, offset]);
+        const [countResult] = await pool.query(countQuery, [searchParam, searchParam]);
+
+        const totalAgents = countResult[0].total;
+        const totalPages = Math.ceil(totalAgents / pageSize);
+
+        console.log('Agents fetched:', agents);
+        res.json({
+            agents,
+            currentPage: page,
+            totalPages,
+            totalAgents
+        });
+    } catch (error) {
+        console.error('Error fetching agents:', error);
+        res.status(500).json({ error: 'Error fetching agents', details: error.message });
+    }
+});
+
+// Add new agent
+app.post('/api/agents', async (req, res) => {
+    const { fullname, email, tenantId } = req.body;
+    
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO Agent (Fullname, Email, TenantID) VALUES (?, ?, ?)',
+            [fullname, email, tenantId]
+        );
+        const agentId = result.insertId;
+
+        res.status(201).json({ message: 'Agent added successfully', agentId: agentId });
+    } catch (error) {
+        console.error('Error adding agent:', error);
+        res.status(500).json({ error: 'Error adding agent', details: error.message });
+    }
+});
+
+// Add payment details
+app.post('/api/payment-details', async (req, res) => {
+    const { agentId, bankName, iban, bic, accountHolderName, paymentMethod } = req.body;
+    
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO Agent_Payment_Details (BankName, IBAN, BIC, AccountHolderName, PaymentMethod) VALUES (?, ?, ?, ?, ?)',
+            [bankName, iban, bic, accountHolderName, paymentMethod]
+        );
+        const paymentDetailsId = result.insertId;
+
+        await pool.query(
+            'UPDATE Agent SET Agent_Payment_Details_ID = ? WHERE AgentID = ?',
+            [paymentDetailsId, agentId]
+        );
+
+        res.status(201).json({ message: 'Payment details added successfully', paymentDetailsId: paymentDetailsId });
+    } catch (error) {
+        console.error('Error adding payment details:', error);
+        res.status(500).json({ error: 'Error adding payment details', details: error.message });
+    }
+});
+
+// CSV upload and parse endpoint
+app.post('/api/upload-csv', upload.single('file'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    try {
+        // Virus scan
+        const scanResult = await virusScan(req.file.buffer);
+        if (!scanResult.isClean) {
+            return res.status(400).json({ error: 'File may be infected with a virus' });
+        }
+
+        // Parse CSV
+        const { headers, rows } = await parseCSV(req.file.buffer);
+
+        // Store in database (you'll need to implement this function)
+        // await storeCSVData(req.file.originalname, headers, rows);
+
+        res.json({ message: 'File uploaded, scanned, and parsed successfully', headers, rows });
+    } catch (error) {
+        console.error('Error processing file:', error);
+        res.status(500).json({ error: 'Error processing file', details: error.message });
+    }
+});
+
+async function virusScan(fileBuffer) {
+    const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+    
+    try {
+        const response = await axios.get(`https://www.virustotal.com/api/v3/files/${hash}`, {
+            headers: {
+                'x-apikey': process.env.VIRUSTOTAL_API_KEY
+            }
+        });
+
+        const stats = response.data.data.attributes.last_analysis_stats;
+        const isClean = stats.malicious === 0 && stats.suspicious === 0;
+
+        return { isClean, hash };
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            // File not previously scanned, consider it clean
+            return { isClean: true, hash };
+        }
+        console.error('Virus scan error:', error);
+        throw new Error('Virus scan failed');
+    }
+}
+
+function parseCSV(csvBuffer) {
+    return new Promise((resolve, reject) => {
+        parse(csvBuffer.toString(), {
+            columns: true,
+            skip_empty_lines: true
+        }, (err, records) => {
+            if (err) {
+                reject(err);
+            } else {
+                const headers = Object.keys(records[0]);
+                const rows = records.map(record => Object.values(record));
+                resolve({ headers, rows });
+            }
+        });
+    });
+}
+
+module.exports = app;
