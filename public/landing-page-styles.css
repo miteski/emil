@@ -130,15 +130,6 @@ footer {
     text-decoration: none;
 }
 
-.social-media {
-    display: flex;
-    gap: 10px;
-}
-
-.social-media img {
-    height: 30px;
-}
-
 .contact-info p {
     margin: 5px 0;
 }
