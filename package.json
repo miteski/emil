@@ -1,7 +1,7 @@
 {
-  "name": "commission-calculator",
+  "name": "emil-insurance-management",
   "version": "1.0.0",
-  "private": true,
+  "main": "api/index.js",
   "dependencies": {
     "express": "^4.17.1",
     "mysql2": "^2.3.3"
