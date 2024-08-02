@@ -1,100 +1,161 @@
 body {
-  font-family: Arial, sans-serif;
-  color: #333;
-  margin: 0;
-  padding: 0;
-  background-color: #f5f5f5; /* Match background color with EMIL website */
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5; /* Match background color with EMIL website */
 }
 
 header {
-  background: url('https://assets-global.website-files.com/5f801bd9152353d350740da6/5ffdad675f5c99dea5fdf687_Header-Home_small.png') no-repeat center center/cover; /* New header background */
-  color: #fff;
-  padding: 50px 0;
-  text-align: center;
+    background: url('https://assets-global.website-files.com/5f801bd9152353d350740da6/5ffdad675f5c99dea5fdf687_Header-Home_small.png') no-repeat center center/cover; /* New header background */
+    color: #fff;
+    padding: 50px 0;
+    text-align: center;
 }
 
 nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
 }
 
 nav img {
-  height: 50px;
+    height: 50px;
 }
 
 nav ul {
-  list-style: none;
-  display: flex;
-  gap: 20px;
+    list-style: none;
+    display: flex;
+    gap: 20px;
 }
 
 nav a {
-  color: #fff;
-  text-decoration: none;
+    color: #fff;
+    text-decoration: none;
 }
 
 .header-content {
-  max-width: 600px;
-  margin: 0 auto;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .header-content h1 {
-  font-size: 48px;
+    font-size: 48px;
 }
 
 .header-content p {
-  font-size: 24px;
-  margin: 20px 0;
+    font-size: 24px;
+    margin: 20px 0;
 }
 
 .cta-button {
-  background: #007bff;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  text-decoration: none;
-  font-size: 18px;
+    background: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 18px;
 }
 
 section {
-  padding: 50px;
-  text-align: center;
+    padding: 50px;
+    text-align: center;
 }
 
 .feature {
-  display: inline-block;
-  width: 30%;
-  margin: 0 10px;
-  text-align: left;
+    display: inline-block;
+    width: 30%;
+    margin: 0 10px;
+    text-align: left;
 }
 
 .feature img {
-  height: 50px;
-  display: block;
-  margin: 0 auto 20px;
+    height: 50px;
+    display: block;
+    margin: 0 auto 20px;
 }
 
 .feature h3 {
-  font-size: 24px;
+    font-size: 24px;
 }
 
 .testimonial {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
 }
 
 .testimonial img {
-  float: left;
-  margin-right: 20px;
-  border-radius: 50%;
-  height: 50px;
+    float: left;
+    margin-right: 20px;
+    border-radius: 50%;
+    height: 50px;
 }
 
 footer {
-  background: #2c3e50;
-  color: #fff;
-  padding: 20px;
+    background: #2c3e50;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.footer-section {
+    margin: 20px;
+}
+
+.footer-section h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin: 5px 0;
+}
+
+.footer-section ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.contact-info p {
+    margin: 5px 0;
+}
+
+.footer-bottom {
+    background: #1a252f;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.footer-bottom p {
+    margin: 5px 0;
+}
+
+.footer-bottom ul {
+    list-style: none;
+    display: flex;
+    gap: 10px;
+    padding: 0;
+    margin: 5px 0;
+}
+
+.footer-bottom ul li a {
+    color: #fff;
+    text-decoration: none;
+}
