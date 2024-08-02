@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Agent - Insurance Management System</title>
+    <title>View Agents - Insurance Management System</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -20,82 +20,95 @@
     </nav>
     
     <div class="container">
-        <h1>Add New Agent</h1>
-        <form id="agentForm">
-            <label for="fullname">Full Name:</label>
-            <input type="text" id="fullname" name="fullname" required>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-            
-            <label for="tenantId">Tenant:</label>
-            <select id="tenantId" name="tenantId" required>
-                <option value="">Select Tenant</option>
-            </select>
-            
-            <button type="submit">Add Agent</button>
-        </form>
+        <h1>View Agents</h1>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by name or email">
+            <button onclick="searchAgents()">Search</button>
+            <button onclick="clearSearch()">Clear</button>
+        </div>
 
-        <div id="result"></div>
+        <table id="agentsTable">
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Tenant</th>
+                </tr>
+            </thead>
+            <tbody id="agentsTableBody">
+                <!-- Agent rows will be populated here -->
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <button onclick="changePage(-1)">Previous</button>
+            <span id="currentPage">1</span>
+            <button onclick="changePage(1)">Next</button>
+        </div>
     </div>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded, fetching tenants...');
-        fetch('/api/tenants')
-            .then(response => {
-                console.log('Tenant response received:', response);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(tenants => {
-                console.log('Tenants data:', tenants);
-                const select = document.getElementById('tenantId');
-                tenants.forEach(tenant => {
-                    const option = document.createElement('option');
-                    option.value = tenant.TenantID;
-                    option.textContent = tenant.Name;
-                    select.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching tenants:', error);
-                document.getElementById('result').textContent = 'Error fetching tenants: ' + error.message;
-            });
+    let currentPage = 1;
+    const pageSize = 10;
 
-        document.getElementById('agentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Form submitted');
-            const formData = new FormData(this);
-            const agentData = Object.fromEntries(formData.entries());
-            console.log('Agent data:', agentData);
-
-            fetch('/api/agents', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(agentData),
-            })
+    function fetchAgents(page, search = '') {
+        console.log(`Fetching agents for page ${page}, search: "${search}"`);
+        fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`)
             .then(response => {
-                console.log('Agent response received:', response);
+                console.log('Response status:', response.status);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                    });
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('Agent added:', data);
-                document.getElementById('result').innerHTML = `Agent added successfully! Agent ID: ${data.agentId}. <a href="/payment-details.html?agentId=${data.agentId}">Add Payment Details</a>`;
+                console.log('Agents data received:', data);
+                const tableBody = document.getElementById('agentsTableBody');
+                tableBody.innerHTML = '';
+                if (data.agents && data.agents.length > 0) {
+                    data.agents.forEach(agent => {
+                        const row = `<tr>
+                            <td>${agent.Fullname}</td>
+                            <td>${agent.Email}</td>
+                            <td>${agent.TenantName || 'N/A'}</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="3">No agents found</td></tr>';
+                }
+                document.getElementById('currentPage').textContent = page;
             })
             .catch(error => {
-                console.error('Error adding agent:', error);
-                document.getElementById('result').textContent = 'Error adding agent: ' + error.message;
+                console.error('Error fetching agents:', error);
+                document.getElementById('agentsTableBody').innerHTML = `<tr><td colspan="3">Error fetching agents: ${error.message}</td></tr>`;
             });
-        });
-    });
+    }
+
+    function searchAgents() {
+        const searchTerm = document.getElementById('searchInput').value;
+        currentPage = 1;
+        fetchAgents(currentPage, searchTerm);
+    }
+
+    function clearSearch() {
+        document.getElementById('searchInput').value = '';
+        currentPage = 1;
+        fetchAgents(currentPage);
+    }
+
+    function changePage(delta) {
+        currentPage += delta;
+        if (currentPage < 1) currentPage = 1;
+        const searchTerm = document.getElementById('searchInput').value;
+        fetchAgents(currentPage, searchTerm);
+    }
+
+    // Initial fetch
+    fetchAgents(currentPage);
     </script>
 </body>
 </html>
