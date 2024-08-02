@@ -40,28 +40,60 @@
     </div>
 
     <script>
-    // ... (keep the existing JavaScript for fetching tenants)
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, fetching tenants...');
+        fetch('/api/tenants')
+            .then(response => {
+                console.log('Tenant response received:', response);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(tenants => {
+                console.log('Tenants data:', tenants);
+                const select = document.getElementById('tenantId');
+                tenants.forEach(tenant => {
+                    const option = document.createElement('option');
+                    option.value = tenant.TenantID;
+                    option.textContent = tenant.Name;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching tenants:', error);
+                document.getElementById('result').textContent = 'Error fetching tenants: ' + error.message;
+            });
 
-    document.getElementById('agentForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const agentData = Object.fromEntries(formData.entries());
+        document.getElementById('agentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted');
+            const formData = new FormData(this);
+            const agentData = Object.fromEntries(formData.entries());
+            console.log('Agent data:', agentData);
 
-        fetch('/api/agents', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(agentData),
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('result').innerHTML = `Agent added successfully! Agent ID: ${data.agentId}. <a href="/payment-details.html?agentId=${data.agentId}">Add Payment Details</a>`;
-            document.getElementById('result').className = 'success';
-        })
-        .catch(error => {
-            document.getElementById('result').textContent = 'Error adding agent: ' + error.message;
-            document.getElementById('result').className = 'error';
+            fetch('/api/agents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(agentData),
+            })
+            .then(response => {
+                console.log('Agent response received:', response);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Agent added:', data);
+                document.getElementById('result').innerHTML = `Agent added successfully! Agent ID: ${data.agentId}. <a href="/payment-details.html?agentId=${data.agentId}">Add Payment Details</a>`;
+            })
+            .catch(error => {
+                console.error('Error adding agent:', error);
+                document.getElementById('result').textContent = 'Error adding agent: ' + error.message;
+            });
         });
     });
     </script>
