@@ -3,6 +3,7 @@ const mysql = require('mysql2/promise');
 const multer = require('multer');
 const { parse } = require('csv-parse');
 
+const app = express();
 app.use(express.json());
 
 const pool = mysql.createPool({
@@ -14,6 +15,9 @@ const pool = mysql.createPool({
         rejectUnauthorized: false
     }
 });
+
+// Set up multer for handling file uploads
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Test endpoint
 app.get('/api/test', (req, res) => {
@@ -123,6 +127,34 @@ app.post('/api/agents', async (req, res) => {
     } finally {
         conn.release();
     }
+});
+
+// CSV upload and parse endpoint
+app.post('/api/upload-csv', upload.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const csvData = req.file.buffer.toString();
+
+    parse(csvData, {
+        columns: true,
+        skip_empty_lines: true
+    }, (err, records) => {
+        if (err) {
+            console.error('Error parsing CSV:', err);
+            return res.status(500).json({ error: 'Error parsing CSV file' });
+        }
+
+        if (records.length === 0) {
+            return res.status(400).json({ error: 'CSV file is empty' });
+        }
+
+        const headers = Object.keys(records[0]);
+        const rows = records.map(record => Object.values(record));
+
+        res.json({ headers, rows });
+    });
 });
 
 module.exports = app;
