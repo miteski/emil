@@ -1,0 +1,126 @@
+body {
+    font-family: Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: url('insurance-background.jpg') no-repeat center center/cover;
+    color: #fff;
+    padding: 50px 0;
+    text-align: center;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 50px;
+}
+
+nav img {
+    height: 50px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.header-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.header-content h1 {
+    font-size: 48px;
+}
+
+.header-content p {
+    font-size: 24px;
+    margin: 20px 0;
+}
+
+.cta-button {
+    background: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+section {
+    padding: 50px;
+    text-align: center;
+}
+
+.feature {
+    display: inline-block;
+    width: 30%;
+    margin: 0 10px;
+    text-align: left;
+}
+
+.feature img {
+    height: 50px;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+.feature h3 {
+    font-size: 24px;
+}
+
+.testimonial {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.testimonial img {
+    float: left;
+    margin-right: 20px;
+    border-radius: 50%;
+    height: 50px;
+}
+
+footer {
+    background: #f8f8f8;
+    padding: 20px;
+    text-align: center;
+}
+
+footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+footer a {
+    text-decoration: none;
+    color: #333;
+}
+
+.social-media {
+    margin: 20px 0;
+}
+
+.social-media a {
+    margin: 0 10px;
+}
+
+.contact-info p {
+    margin: 5px 0;
+}
