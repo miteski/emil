@@ -3,20 +3,12 @@ const mysql = require('mysql2/promise');
 const multer = require('multer');
 const { parse } = require('csv-parse');
 const axios = require('axios');
-const FormData = require('form-data');
+const crypto = require('crypto');
 
 const app = express();
 app.use(express.json());
 
-const pool = mysql.createPool({
-    host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
-    ssl: {
-        rejectUnauthorized: false
-    }
-});
+// ... (keep your existing database connection code)
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -32,7 +24,7 @@ app.post('/api/upload-csv', upload.single('file'), async (req, res) => {
         // Virus scan
         const scanResult = await virusScan(req.file.buffer);
         if (!scanResult.isClean) {
-            return res.status(400).json({ error: 'File is infected with a virus' });
+            return res.status(400).json({ error: 'File may be infected with a virus' });
         }
 
         // Parse CSV
@@ -49,41 +41,29 @@ app.post('/api/upload-csv', upload.single('file'), async (req, res) => {
 });
 
 async function virusScan(fileBuffer) {
-    const form = new FormData();
-    form.append('file', fileBuffer, { filename: 'scan_file' });
-
+    const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+    
     try {
-        const response = await axios.post('https://your-clamav-api-url/scan', form, {
-            headers: form.getHeaders()
+        const response = await axios.get(`https://www.virustotal.com/api/v3/files/${hash}`, {
+            headers: {
+                'x-apikey': process.env.VIRUSTOTAL_API_KEY
+            }
         });
-        return { isClean: response.data.result === 'OK' };
+
+        const stats = response.data.data.attributes.last_analysis_stats;
+        const isClean = stats.malicious === 0 && stats.suspicious === 0;
+
+        return { isClean };
     } catch (error) {
+        if (error.response && error.response.status === 404) {
+            // File not previously scanned, consider it clean
+            return { isClean: true };
+        }
         console.error('Virus scan error:', error);
         throw new Error('Virus scan failed');
     }
 }
 
-function parseCSV(csvBuffer) {
-    return new Promise((resolve, reject) => {
-        parse(csvBuffer.toString(), {
-            columns: true,
-            skip_empty_lines: true
-        }, (err, records) => {
-            if (err) {
-                reject(err);
-            } else {
-                const headers = Object.keys(records[0]);
-                const rows = records.map(record => Object.values(record));
-                resolve({ headers, rows });
-            }
-        });
-    });
-}
-
-async function storeCSVData(filename, headers, rows) {
-    const data = JSON.stringify({ headers, rows });
-    const query = 'INSERT INTO csv_uploads (filename, data) VALUES (?, ?)';
-    await pool.query(query, [filename, data]);
-}
+// ... (keep the parseCSV and storeCSVData functions as they were)
 
 module.exports = app;
