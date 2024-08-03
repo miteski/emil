@@ -20,13 +20,19 @@ const pool = mysql.createPool({
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Test endpoint
+// API Routes
 app.get('/api/test', (req, res) => {
     res.json({ message: 'API is working' });
 });
 
-// Fetch tenants
-app.get('/api/tenants', async (req, res) => {
+app.get('/api/tenants', getTenants);
+app.get('/api/agents', getAgents);
+app.post('/api/agents', addAgent);
+app.post('/api/payment-details', addPaymentDetails);
+app.post('/api/upload-csv', upload.single('file'), uploadCSV);
+
+// Route Handlers
+async function getTenants(req, res) {
     try {
         console.log('Fetching tenants...');
         const [rows] = await pool.query('SELECT TenantID, Name FROM Tenant');
@@ -36,10 +42,9 @@ app.get('/api/tenants', async (req, res) => {
         console.error('Error fetching tenants:', error);
         res.status(500).json({ error: 'Error fetching tenants', details: error.message });
     }
-});
+}
 
-// Fetch agents
-app.get('/api/agents', async (req, res) => {
+async function getAgents(req, res) {
     console.log('Fetching agents...');
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
@@ -78,10 +83,9 @@ app.get('/api/agents', async (req, res) => {
         console.error('Error fetching agents:', error);
         res.status(500).json({ error: 'Error fetching agents', details: error.message });
     }
-});
+}
 
-// Add new agent
-app.post('/api/agents', async (req, res) => {
+async function addAgent(req, res) {
     const { fullname, email, tenantId } = req.body;
     
     try {
@@ -96,10 +100,9 @@ app.post('/api/agents', async (req, res) => {
         console.error('Error adding agent:', error);
         res.status(500).json({ error: 'Error adding agent', details: error.message });
     }
-});
+}
 
-// Add payment details
-app.post('/api/payment-details', async (req, res) => {
+async function addPaymentDetails(req, res) {
     const { agentId, bankName, iban, bic, accountHolderName, paymentMethod } = req.body;
     
     try {
@@ -119,34 +122,29 @@ app.post('/api/payment-details', async (req, res) => {
         console.error('Error adding payment details:', error);
         res.status(500).json({ error: 'Error adding payment details', details: error.message });
     }
-});
+}
 
-// CSV upload and parse endpoint
-app.post('/api/upload-csv', upload.single('file'), async (req, res) => {
+async function uploadCSV(req, res) {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
 
     try {
-        // Virus scan
         const scanResult = await virusScan(req.file.buffer);
         if (!scanResult.isClean) {
             return res.status(400).json({ error: 'File may be infected with a virus' });
         }
 
-        // Parse CSV
         const { headers, rows } = await parseCSV(req.file.buffer);
-
-        // Store in database (you'll need to implement this function)
-        // await storeCSVData(req.file.originalname, headers, rows);
 
         res.json({ message: 'File uploaded, scanned, and parsed successfully', headers, rows });
     } catch (error) {
         console.error('Error processing file:', error);
         res.status(500).json({ error: 'Error processing file', details: error.message });
     }
-});
+}
 
+// Helper Functions
 async function virusScan(fileBuffer) {
     const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
     
@@ -163,7 +161,6 @@ async function virusScan(fileBuffer) {
         return { isClean, hash };
     } catch (error) {
         if (error.response && error.response.status === 404) {
-            // File not previously scanned, consider it clean
             return { isClean: true, hash };
         }
         console.error('Virus scan error:', error);
@@ -187,5 +184,12 @@ function parseCSV(csvBuffer) {
         });
     });
 }
+
+// Debugging Information
+console.log('Environment Variables:');
+console.log('MYSQL_HOST:', process.env.MYSQL_HOST);
+console.log('MYSQL_USER:', process.env.MYSQL_USER);
+console.log('MYSQL_DATABASE:', process.env.MYSQL_DATABASE);
+console.log('VIRUSTOTAL_API_KEY:', process.env.VIRUSTOTAL_API_KEY ? 'Set' : 'Not Set');
 
 module.exports = app;
