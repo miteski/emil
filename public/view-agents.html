@@ -5,79 +5,160 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Agents - Insurance Management System</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #debugInfo {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
     <nav>
-        <a href="/" class="logo">emil</a>
-        <a href="/add-agent.html">Add Agent</a>
-        <a href="/view-agents.html">View Agents</a>
+        <div class="container">
+            <a href="/" class="logo">emil</a>
+            <div>
+                <a href="/add-agent.html">Add Agent</a>
+                <a href="/view-agents.html">View Agents</a>
+                <a href="/upload-csv.html">Upload CSV</a>
+                <a href="/payment-details.html">Add Payment Details</a>
+            </div>
+        </div>
     </nav>
-    <h1>View Agents</h1>
     
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search by name or email">
-        <button onclick="searchAgents()">Search</button>
-        <button onclick="clearSearch()">Clear</button>
+    <div class="container">
+        <h1>View Agents</h1>
+        
+        <button onclick="openAddAgentModal()">Add Agent</button>
+        <button onclick="deleteSelectedAgents()">Delete Selected Agents</button>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by name or email">
+            <button onclick="searchAgents()">Search</button>
+            <button onclick="clearSearch()">Clear</button>
+        </div>
+
+        <table id="agentsTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Tenant</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="agentsTableBody">
+                <!-- Agent rows will be populated here -->
+            </tbody>
+        </table>
+
+        <div class="pagination">
+            <button onclick="changePage(-1)">Previous</button>
+            <span id="currentPage">1</span>
+            <button onclick="changePage(1)">Next</button>
+        </div>
     </div>
 
-    <div id="debug"></div>
-
-    <table id="agentsTable">
-        <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Tenant</th>
-            </tr>
-        </thead>
-        <tbody id="agentsTableBody">
-            <!-- Agent rows will be populated here -->
-        </tbody>
-    </table>
-
-    <div class="pagination">
-        <button onclick="changePage(-1)">Previous</button>
-        <span id="currentPage">1</span>
-        <button onclick="changePage(1)">Next</button>
+    <div id="addAgentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addAgentModal')">&times;</span>
+            <h2 id="modalTitle">Add Agent</h2>
+            <form id="agentForm">
+                <input type="hidden" id="agentId">
+                <label for="fullname">Full Name:</label>
+                <input type="text" id="fullname" name="fullname" required>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                
+                <label for="tenantId">Tenant:</label>
+                <select id="tenantId" name="tenantId" required>
+                    <option value="">Select Tenant</option>
+                </select>
+                
+                <button type="submit">Save Agent</button>
+            </form>
+        </div>
     </div>
+
+    <button onclick="toggleDebugInfo()" style="position: fixed; bottom: 10px; right: 10px;">Debug Info</button>
+    <div id="debugInfo"></div>
 
     <script>
     let currentPage = 1;
     const pageSize = 10;
 
     function fetchAgents(page, search = '') {
-        document.getElementById('debug').innerHTML = 'Fetching agents...';
+        console.log(`Fetching agents for page ${page}, search: "${search}"`);
         fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`)
             .then(response => {
+                console.log('Response status:', response.status);
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                    });
                 }
                 return response.json();
             })
             .then(data => {
                 console.log('Agents data received:', data);
-                document.getElementById('debug').innerHTML += '<br>Data received: ' + JSON.stringify(data);
                 const tableBody = document.getElementById('agentsTableBody');
                 tableBody.innerHTML = '';
                 if (data.agents && data.agents.length > 0) {
                     data.agents.forEach(agent => {
                         const row = `<tr>
+                            <td><input type="checkbox" class="agentCheckbox" value="${agent.AgentID}"></td>
                             <td>${agent.Fullname}</td>
                             <td>${agent.Email}</td>
-                            <td>${agent.TenantName}</td>
+                            <td>${agent.TenantName || 'N/A'}</td>
+                            <td>
+                                <button onclick="editAgent(${agent.AgentID})">Edit</button>
+                                <button onclick="deleteAgent(${agent.AgentID})">Delete</button>
+                            </td>
                         </tr>`;
                         tableBody.innerHTML += row;
                     });
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="3">No agents found</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="5">No agents found</td></tr>';
                 }
                 document.getElementById('currentPage').textContent = page;
-                document.getElementById('debug').innerHTML += '<br>Table updated';
             })
             .catch(error => {
                 console.error('Error fetching agents:', error);
-                document.getElementById('agentsTableBody').innerHTML = `<tr><td colspan="3">Error fetching agents: ${error.message}</td></tr>`;
-                document.getElementById('debug').innerHTML += '<br>Error: ' + error.message;
+                document.getElementById('agentsTableBody').innerHTML = `<tr><td colspan="5">Error fetching agents: ${error.message}</td></tr>`;
             });
     }
 
@@ -100,10 +181,135 @@
         fetchAgents(currentPage, searchTerm);
     }
 
-    // Initial fetch
-    document.addEventListener('DOMContentLoaded', function() {
-        fetchAgents(currentPage);
+    function openAddAgentModal() {
+        document.getElementById('modalTitle').textContent = 'Add Agent';
+        document.getElementById('agentId').value = '';
+        document.getElementById('agentForm').reset();
+        document.getElementById('addAgentModal').style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    function editAgent(agentId) {
+        fetch(`/api/agents/${agentId}`)
+            .then(response => response.json())
+            .then(agent => {
+                document.getElementById('modalTitle').textContent = 'Edit Agent';
+                document.getElementById('agentId').value = agent.AgentID;
+                document.getElementById('fullname').value = agent.Fullname;
+                document.getElementById('email').value = agent.Email;
+                document.getElementById('tenantId').value = agent.TenantID;
+                document.getElementById('addAgentModal').style.display = 'block';
+            })
+            .catch(error => console.error('Error fetching agent details:', error));
+    }
+
+    function deleteAgent(agentId) {
+        if (confirm('Are you sure you want to delete this agent?')) {
+            fetch(`/api/agents/${agentId}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    fetchAgents(currentPage);
+                })
+                .catch(error => console.error('Error deleting agent:', error));
+        }
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.getElementsByClassName('agentCheckbox');
+        for (let checkbox of checkboxes) {
+            checkbox.checked = selectAll.checked;
+        }
+    }
+
+    function deleteSelectedAgents() {
+        const selectedAgents = Array.from(document.getElementsByClassName('agentCheckbox'))
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+
+        if (selectedAgents.length === 0) {
+            alert('No agents selected');
+            return;
+        }
+
+        if (confirm(`Are you sure you want to delete ${selectedAgents.length} agent(s)?`)) {
+            fetch('/api/agents/bulk-delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ agentIds: selectedAgents }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchAgents(currentPage);
+            })
+            .catch(error => console.error('Error deleting agents:', error));
+        }
+    }
+
+    document.getElementById('agentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const agentId = document.getElementById('agentId').value;
+        const formData = new FormData(this);
+        const agentData = Object.fromEntries(formData.entries());
+
+        const url = agentId ? `/api/agents/${agentId}` : '/api/agents';
+        const method = agentId ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(agentData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            closeModal('addAgentModal');
+            fetchAgents(currentPage);
+        })
+        .catch(error => console.error('Error saving agent:', error));
     });
+
+    function toggleDebugInfo() {
+        const debugInfo = document.getElementById('debugInfo');
+        if (debugInfo.style.display === 'none') {
+            debugInfo.style.display = 'block';
+            debugInfo.innerHTML = `
+                <h3>Debug Information</h3>
+                <p>Current Page: ${currentPage}</p>
+                <p>Page Size: ${pageSize}</p>
+                <p>Search Term: ${document.getElementById('searchInput').value}</p>
+                <p>Last API Call: ${new Date().toLocaleString()}</p>
+            `;
+        } else {
+            debugInfo.style.display = 'none';
+        }
+    }
+
+    // Initial fetch
+    fetchAgents(currentPage);
+
+    // Fetch tenants for the dropdown
+    fetch('/api/tenants')
+        .then(response => response.json())
+        .then(tenants => {
+            const select = document.getElementById('tenantId');
+            tenants.forEach(tenant => {
+                const option = document.createElement('option');
+                option.value = tenant.TenantID;
+                option.textContent = tenant.Name;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching tenants:', error));
     </script>
 </body>
 </html>
