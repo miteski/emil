@@ -28,6 +28,10 @@ app.get('/api/test', (req, res) => {
 app.get('/api/tenants', getTenants);
 app.get('/api/agents', getAgents);
 app.post('/api/agents', addAgent);
+app.get('/api/agents/:id', getAgent);
+app.put('/api/agents/:id', updateAgent);
+app.delete('/api/agents/:id', deleteAgent);
+app.post('/api/agents/bulk-delete', bulkDeleteAgents);
 app.post('/api/payment-details', addPaymentDetails);
 app.post('/api/upload-csv', upload.single('file'), uploadCSV);
 
@@ -99,6 +103,58 @@ async function addAgent(req, res) {
     } catch (error) {
         console.error('Error adding agent:', error);
         res.status(500).json({ error: 'Error adding agent', details: error.message });
+    }
+}
+
+async function getAgent(req, res) {
+    const agentId = req.params.id;
+    try {
+        const [rows] = await pool.query('SELECT * FROM Agent WHERE AgentID = ?', [agentId]);
+        if (rows.length === 0) {
+            res.status(404).json({ error: 'Agent not found' });
+        } else {
+            res.json(rows[0]);
+        }
+    } catch (error) {
+        console.error('Error fetching agent:', error);
+        res.status(500).json({ error: 'Error fetching agent', details: error.message });
+    }
+}
+
+async function updateAgent(req, res) {
+    const agentId = req.params.id;
+    const { fullname, email, tenantId } = req.body;
+    try {
+        await pool.query(
+            'UPDATE Agent SET Fullname = ?, Email = ?, TenantID = ? WHERE AgentID = ?',
+            [fullname, email, tenantId, agentId]
+        );
+        res.json({ message: 'Agent updated successfully' });
+    } catch (error) {
+        console.error('Error updating agent:', error);
+        res.status(500).json({ error: 'Error updating agent', details: error.message });
+    }
+}
+
+async function deleteAgent(req, res) {
+    const agentId = req.params.id;
+    try {
+        await pool.query('DELETE FROM Agent WHERE AgentID = ?', [agentId]);
+        res.json({ message: 'Agent deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting agent:', error);
+        res.status(500).json({ error: 'Error deleting agent', details: error.message });
+    }
+}
+
+async function bulkDeleteAgents(req, res) {
+    const { agentIds } = req.body;
+    try {
+        await pool.query('DELETE FROM Agent WHERE AgentID IN (?)', [agentIds]);
+        res.json({ message: `${agentIds.length} agent(s) deleted successfully` });
+    } catch (error) {
+        console.error('Error deleting agents:', error);
+        res.status(500).json({ error: 'Error deleting agents', details: error.message });
     }
 }
 
@@ -185,11 +241,13 @@ function parseCSV(csvBuffer) {
     });
 }
 
-// Debugging Information
-console.log('Environment Variables:');
-console.log('MYSQL_HOST:', process.env.MYSQL_HOST);
-console.log('MYSQL_USER:', process.env.MYSQL_USER);
-console.log('MYSQL_DATABASE:', process.env.MYSQL_DATABASE);
-console.log('VIRUSTOTAL_API_KEY:', process.env.VIRUSTOTAL_API_KEY ? 'Set' : 'Not Set');
-
 module.exports = app;
+
+// Debugging Information
+console.log('=== Debugging Information ===');
+console.log('Node.js version:', process.version);
+console.log('Environment:', process.env.NODE_ENV);
+console.log('Database Host:', process.env.MYSQL_HOST);
+console.log('Database Name:', process.env.MYSQL_DATABASE);
+console.log('VirusTotal API Key:', process.env.VIRUSTOTAL_API_KEY ? 'Set' : 'Not Set');
+console.log('=============================');
