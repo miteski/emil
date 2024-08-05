@@ -18,6 +18,30 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+// Simple test function
+async function runTests() {
+  console.log('Running tests...');
+  
+  try {
+    // Test database connection
+    await pool.query('SELECT 1');
+    console.log('Database connection test passed');
+
+    // Test tenant fetch
+    const [tenants] = await pool.query('SELECT * FROM Tenant LIMIT 1');
+    if (tenants.length > 0) {
+      console.log('Tenant fetch test passed');
+    } else {
+      console.log('Tenant fetch test failed: No tenants found');
+    }
+
+    console.log('All tests passed');
+  } catch (error) {
+    console.error('Test failed:', error);
+    process.exit(1);  // Exit with error code
+  }
+}
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 // API Routes
@@ -241,7 +265,16 @@ function parseCSV(csvBuffer) {
     });
 }
 
-module.exports = app;
+// Run tests before starting the server
+runTests().then(() => {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}).catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
 
 // Debugging Information
 console.log('=== Debugging Information ===');
