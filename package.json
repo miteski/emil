@@ -1,5 +1,9 @@
 {
   "scripts": {
+    "start": "node index.js"
+  },
+{
+  "scripts": {
     "start": "node index.js",
     "test": "node test.js"
   },
@@ -12,3 +16,5 @@
     "dotenv": "^8.2.0"
   }
 }
+}
+
