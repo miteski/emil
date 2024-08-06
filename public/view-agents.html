@@ -1,262 +1,234 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Agents - Insurance Management System</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
+        body { 
+            padding-top: 60px; 
+            font-family: 'Poppins', sans-serif;
         }
-        .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
-            padding: 0 20px;
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.5rem;
         }
-        nav {
-            background-color: #1a237e;
-            color: white;
-            padding: 1rem 0;
-            margin-bottom: 0;
-        }
-        nav .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 0 15px;
-        }
-        .logo {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        .sub-header {
-            background-color: #424242;
-            color: white;
-            padding: 0.5rem 0;
-            margin: 0;
-        }
-        .sub-header h1 {
-            margin: 0;
-            font-size: 1.2em;
-            font-weight: 300;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 600px;
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
+        .modal-dialog { max-width: 500px; }
         #debugInfo {
-            display: none;
-            margin-top: 20px;
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
             padding: 10px;
-            background-color: #f0f0f0;
-            border: 1px solid #ddd;
-        }
-        .error-message {
-            color: red;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .form-section {
-            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+            font-size: 0.8rem;
         }
         .commission-rule {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
-        .add-rule-btn {
-            margin-top: 10px;
+        .page-title {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
-        .green-check {
-            color: green;
-        }
-        .red-x {
-            color: red;
-        }
-        button {
-            background-color: #1a237e;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            margin: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #3949ab;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f2f2f2;
+        .page-title h1 {
+            margin: 0;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div class="container">
-            <a href="/" class="logo">emil</a>
-            <div>
-                <a href="/add-agent.html">Add Agent</a>
-                <a href="/view-agents.html">View Agents</a>
-                <a href="/upload-csv.html">Upload CSV</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">emil</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/view-agents.html">View Agents</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/upload-csv.html">Upload Policies</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
-    <div class="sub-header">
-        <div class="container">
+
+    <div class="container mt-4">
+        <div class="page-title">
             <h1>View Agents</h1>
         </div>
-    </div>
-    
-    <div class="container">
-        <button onclick="openAddAgentModal()">Add Agent</button>
-        <button onclick="deleteSelectedAgents()">Delete Selected Agents</button>
         
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search by name or email">
-            <button onclick="searchAgents()">Search</button>
-            <button onclick="clearSearch()">Clear</button>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <button class="btn btn-primary me-2" onclick="openAddAgentModal()">
+                    <i class="bi bi-person-plus"></i> Add Agent
+                </button>
+                <button class="btn btn-danger" onclick="deleteSelectedAgents()">
+                    <i class="bi bi-trash"></i> Delete Selected Agents
+                </button>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
+                    <button class="btn btn-outline-secondary" type="button" onclick="searchAgents()">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                    <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <div id="errorMessage" class="error-message"></div>
+        <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
 
-        <table id="agentsTable">
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
-                    <th>Full Name</th>
-                    <th>Tenant</th>
-                    <th>Banking Info</th>
-                    <th>Commission Rules</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="agentsTableBody">
-                <!-- Agent rows will be populated here -->
-            </tbody>
-        </table>
-
-        <div class="pagination">
-            <button onclick="changePage(-1)">Previous</button>
-            <span id="currentPage">1</span>
-            <button onclick="changePage(1)">Next</button>
+        <div class="table-responsive">
+            <table id="agentsTable" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
+                        <th>Full Name</th>
+                        <th>Tenant</th>
+                        <th>Banking Info</th>
+                        <th>Commission Rules</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="agentsTableBody">
+                    <!-- Agent rows will be populated here -->
+                </tbody>
+            </table>
         </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(-1)" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link" id="currentPage">1</span>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#" onclick="changePage(1)" aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 
     <!-- Basic Info Modal -->
-    <div id="basicInfoModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('basicInfoModal')">&times;</span>
-            <h2 id="basicInfoModalTitle">Agent Basic Info</h2>
-            <form id="basicInfoForm">
-                <input type="hidden" id="agentId">
-                <label for="fullname">Full Name:</label>
-                <input type="text" id="fullname" name="fullname" required>
-                
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                
-                <label for="tenantId">Tenant:</label>
-                <select id="tenantId" name="tenantId" required>
-                    <option value="">Select Tenant</option>
-                </select>
-                
-                <button type="submit">Save Basic Info</button>
-            </form>
+    <div class="modal fade" id="basicInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="basicInfoModalTitle">Agent Basic Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="basicInfoForm">
+                        <input type="hidden" id="agentId">
+                        <div class="mb-3">
+                            <label for="fullname" class="form-label">Full Name:</label>
+                            <input type="text" class="form-control" id="fullname" name="fullname" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tenantId" class="form-label">Tenant:</label>
+                            <select class="form-select" id="tenantId" name="tenantId" required>
+                                <option value="">Select Tenant</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Basic Info</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Banking Info Modal -->
-    <div id="bankingInfoModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('bankingInfoModal')">&times;</span>
-            <h2>Agent Banking Info</h2>
-            <form id="bankingInfoForm">
-                <input type="hidden" id="bankingAgentId">
-                <label for="bankName">Bank Name:</label>
-                <input type="text" id="bankName" name="bankName" required>
-                
-                <label for="iban">IBAN:</label>
-                <input type="text" id="iban" name="iban" required>
-                
-                <label for="bic">BIC:</label>
-                <input type="text" id="bic" name="bic" required>
-                
-                <label for="accountHolderName">Account Holder Name:</label>
-                <input type="text" id="accountHolderName" name="accountHolderName" required>
-                
-                <label for="paymentMethod">Payment Method:</label>
-                <input type="text" id="paymentMethod" name="paymentMethod" required>
-                
-                <button type="submit">Save Banking Info</button>
-            </form>
+    <div class="modal fade" id="bankingInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agent Banking Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="bankingInfoForm">
+                        <input type="hidden" id="bankingAgentId">
+                        <div class="mb-3">
+                            <label for="bankName" class="form-label">Bank Name:</label>
+                            <input type="text" class="form-control" id="bankName" name="bankName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="iban" class="form-label">IBAN:</label>
+                            <input type="text" class="form-control" id="iban" name="iban" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bic" class="form-label">BIC:</label>
+                            <input type="text" class="form-control" id="bic" name="bic" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="accountHolderName" class="form-label">Account Holder Name:</label>
+                            <input type="text" class="form-control" id="accountHolderName" name="accountHolderName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="paymentMethod" class="form-label">Payment Method:</label>
+                            <input type="text" class="form-control" id="paymentMethod" name="paymentMethod" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Banking Info</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Commission Rules Modal -->
-    <div id="commissionRulesModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('commissionRulesModal')">&times;</span>
-            <h2>Agent Commission Rules</h2>
-            <form id="commissionRulesForm">
-                <input type="hidden" id="commissionAgentId">
-                <div id="commissionRulesFields"></div>
-                <button type="button" class="add-rule-btn" onclick="addCommissionRule()">Add Rule</button>
-                <button type="submit">Save Commission Rules</button>
-            </form>
+    <div class="modal fade" id="commissionRulesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agent Commission Rules</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="commissionRulesForm">
+                        <input type="hidden" id="commissionAgentId">
+                        <div id="commissionRulesFields"></div>
+                        <button type="button" class="btn btn-secondary mb-3" onclick="addCommissionRule()">Add Rule</button>
+                        <button type="submit" class="btn btn-primary">Save Commission Rules</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
-    <button onclick="toggleDebugInfo()" style="position: fixed; bottom: 10px; right: 10px;">Debug Info</button>
+    <button class="btn btn-sm btn-secondary position-fixed bottom-0 end-0 m-3" onclick="toggleDebugInfo()">
+        <i class="bi bi-bug"></i>
+    </button>
     <div id="debugInfo"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     let currentPage = 1;
     const pageSize = 10;
@@ -285,28 +257,38 @@
                             <td><input type="checkbox" class="agentCheckbox" value="${agent.AgentID}"></td>
                             <td>${agent.Fullname}</td>
                             <td>${agent.TenantName || 'N/A'}</td>
-                            <td>${agent.hasBankingInfo ? '<span class="green-check">✓</span>' : '<span class="red-x">✗</span>'}</td>
-                            <td>${agent.hasCommissionRules ? '<span class="green-check">✓</span>' : '<span class="red-x">✗</span>'}</td>
+                            <td>${agent.hasBankingInfo ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>'}</td>
+                            <td>${agent.hasCommissionRules ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>'}</td>
                             <td>
-                                <button onclick="editBasicInfo(${agent.AgentID})">Basic Info</button>
-                                <button onclick="editBankingInfo(${agent.AgentID})">Banking Info</button>
-                                <button onclick="editCommissionRules(${agent.AgentID})">Commission Rules</button>
-                                <button onclick="deleteAgent(${agent.AgentID})">Delete</button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="editBasicInfo(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Basic Info">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" onclick="editBankingInfo(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Banking Info">
+                                    <i class="bi bi-bank"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success" onclick="editCommissionRules(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Commission Rules">
+                                    <i class="bi bi-percent"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAgent(${agent.AgentID})" data-bs-toggle="tooltip" title="Delete Agent">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </td>
                         </tr>`;
                         tableBody.innerHTML += row;
                     });
+                    initTooltips();
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="6">No agents found</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No agents found</td></tr>';
                 }
                 document.getElementById('currentPage').textContent = page;
-                document.getElementById('errorMessage').textContent = '';
+                document.getElementById('errorMessage').style.display = 'none';
                 lastError = '';
             })
             .catch(error => {
                 console.error('Error fetching agents:', error);
-                document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="6">Failed to load records</td></tr>';
+                document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Failed to load records</td></tr>';
                 document.getElementById('errorMessage').textContent = 'Failed to load records';
+                document.getElementById('errorMessage').style.display = 'block';
                 lastError = error.message;
                 updateDebugInfo();
             });
@@ -335,11 +317,7 @@
         document.getElementById('basicInfoModalTitle').textContent = 'Add Agent';
         document.getElementById('agentId').value = '';
         document.getElementById('basicInfoForm').reset();
-        document.getElementById('basicInfoModal').style.display = 'block';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
+        new bootstrap.Modal(document.getElementById('basicInfoModal')).show();
     }
 
     function editBasicInfo(agentId) {
@@ -351,7 +329,7 @@
                 document.getElementById('fullname').value = agent.Fullname;
                 document.getElementById('email').value = agent.Email;
                 document.getElementById('tenantId').value = agent.TenantID;
-                document.getElementById('basicInfoModal').style.display = 'block';
+                new bootstrap.Modal(document.getElementById('basicInfoModal')).show();
             })
             .catch(error => console.error('Error fetching agent details:', error));
     }
@@ -366,9 +344,12 @@
                 document.getElementById('bic').value = bankingInfo.BIC || '';
                 document.getElementById('accountHolderName').value = bankingInfo.AccountHolderName || '';
                 document.getElementById('paymentMethod').value = bankingInfo.PaymentMethod || '';
-                document.getElementById('bankingInfoModal').style.display = 'block';
+                new bootstrap.Modal(document.getElementById('bankingInfoModal')).show();
             })
-            .catch(error => console.error('Error fetching banking info:', error));
+            .catch(error => {
+                console.error('Error fetching banking info:', error);
+                alert('Failed to fetch banking information. Please try again.');
+            });
     }
 
     function editCommissionRules(agentId) {
@@ -385,7 +366,7 @@
                     commissionRules.forEach(rule => addCommissionRule(rule));
                 }
                 
-                document.getElementById('commissionRulesModal').style.display = 'block';
+                new bootstrap.Modal(document.getElementById('commissionRulesModal')).show();
             })
             .catch(error => console.error('Error fetching commission rules:', error));
     }
@@ -395,16 +376,32 @@
         const ruleDiv = document.createElement('div');
         ruleDiv.className = 'commission-rule';
         ruleDiv.innerHTML = `
-            <select name="CoverageID" required>
-                <option value="">Select Coverage</option>
-                          ${coverages.map(coverage => `<option value="${coverage.CoverageID}"${rule && rule.CoverageID === coverage.CoverageID ? ' selected' : ''}>${coverage.CoverageDescription}</option>`).join('')}
-            </select>
-            <input type="number" name="Premium_Commission_Percentage" placeholder="Commission from Premium (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Premium_Commission_Percentage : ''}">
-            <input type="number" name="Percentage_In_Advance" placeholder="Portion of Commission paid in Advance (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_In_Advance : ''}">
-            <input type="number" name="Percentage_On_Installments" placeholder="Portion of Commission paid with Installments (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_On_Installments : ''}">
-            <input type="date" name="StartDate" required value="${rule ? rule.StartDate.split('T')[0] : ''}">
-            <input type="date" name="EndDate" required value="${rule ? rule.EndDate.split('T')[0] : ''}">
-            <button type="button" onclick="this.parentElement.remove()">Remove</button>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <select name="CoverageID" class="form-select" required>
+                        <option value="">Select Coverage</option>
+                        ${coverages.map(coverage => `<option value="${coverage.CoverageID}"${rule && rule.CoverageID === coverage.CoverageID ? ' selected' : ''}>${coverage.CoverageDescription}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <input type="number" name="Premium_Commission_Percentage" class="form-control" placeholder="Commission from Premium (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Premium_Commission_Percentage : ''}">
+                </div>
+                <div class="col-md-6">
+                    <input type="number" name="Percentage_In_Advance" class="form-control" placeholder="Portion paid in Advance (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_In_Advance : ''}">
+                </div>
+                <div class="col-md-6">
+                    <input type="number" name="Percentage_On_Installments" class="form-control" placeholder="Portion paid with Installments (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_On_Installments : ''}">
+                </div>
+                <div class="col-md-6">
+                    <input type="date" name="StartDate" class="form-control" required value="${rule ? rule.StartDate.split('T')[0] : ''}">
+                </div>
+                <div class="col-md-6">
+                    <input type="date" name="EndDate" class="form-control" required value="${rule ? rule.EndDate.split('T')[0] : ''}">
+                </div>
+                <div class="col-12">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.commission-rule').remove()">Remove Rule</button>
+                </div>
+            </div>
         `;
         commissionRulesFields.appendChild(ruleDiv);
     }
@@ -458,6 +455,7 @@
 
     document.getElementById('basicInfoForm').addEventListener('submit', function(e) {
         e.preventDefault();
+
         const agentId = document.getElementById('agentId').value;
         const formData = new FormData(this);
         const agentData = Object.fromEntries(formData.entries());
@@ -475,7 +473,7 @@
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            closeModal('basicInfoModal');
+            bootstrap.Modal.getInstance(document.getElementById('basicInfoModal')).hide();
             fetchAgents(currentPage);
         })
         .catch(error => console.error('Error saving agent:', error));
@@ -497,7 +495,7 @@
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            closeModal('bankingInfoModal');
+            bootstrap.Modal.getInstance(document.getElementById('bankingInfoModal')).hide();
             fetchAgents(currentPage);
         })
         .catch(error => console.error('Error saving banking info:', error));
@@ -524,7 +522,7 @@
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            closeModal('commissionRulesModal');
+            bootstrap.Modal.getInstance(document.getElementById('commissionRulesModal')).hide();
             fetchAgents(currentPage);
         })
         .catch(error => console.error('Error saving commission rules:', error));
@@ -532,11 +530,9 @@
 
     function toggleDebugInfo() {
         const debugInfo = document.getElementById('debugInfo');
-        if (debugInfo.style.display === 'none') {
+        debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
+        if (debugInfo.style.display === 'block') {
             updateDebugInfo();
-            debugInfo.style.display = 'block';
-        } else {
-            debugInfo.style.display = 'none';
         }
     }
 
@@ -550,6 +546,13 @@
             <p>Last API Call: ${new Date().toLocaleString()}</p>
             <p>Last Error: ${lastError}</p>
         `;
+    }
+
+    function initTooltips() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
     }
 
     // Initial fetch
