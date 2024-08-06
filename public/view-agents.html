@@ -43,6 +43,11 @@
             background-color: #f0f0f0;
             border: 1px solid #ddd;
         }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +74,8 @@
             <button onclick="searchAgents()">Search</button>
             <button onclick="clearSearch()">Clear</button>
         </div>
+
+        <div id="errorMessage" class="error-message"></div>
 
         <table id="agentsTable">
             <thead>
@@ -120,6 +127,7 @@
     <script>
     let currentPage = 1;
     const pageSize = 10;
+    let lastError = '';
 
     function fetchAgents(page, search = '') {
         console.log(`Fetching agents for page ${page}, search: "${search}"`);
@@ -155,10 +163,15 @@
                     tableBody.innerHTML = '<tr><td colspan="5">No agents found</td></tr>';
                 }
                 document.getElementById('currentPage').textContent = page;
+                document.getElementById('errorMessage').textContent = '';
+                lastError = '';
             })
             .catch(error => {
                 console.error('Error fetching agents:', error);
-                document.getElementById('agentsTableBody').innerHTML = `<tr><td colspan="5">Error fetching agents: ${error.message}</td></tr>`;
+                document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="5">Failed to load records</td></tr>';
+                document.getElementById('errorMessage').textContent = 'Failed to load records';
+                lastError = error.message;
+                updateDebugInfo();
             });
     }
 
@@ -281,17 +294,23 @@
     function toggleDebugInfo() {
         const debugInfo = document.getElementById('debugInfo');
         if (debugInfo.style.display === 'none') {
+            updateDebugInfo();
             debugInfo.style.display = 'block';
-            debugInfo.innerHTML = `
-                <h3>Debug Information</h3>
-                <p>Current Page: ${currentPage}</p>
-                <p>Page Size: ${pageSize}</p>
-                <p>Search Term: ${document.getElementById('searchInput').value}</p>
-                <p>Last API Call: ${new Date().toLocaleString()}</p>
-            `;
         } else {
             debugInfo.style.display = 'none';
         }
+    }
+
+    function updateDebugInfo() {
+        const debugInfo = document.getElementById('debugInfo');
+        debugInfo.innerHTML = `
+            <h3>Debug Information</h3>
+            <p>Current Page: ${currentPage}</p>
+            <p>Page Size: ${pageSize}</p>
+            <p>Search Term: ${document.getElementById('searchInput').value}</p>
+            <p>Last API Call: ${new Date().toLocaleString()}</p>
+            <p>Last Error: ${lastError}</p>
+        `;
     }
 
     // Initial fetch
