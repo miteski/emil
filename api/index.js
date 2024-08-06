@@ -4,9 +4,11 @@ const multer = require('multer');
 const { parse } = require('csv-parse');
 const axios = require('axios');
 const crypto = require('crypto');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
+app.use(express.static('public'));
 
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
@@ -265,6 +267,10 @@ function parseCSV(csvBuffer) {
     });
 }
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // Run tests before starting the server
 runTests().then(() => {
   const port = process.env.PORT || 3000;
@@ -284,3 +290,27 @@ console.log('Database Host:', process.env.MYSQL_HOST);
 console.log('Database Name:', process.env.MYSQL_DATABASE);
 console.log('VirusTotal API Key:', process.env.VIRUSTOTAL_API_KEY ? 'Set' : 'Not Set');
 console.log('=============================');
+
+module.exports = app;
+```
+
+3. `package.json` (full file):
+
+```json
+{
+  "name": "emil-insurance-management",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "mkdir -p public && cp *.html public/"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql2": "^2.3.3",
+    "multer": "^1.4.5-lts.1",
+    "csv-parse": "^5.3.0",
+    "axios": "^0.27.2",
+    "dotenv": "^10.0.0"
+  }
+}
