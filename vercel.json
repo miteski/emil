@@ -6,7 +6,7 @@
       "use": "@vercel/node"
     },
     {
-      "src": "public/**/*",
+      "src": "public/**",
       "use": "@vercel/static"
     }
   ],
@@ -17,14 +17,14 @@
     },
     {
       "src": "/(.*)",
-      "dest": "public/$1"
+      "dest": "/public/$1"
     }
   ],
   "env": {
-    "VIRUSTOTAL_API_KEY": "VIRUSTOTAL_API_KEY",
-    "MYSQL_DATABASE": "MYSQL_DATABASE",
-    "MYSQL_PASSWORD": "MYSQL_PASSWORD",
-    "MYSQL_USER": "MYSQL_USER",
-    "MYSQL_HOST": "MYSQL_HOST"
+    "MYSQL_HOST": "@mysql_host",
+    "MYSQL_USER": "@mysql_user",
+    "MYSQL_PASSWORD": "@mysql_password",
+    "MYSQL_DATABASE": "@mysql_database",
+    "VIRUSTOTAL_API_KEY": "@virustotal_api_key"
   }
 }
