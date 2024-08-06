@@ -52,11 +52,13 @@
         .form-section {
             margin-bottom: 20px;
         }
-        .green-check {
-            color: green;
+        .commission-rule {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
         }
-        .red-x {
-            color: red;
+        .add-rule-btn {
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -166,9 +168,8 @@
             <h2>Agent Commission Rules</h2>
             <form id="commissionRulesForm">
                 <input type="hidden" id="commissionAgentId">
-                <div id="commissionRulesFields">
-                    <!-- Commission rule fields will be dynamically added here -->
-                </div>
+                <div id="commissionRulesFields"></div>
+                <button type="button" class="add-rule-btn" onclick="addCommissionRule()">Add Rule</button>
                 <button type="submit">Save Commission Rules</button>
             </form>
         </div>
@@ -181,6 +182,7 @@
     let currentPage = 1;
     const pageSize = 10;
     let lastError = '';
+    let coverages = [];
 
     function fetchAgents(page, search = '') {
         console.log(`Fetching agents for page ${page}, search: "${search}"`);
@@ -298,20 +300,34 @@
                 commissionRulesFields.innerHTML = '';
                 document.getElementById('commissionAgentId').value = agentId;
                 
-                commissionRules.forEach(rule => {
-                    const fieldHtml = `
-                        <div>
-                            <label for="coverageType_${rule.CoverageType}">${rule.CoverageType}:</label>
-                            <input type="number" id="coverageType_${rule.CoverageType}" name="coverageType_${rule.CoverageType}" 
-                                   value="${rule.CommissionPercentage}" min="0" max="100" step="0.01" required>
-                        </div>
-                    `;
-                    commissionRulesFields.innerHTML += fieldHtml;
-                });
+                if (commissionRules.length === 0) {
+                    addCommissionRule();
+                } else {
+                    commissionRules.forEach(rule => addCommissionRule(rule));
+                }
                 
                 document.getElementById('commissionRulesModal').style.display = 'block';
             })
             .catch(error => console.error('Error fetching commission rules:', error));
+    }
+
+    function addCommissionRule(rule = null) {
+        const commissionRulesFields = document.getElementById('commissionRulesFields');
+        const ruleDiv = document.createElement('div');
+        ruleDiv.className = 'commission-rule';
+        ruleDiv.innerHTML = `
+            <select name="CoverageID" required>
+                <option value="">Select Coverage</option>
+                ${coverages.map(coverage => `<option value="${coverage.CoverageID}"${rule && rule.CoverageID === coverage.CoverageID ? ' selected' : ''}>${coverage.CoverageDescription}</option>`).join('')}
+            </select>
+            <input type="number" name="Premium_Commission_Percentage" placeholder="Commission from Premium (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Premium_Commission_Percentage : ''}">
+            <input type="number" name="Percentage_In_Advance" placeholder="Portion of Commission paid in Advance (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_In_Advance : ''}">
+            <input type="number" name="Percentage_On_Installments" placeholder="Portion of Commission paid with Installments (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_On_Installments : ''}">
+            <input type="date" name="StartDate" required value="${rule ? rule.StartDate.split('T')[0] : ''}">
+            <input type="date" name="EndDate" required value="${rule ? rule.EndDate.split('T')[0] : ''}">
+            <button type="button" onclick="this.parentElement.remove()">Remove</button>
+        `;
+        commissionRulesFields.appendChild(ruleDiv);
     }
 
     function deleteAgent(agentId) {
@@ -363,6 +379,7 @@
 
     document.getElementById('basicInfoForm').addEventListener('submit', function(e) {
         e.preventDefault();
+
         const agentId = document.getElementById('agentId').value;
         const formData = new FormData(this);
         const agentData = Object.fromEntries(formData.entries());
@@ -411,15 +428,20 @@
     document.getElementById('commissionRulesForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const agentId = document.getElementById('commissionAgentId').value;
-        const formData = new FormData(this);
-        const commissionData = Object.fromEntries(formData.entries());
+        const rules = Array.from(this.querySelectorAll('.commission-rule')).map(ruleDiv => {
+            const rule = {};
+            ruleDiv.querySelectorAll('select, input').forEach(input => {
+                rule[input.name] = input.value;
+            });
+            return rule;
+        });
 
         fetch(`/api/agents/${agentId}/commission-rules`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(commissionData),
+            body: JSON.stringify(rules),
         })
         .then(response => response.json())
         .then(data => {
@@ -468,6 +490,14 @@
             });
         })
         .catch(error => console.error('Error fetching tenants:', error));
+
+    // Fetch coverages
+    fetch('/api/coverages')
+        .then(response => response.json())
+        .then(data => {
+            coverages = data;
+        })
+        .catch(error => console.error('Error fetching coverages:', error));
     </script>
 </body>
 </html>
