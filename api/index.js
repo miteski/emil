@@ -50,6 +50,7 @@ app.get('/api/agents/:id/banking-info', getBankingInfo);
 app.put('/api/agents/:id/banking-info', updateBankingInfo);
 app.get('/api/agents/:id/commission-rules', getCommissionRules);
 app.put('/api/agents/:id/commission-rules', updateCommissionRules);
+app.get('/api/coverages', getCoverages);
 app.post('/api/upload-csv', upload.single('file'), uploadCSV);
 
 // Route Handlers
@@ -247,10 +248,12 @@ async function updateBankingInfo(req, res) {
 async function getCommissionRules(req, res) {
     const agentId = req.params.id;
     try {
-        const [rows] = await pool.query(
-            'SELECT * FROM Agent_Coverage_Commission WHERE AgentID = ?',
-            [agentId]
-        );
+        const [rows] = await pool.query(`
+            SELECT acc.*, c.CoverageDescription
+            FROM Agent_Coverage_Commission acc
+            JOIN Coverages c ON acc.CoverageID = c.CoverageID
+            WHERE acc.AgentID = ?
+        `, [agentId]);
         res.json(rows);
     } catch (error) {
         console.error('Error fetching commission rules:', error);
@@ -269,14 +272,12 @@ async function updateCommissionRules(req, res) {
         await conn.query('DELETE FROM Agent_Coverage_Commission WHERE AgentID = ?', [agentId]);
 
         // Insert new commission rules
-        for (const [coverageType, percentage] of Object.entries(commissionRules)) {
-            if (coverageType.startsWith('coverageType_')) {
-                const type = coverageType.replace('coverageType_', '');
-                await conn.query(
-                    'INSERT INTO Agent_Coverage_Commission (AgentID, CoverageType, CommissionPercentage) VALUES (?, ?, ?)',
-                    [agentId, type, percentage]
-                );
-            }
+        for (const rule of commissionRules) {
+            await conn.query(`
+                INSERT INTO Agent_Coverage_Commission 
+                (AgentID, CoverageID, Premium_Commission_Percentage, Percentage_On_Installments, Percentage_In_Advance, StartDate, EndDate) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `, [agentId, rule.CoverageID, rule.Premium_Commission_Percentage, rule.Percentage_On_Installments, rule.Percentage_In_Advance, rule.StartDate, rule.EndDate]);
         }
 
         await conn.commit();
@@ -287,6 +288,16 @@ async function updateCommissionRules(req, res) {
         res.status(500).json({ error: 'Error updating commission rules', details: error.message });
     } finally {
         conn.release();
+    }
+}
+
+async function getCoverages(req, res) {
+    try {
+        const [rows] = await pool.query('SELECT * FROM Coverages');
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching coverages:', error);
+        res.status(500).json({ error: 'Error fetching coverages', details: error.message });
     }
 }
 
