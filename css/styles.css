@@ -8,7 +8,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
     line-height: 1.6;
     color: var(--dark-gray);
     background-color: var(--light-gray);
@@ -21,6 +21,7 @@ body {
 
 .navbar-brand, .nav-link {
     color: white !important;
+    font-weight: 600;
 }
 
 .container {
@@ -29,19 +30,19 @@ body {
     padding: 0 15px;
 }
 
-.card {
-    border: none;
+.page-title {
+    background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
     margin-bottom: 1.5rem;
+    text-align: center;
 }
 
-.card-header {
-    background-color: var(--primary-color);
-    color: white;
-    font-weight: bold;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+.page-title h1 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--primary-color);
 }
 
 .btn {
@@ -54,14 +55,24 @@ body {
     border-color: var(--primary-color);
 }
 
-.btn-success {
-    background-color: var(--success-color);
-    border-color: var(--success-color);
-}
-
 .btn-danger {
     background-color: var(--danger-color);
     border-color: var(--danger-color);
+}
+
+.input-group {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-control {
+    border-radius: 0;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: none;
 }
 
 .table {
@@ -76,22 +87,45 @@ body {
     color: white;
 }
 
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
 .form-control {
     border-radius: 4px;
 }
 
 .form-control:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    box-shadow: none;
+}
+
+.commission-rule {
+    background-color: var(--light-gray);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.alert {
+    border-radius: 8px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .container {
         padding: 0 10px;
-    }
-    
-    .card {
-        margin-bottom: 1rem;
     }
 }
