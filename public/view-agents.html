@@ -52,6 +52,12 @@
         .form-section {
             margin-bottom: 20px;
         }
+        .green-check {
+            color: green;
+        }
+        .red-x {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -62,7 +68,6 @@
                 <a href="/add-agent.html">Add Agent</a>
                 <a href="/view-agents.html">View Agents</a>
                 <a href="/upload-csv.html">Upload CSV</a>
-                <a href="/payment-details.html">Add Payment Details</a>
             </div>
         </div>
     </nav>
@@ -86,8 +91,9 @@
                 <tr>
                     <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"></th>
                     <th>Full Name</th>
-                    <th>Email</th>
                     <th>Tenant</th>
+                    <th>Banking Info</th>
+                    <th>Commission Rules</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -103,45 +109,67 @@
         </div>
     </div>
 
-    <div id="agentModal" class="modal">
+    <!-- Basic Info Modal -->
+    <div id="basicInfoModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('agentModal')">&times;</span>
-            <h2 id="modalTitle">Add/Edit Agent</h2>
-            <form id="agentForm">
+            <span class="close" onclick="closeModal('basicInfoModal')">&times;</span>
+            <h2 id="basicInfoModalTitle">Agent Basic Info</h2>
+            <form id="basicInfoForm">
                 <input type="hidden" id="agentId">
-                <div class="form-section">
-                    <h3>Agent Details</h3>
-                    <label for="fullname">Full Name:</label>
-                    <input type="text" id="fullname" name="fullname" required>
-                    
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                    
-                    <label for="tenantId">Tenant:</label>
-                    <select id="tenantId" name="tenantId" required>
-                        <option value="">Select Tenant</option>
-                    </select>
-                </div>
+                <label for="fullname">Full Name:</label>
+                <input type="text" id="fullname" name="fullname" required>
                 
-                <div class="form-section">
-                    <h3>Banking Information</h3>
-                    <label for="bankName">Bank Name:</label>
-                    <input type="text" id="bankName" name="bankName" required>
-                    
-                    <label for="iban">IBAN:</label>
-                    <input type="text" id="iban" name="iban" required>
-                    
-                    <label for="bic">BIC:</label>
-                    <input type="text" id="bic" name="bic" required>
-                    
-                    <label for="accountHolderName">Account Holder Name:</label>
-                    <input type="text" id="accountHolderName" name="accountHolderName" required>
-                    
-                    <label for="paymentMethod">Payment Method:</label>
-                    <input type="text" id="paymentMethod" name="paymentMethod" required>
-                </div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
                 
-                <button type="submit">Save Agent</button>
+                <label for="tenantId">Tenant:</label>
+                <select id="tenantId" name="tenantId" required>
+                    <option value="">Select Tenant</option>
+                </select>
+                
+                <button type="submit">Save Basic Info</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Banking Info Modal -->
+    <div id="bankingInfoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('bankingInfoModal')">&times;</span>
+            <h2>Agent Banking Info</h2>
+            <form id="bankingInfoForm">
+                <input type="hidden" id="bankingAgentId">
+                <label for="bankName">Bank Name:</label>
+                <input type="text" id="bankName" name="bankName" required>
+                
+                <label for="iban">IBAN:</label>
+                <input type="text" id="iban" name="iban" required>
+                
+                <label for="bic">BIC:</label>
+                <input type="text" id="bic" name="bic" required>
+                
+                <label for="accountHolderName">Account Holder Name:</label>
+                <input type="text" id="accountHolderName" name="accountHolderName" required>
+                
+                <label for="paymentMethod">Payment Method:</label>
+                <input type="text" id="paymentMethod" name="paymentMethod" required>
+                
+                <button type="submit">Save Banking Info</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Commission Rules Modal -->
+    <div id="commissionRulesModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('commissionRulesModal')">&times;</span>
+            <h2>Agent Commission Rules</h2>
+            <form id="commissionRulesForm">
+                <input type="hidden" id="commissionAgentId">
+                <div id="commissionRulesFields">
+                    <!-- Commission rule fields will be dynamically added here -->
+                </div>
+                <button type="submit">Save Commission Rules</button>
             </form>
         </div>
     </div>
@@ -175,17 +203,20 @@
                         const row = `<tr>
                             <td><input type="checkbox" class="agentCheckbox" value="${agent.AgentID}"></td>
                             <td>${agent.Fullname}</td>
-                            <td>${agent.Email}</td>
                             <td>${agent.TenantName || 'N/A'}</td>
+                            <td>${agent.hasBankingInfo ? '<span class="green-check">✓</span>' : '<span class="red-x">✗</span>'}</td>
+                            <td>${agent.hasCommissionRules ? '<span class="green-check">✓</span>' : '<span class="red-x">✗</span>'}</td>
                             <td>
-                                <button onclick="editAgent(${agent.AgentID})">Edit</button>
+                                <button onclick="editBasicInfo(${agent.AgentID})">Basic Info</button>
+                                <button onclick="editBankingInfo(${agent.AgentID})">Banking Info</button>
+                                <button onclick="editCommissionRules(${agent.AgentID})">Commission Rules</button>
                                 <button onclick="deleteAgent(${agent.AgentID})">Delete</button>
                             </td>
                         </tr>`;
                         tableBody.innerHTML += row;
                     });
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="5">No agents found</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="6">No agents found</td></tr>';
                 }
                 document.getElementById('currentPage').textContent = page;
                 document.getElementById('errorMessage').textContent = '';
@@ -193,7 +224,7 @@
             })
             .catch(error => {
                 console.error('Error fetching agents:', error);
-                document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="5">Failed to load records</td></tr>';
+                document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="6">Failed to load records</td></tr>';
                 document.getElementById('errorMessage').textContent = 'Failed to load records';
                 lastError = error.message;
                 updateDebugInfo();
@@ -220,36 +251,67 @@
     }
 
     function openAddAgentModal() {
-        document.getElementById('modalTitle').textContent = 'Add Agent';
+        document.getElementById('basicInfoModalTitle').textContent = 'Add Agent';
         document.getElementById('agentId').value = '';
-        document.getElementById('agentForm').reset();
-        document.getElementById('agentModal').style.display = 'block';
+        document.getElementById('basicInfoForm').reset();
+        document.getElementById('basicInfoModal').style.display = 'block';
     }
 
     function closeModal(modalId) {
         document.getElementById(modalId).style.display = 'none';
     }
 
-    function editAgent(agentId) {
+    function editBasicInfo(agentId) {
         fetch(`/api/agents/${agentId}`)
             .then(response => response.json())
             .then(agent => {
-                document.getElementById('modalTitle').textContent = 'Edit Agent';
+                document.getElementById('basicInfoModalTitle').textContent = 'Edit Agent Basic Info';
                 document.getElementById('agentId').value = agent.AgentID;
                 document.getElementById('fullname').value = agent.Fullname;
                 document.getElementById('email').value = agent.Email;
                 document.getElementById('tenantId').value = agent.TenantID;
-                
-                // Populate banking information
-                document.getElementById('bankName').value = agent.BankName || '';
-                document.getElementById('iban').value = agent.IBAN || '';
-                document.getElementById('bic').value = agent.BIC || '';
-                document.getElementById('accountHolderName').value = agent.AccountHolderName || '';
-                document.getElementById('paymentMethod').value = agent.PaymentMethod || '';
-                
-                document.getElementById('agentModal').style.display = 'block';
+                document.getElementById('basicInfoModal').style.display = 'block';
             })
             .catch(error => console.error('Error fetching agent details:', error));
+    }
+
+    function editBankingInfo(agentId) {
+        fetch(`/api/agents/${agentId}/banking-info`)
+            .then(response => response.json())
+            .then(bankingInfo => {
+                document.getElementById('bankingAgentId').value = agentId;
+                document.getElementById('bankName').value = bankingInfo.BankName || '';
+                document.getElementById('iban').value = bankingInfo.IBAN || '';
+                document.getElementById('bic').value = bankingInfo.BIC || '';
+                document.getElementById('accountHolderName').value = bankingInfo.AccountHolderName || '';
+                document.getElementById('paymentMethod').value = bankingInfo.PaymentMethod || '';
+                document.getElementById('bankingInfoModal').style.display = 'block';
+            })
+            .catch(error => console.error('Error fetching banking info:', error));
+    }
+
+    function editCommissionRules(agentId) {
+        fetch(`/api/agents/${agentId}/commission-rules`)
+            .then(response => response.json())
+            .then(commissionRules => {
+                const commissionRulesFields = document.getElementById('commissionRulesFields');
+                commissionRulesFields.innerHTML = '';
+                document.getElementById('commissionAgentId').value = agentId;
+                
+                commissionRules.forEach(rule => {
+                    const fieldHtml = `
+                        <div>
+                            <label for="coverageType_${rule.CoverageType}">${rule.CoverageType}:</label>
+                            <input type="number" id="coverageType_${rule.CoverageType}" name="coverageType_${rule.CoverageType}" 
+                                   value="${rule.CommissionPercentage}" min="0" max="100" step="0.01" required>
+                        </div>
+                    `;
+                    commissionRulesFields.innerHTML += fieldHtml;
+                });
+                
+                document.getElementById('commissionRulesModal').style.display = 'block';
+            })
+            .catch(error => console.error('Error fetching commission rules:', error));
     }
 
     function deleteAgent(agentId) {
@@ -299,7 +361,7 @@
         }
     }
 
-    document.getElementById('agentForm').addEventListener('submit', function(e) {
+    document.getElementById('basicInfoForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const agentId = document.getElementById('agentId').value;
         const formData = new FormData(this);
@@ -318,10 +380,54 @@
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            closeModal('agentModal');
+            closeModal('basicInfoModal');
             fetchAgents(currentPage);
         })
         .catch(error => console.error('Error saving agent:', error));
+    });
+
+    document.getElementById('bankingInfoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const agentId = document.getElementById('bankingAgentId').value;
+        const formData = new FormData(this);
+        const bankingData = Object.fromEntries(formData.entries());
+
+        fetch(`/api/agents/${agentId}/banking-info`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(bankingData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            closeModal('bankingInfoModal');
+            fetchAgents(currentPage);
+        })
+        .catch(error => console.error('Error saving banking info:', error));
+    });
+
+    document.getElementById('commissionRulesForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const agentId = document.getElementById('commissionAgentId').value;
+        const formData = new FormData(this);
+        const commissionData = Object.fromEntries(formData.entries());
+
+        fetch(`/api/agents/${agentId}/commission-rules`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(commissionData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            closeModal('commissionRulesModal');
+            fetchAgents(currentPage);
+        })
+        .catch(error => console.error('Error saving commission rules:', error));
     });
 
     function toggleDebugInfo() {
