@@ -46,6 +46,10 @@ app.get('/api/agents/:id', getAgent);
 app.put('/api/agents/:id', updateAgent);
 app.delete('/api/agents/:id', deleteAgent);
 app.post('/api/agents/bulk-delete', bulkDeleteAgents);
+app.get('/api/agents/:id/banking-info', getBankingInfo);
+app.put('/api/agents/:id/banking-info', updateBankingInfo);
+app.get('/api/agents/:id/commission-rules', getCommissionRules);
+app.put('/api/agents/:id/commission-rules', updateCommissionRules);
 app.post('/api/upload-csv', upload.single('file'), uploadCSV);
 
 // Route Handlers
@@ -72,15 +76,18 @@ async function getAgents(req, res) {
     try {
         let query = `
             SELECT a.AgentID, a.Fullname, a.Email, t.Name AS TenantName,
-                   apd.BankName, apd.IBAN, apd.BIC, apd.AccountHolderName, apd.PaymentMethod
+                   CASE WHEN apd.Agent_Payment_Details_ID IS NOT NULL THEN 1 ELSE 0 END AS hasBankingInfo,
+                   CASE WHEN acc.Agent_Coverage_CommissionID IS NOT NULL THEN 1 ELSE 0 END AS hasCommissionRules
             FROM Agent a
             LEFT JOIN Tenant t ON a.TenantID = t.TenantID
             LEFT JOIN Agent_Payment_Details apd ON a.Agent_Payment_Details_ID = apd.Agent_Payment_Details_ID
+            LEFT JOIN Agent_Coverage_Commission acc ON a.AgentID = acc.AgentID
             WHERE a.Fullname LIKE ? OR a.Email LIKE ?
+            GROUP BY a.AgentID
             LIMIT ? OFFSET ?
         `;
         let countQuery = `
-            SELECT COUNT(*) AS total
+            SELECT COUNT(DISTINCT a.AgentID) AS total
             FROM Agent a
             WHERE a.Fullname LIKE ? OR a.Email LIKE ?
         `;
@@ -106,46 +113,26 @@ async function getAgents(req, res) {
 }
 
 async function addAgent(req, res) {
-    const { fullname, email, tenantId, bankName, iban, bic, accountHolderName, paymentMethod } = req.body;
+    const { fullname, email, tenantId } = req.body;
     
-    const conn = await pool.getConnection();
     try {
-        await conn.beginTransaction();
-
-        // Insert payment details
-        const [paymentResult] = await conn.query(
-            'INSERT INTO Agent_Payment_Details (BankName, IBAN, BIC, AccountHolderName, PaymentMethod) VALUES (?, ?, ?, ?, ?)',
-            [bankName, iban, bic, accountHolderName, paymentMethod]
+        const [result] = await pool.query(
+            'INSERT INTO Agent (Fullname, Email, TenantID) VALUES (?, ?, ?)',
+            [fullname, email, tenantId]
         );
-        const paymentDetailsId = paymentResult.insertId;
+        const agentId = result.insertId;
 
-        // Insert agent
-        const [agentResult] = await conn.query(
-            'INSERT INTO Agent (Fullname, Email, TenantID, Agent_Payment_Details_ID) VALUES (?, ?, ?, ?)',
-            [fullname, email, tenantId, paymentDetailsId]
-        );
-        const agentId = agentResult.insertId;
-
-        await conn.commit();
         res.status(201).json({ message: 'Agent added successfully', agentId: agentId });
     } catch (error) {
-        await conn.rollback();
         console.error('Error adding agent:', error);
         res.status(500).json({ error: 'Error adding agent', details: error.message });
-    } finally {
-        conn.release();
     }
 }
 
 async function getAgent(req, res) {
     const agentId = req.params.id;
     try {
-        const [rows] = await pool.query(`
-            SELECT a.*, apd.BankName, apd.IBAN, apd.BIC, apd.AccountHolderName, apd.PaymentMethod
-            FROM Agent a
-            LEFT JOIN Agent_Payment_Details apd ON a.Agent_Payment_Details_ID = apd.Agent_Payment_Details_ID
-            WHERE a.AgentID = ?
-        `, [agentId]);
+        const [rows] = await pool.query('SELECT * FROM Agent WHERE AgentID = ?', [agentId]);
         if (rows.length === 0) {
             res.status(404).json({ error: 'Agent not found' });
         } else {
@@ -159,104 +146,145 @@ async function getAgent(req, res) {
 
 async function updateAgent(req, res) {
     const agentId = req.params.id;
-    const { fullname, email, tenantId, bankName, iban, bic, accountHolderName, paymentMethod } = req.body;
-    
-    const conn = await pool.getConnection();
+    const { fullname, email, tenantId } = req.body;
     try {
-        await conn.beginTransaction();
-
-        // Update agent details
-        await conn.query(
+        await pool.query(
             'UPDATE Agent SET Fullname = ?, Email = ?, TenantID = ? WHERE AgentID = ?',
             [fullname, email, tenantId, agentId]
         );
-
-        // Get the Agent_Payment_Details_ID
-        const [agentRows] = await conn.query('SELECT Agent_Payment_Details_ID FROM Agent WHERE AgentID = ?', [agentId]);
-        const paymentDetailsId = agentRows[0].Agent_Payment_Details_ID;
-
-        if (paymentDetailsId) {
-            // Update existing payment details
-            await conn.query(
-                'UPDATE Agent_Payment_Details SET BankName = ?, IBAN = ?, BIC = ?, AccountHolderName = ?, PaymentMethod = ? WHERE Agent_Payment_Details_ID = ?',
-                [bankName, iban, bic, accountHolderName, paymentMethod, paymentDetailsId]
-            );
-        } else {
-            // Insert new payment details
-            const [paymentResult] = await conn.query(
-                'INSERT INTO Agent_Payment_Details (BankName, IBAN, BIC, AccountHolderName, PaymentMethod) VALUES (?, ?, ?, ?, ?)',
-                [bankName, iban, bic, accountHolderName, paymentMethod]
-            );
-            const newPaymentDetailsId = paymentResult.insertId;
-
-            // Update agent with new payment details ID
-            await conn.query('UPDATE Agent SET Agent_Payment_Details_ID = ? WHERE AgentID = ?', [newPaymentDetailsId, agentId]);
-        }
-
-        await conn.commit();
         res.json({ message: 'Agent updated successfully' });
     } catch (error) {
-        await conn.rollback();
         console.error('Error updating agent:', error);
         res.status(500).json({ error: 'Error updating agent', details: error.message });
-    } finally {
-        conn.release();
     }
 }
 
 async function deleteAgent(req, res) {
     const agentId = req.params.id;
-    const conn = await pool.getConnection();
     try {
-        await conn.beginTransaction();
-
-        // Get the Agent_Payment_Details_ID
-        const [agentRows] = await conn.query('SELECT Agent_Payment_Details_ID FROM Agent WHERE AgentID = ?', [agentId]);
-        const paymentDetailsId = agentRows[0].Agent_Payment_Details_ID;
-
-        // Delete the agent
-        await conn.query('DELETE FROM Agent WHERE AgentID = ?', [agentId]);
-
-        // Delete the associated payment details if they exist
-        if (paymentDetailsId) {
-            await conn.query('DELETE FROM Agent_Payment_Details WHERE Agent_Payment_Details_ID = ?', [paymentDetailsId]);
-        }
-
-        await conn.commit();
+        await pool.query('DELETE FROM Agent WHERE AgentID = ?', [agentId]);
         res.json({ message: 'Agent deleted successfully' });
     } catch (error) {
-        await conn.rollback();
         console.error('Error deleting agent:', error);
         res.status(500).json({ error: 'Error deleting agent', details: error.message });
-    } finally {
-        conn.release();
     }
 }
 
 async function bulkDeleteAgents(req, res) {
     const { agentIds } = req.body;
+    try {
+        await pool.query('DELETE FROM Agent WHERE AgentID IN (?)', [agentIds]);
+        res.json({ message: `${agentIds.length} agent(s) deleted successfully` });
+    } catch (error) {
+        console.error('Error deleting agents:', error);
+        res.status(500).json({ error: 'Error deleting agents', details: error.message });
+    }
+}
+
+async function getBankingInfo(req, res) {
+    const agentId = req.params.id;
+    try {
+        const [rows] = await pool.query(
+            'SELECT * FROM Agent_Payment_Details WHERE Agent_Payment_Details_ID = (SELECT Agent_Payment_Details_ID FROM Agent WHERE AgentID = ?)',
+            [agentId]
+        );
+        if (rows.length === 0) {
+            res.json({}); // Return empty object if no banking info found
+        } else {
+            res.json(rows[0]);
+        }
+    } catch (error) {
+        console.error('Error fetching banking info:', error);
+        res.status(500).json({ error: 'Error fetching banking info', details: error.message });
+    }
+}
+
+async function updateBankingInfo(req, res) {
+    const agentId = req.params.id;
+    const { bankName, iban, bic, accountHolderName, paymentMethod } = req.body;
     const conn = await pool.getConnection();
     try {
         await conn.beginTransaction();
 
-        // Get the Agent_Payment_Details_IDs
-        const [paymentDetailsRows] = await conn.query('SELECT Agent_Payment_Details_ID FROM Agent WHERE AgentID IN (?)', [agentIds]);
-        const paymentDetailsIds = paymentDetailsRows.map(row => row.Agent_Payment_Details_ID).filter(id => id != null);
+        // Check if banking info exists
+        const [existingInfo] = await conn.query(
+            'SELECT Agent_Payment_Details_ID FROM Agent WHERE AgentID = ?',
+            [agentId]
+        );
 
-        // Delete the agents
-        await conn.query('DELETE FROM Agent WHERE AgentID IN (?)', [agentIds]);
+        if (existingInfo[0].Agent_Payment_Details_ID) {
+            // Update existing banking info
+            await conn.query(
+                'UPDATE Agent_Payment_Details SET BankName = ?, IBAN = ?, BIC = ?, AccountHolderName = ?, PaymentMethod = ? WHERE Agent_Payment_Details_ID = ?',
+                [bankName, iban, bic, accountHolderName, paymentMethod, existingInfo[0].Agent_Payment_Details_ID]
+            );
+        } else {
+            // Insert new banking info
+            const [result] = await conn.query(
+                'INSERT INTO Agent_Payment_Details (BankName, IBAN, BIC, AccountHolderName, PaymentMethod) VALUES (?, ?, ?, ?, ?)',
+                [bankName, iban, bic, accountHolderName, paymentMethod]
+            );
+            const newPaymentDetailsId = result.insertId;
 
-        // Delete the associated payment details
-        if (paymentDetailsIds.length > 0) {
-            await conn.query('DELETE FROM Agent_Payment_Details WHERE Agent_Payment_Details_ID IN (?)', [paymentDetailsIds]);
+            // Update agent with new payment details ID
+            await conn.query(
+                'UPDATE Agent SET Agent_Payment_Details_ID = ? WHERE AgentID = ?',
+                [newPaymentDetailsId, agentId]
+            );
         }
 
         await conn.commit();
-        res.json({ message: `${agentIds.length} agent(s) deleted successfully` });
+        res.json({ message: 'Banking info updated successfully' });
     } catch (error) {
         await conn.rollback();
-        console.error('Error deleting agents:', error);
-        res.status(500).json({ error: 'Error deleting agents', details: error.message });
+        console.error('Error updating banking info:', error);
+        res.status(500).json({ error: 'Error updating banking info', details: error.message });
+    } finally {
+        conn.release();
+    }
+}
+
+async function getCommissionRules(req, res) {
+    const agentId = req.params.id;
+    try {
+        const [rows] = await pool.query(
+            'SELECT * FROM Agent_Coverage_Commission WHERE AgentID = ?',
+            [agentId]
+        );
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching commission rules:', error);
+        res.status(500).json({ error: 'Error fetching commission rules', details: error.message });
+    }
+}
+
+async function updateCommissionRules(req, res) {
+    const agentId = req.params.id;
+    const commissionRules = req.body;
+    const conn = await pool.getConnection();
+    try {
+        await conn.beginTransaction();
+
+        // Delete existing commission rules
+        await conn.query('DELETE FROM Agent_Coverage_Commission WHERE AgentID = ?', [agentId]);
+
+        // Insert new commission rules
+        for (const [coverageType, percentage] of Object.entries(commissionRules)) {
+            if (coverageType.startsWith('coverageType_')) {
+                const type = coverageType.replace('coverageType_', '');
+                await conn.query(
+                    'INSERT INTO Agent_Coverage_Commission (AgentID, CoverageType, CommissionPercentage) VALUES (?, ?, ?)',
+                    [agentId, type, percentage]
+                );
+            }
+        }
+
+        await conn.commit();
+        res.json({ message: 'Commission rules updated successfully' });
+    } catch (error) {
+        await conn.rollback();
+        console.error('Error updating commission rules:', error);
+        res.status(500).json({ error: 'Error updating commission rules', details: error.message });
     } finally {
         conn.release();
     }
