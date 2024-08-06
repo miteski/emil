@@ -1,17 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Agents - Insurance Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link href="/css/styles.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background-color: var(--light-gray);
+        }
+
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 15px;
+        }
+
+        .page-title {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .page-title h1 {
+            margin: 0;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .btn {
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .input-group {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+            border-radius: 0;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: none;
+        }
+
+        .table {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+            }
+
+            .card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">emil</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,7 +119,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/view-agents.html">View Agents</a>
+                        <a class="nav-link active" href="/view-agents.html">View Agents</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/upload-csv.html">Upload Policies</a>
@@ -29,11 +128,12 @@
             </div>
         </div>
     </nav>
-     <div class="container mt-5">
+
+    <div class="container mt-5">
         <div class="page-title">
-            <h1> View Agent </h1>
+            <h1>View Agents</h1>
         </div>
-         
+        
         <div class="row mb-3">
             <div class="col-md-6 d-flex align-items-center">
                 <button class="btn btn-primary me-2" onclick="openAddAgentModal()">
@@ -138,409 +238,4 @@
                 <div class="modal-body">
                     <form id="bankingInfoForm">
                         <input type="hidden" id="bankingAgentId">
-                        <div class="mb-3">
-                            <label for="bankName" class="form-label">Bank Name:</label>
-                            <input type="text" class="form-control" id="bankName" name="bankName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="iban" class="form-label">IBAN:</label>
-                            <input type="text" class="form-control" id="iban" name="iban" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="bic" class="form-label">BIC:</label>
-                            <input type="text" class="form-control" id="bic" name="bic" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="accountHolderName" class="form-label">Account Holder Name:</label>
-                            <input type="text" class="form-control" id="accountHolderName" name="accountHolderName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="paymentMethod" class="form-label">Payment Method:</label>
-                            <input type="text" class="form-control" id="paymentMethod" name="paymentMethod" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Banking Info</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Commission Rules Modal -->
-    <div class="modal fade" id="commissionRulesModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Agent Commission Rules</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="commissionRulesForm">
-                        <input type="hidden" id="commissionAgentId">
-                        <div id="commissionRulesFields"></div>
-                        <button type="button" class="btn btn-secondary mb-3" onclick="addCommissionRule()">Add Rule</button>
-                        <button type="submit" class="btn btn-primary">Save Commission Rules</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <button class="btn btn-sm btn-secondary position-fixed bottom-0 end-0 m-3" onclick="toggleDebugInfo()">
-        <i class="bi bi-bug"></i>
-    </button>
-    <div id="debugInfo"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    let currentPage = 1;
-    const pageSize = 10;
-    let lastError = '';
-    let coverages = [];
-
-    function fetchAgents(page, search = '') {
-        console.log(`Fetching agents for page ${page}, search: "${search}"`);
-        fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`)
-            .then(response => {
-                console.log('Response status:', response.status);
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Agents data received:', data);
-                const tableBody = document.getElementById('agentsTableBody');
-                tableBody.innerHTML = '';
-                if (data.agents && data.agents.length > 0) {
-                    data.agents.forEach(agent => {
-                        const row = `<tr>
-                            <td><input type="checkbox" class="agentCheckbox" value="${agent.AgentID}"></td>
-                            <td>${agent.Fullname}</td>
-                            <td>${agent.TenantName || 'N/A'}</td>
-                            <td>${agent.hasBankingInfo ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>'}</td>
-                            <td>${agent.hasCommissionRules ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>'}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="editBasicInfo(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Basic Info">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-info" onclick="editBankingInfo(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Banking Info">
-                                    <i class="bi bi-bank"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-success" onclick="editCommissionRules(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Commission Rules">
-                                    <i class="bi bi-percent"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAgent(${agent.AgentID})" data-bs-toggle="tooltip" title="Delete Agent">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>`;
-                        tableBody.innerHTML += row;
-                    });
-                    initTooltips();
-                } else {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center">No agents found</td></tr>';
-                }
-                document.getElementById('currentPage').textContent = page;
-                document.getElementById('errorMessage').style.display = 'none';
-                lastError = '';
-            })
-            .catch(error => {
-                console.error('Error fetching agents:', error);
-                document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Failed to load records</td></tr>';
-                document.getElementById('errorMessage').textContent = 'Failed to load records';
-                document.getElementById('errorMessage').style.display = 'block';
-                lastError = error.message;
-                updateDebugInfo();
-            });
-    }
-
-    function searchAgents() {
-        const searchTerm = document.getElementById('searchInput').value;
-        currentPage = 1;
-        fetchAgents(currentPage, searchTerm);
-    }
-
-    function clearSearch() {
-        document.getElementById('searchInput').value = '';
-        currentPage = 1;
-        fetchAgents(currentPage);
-    }
-
-    function changePage(delta) {
-        currentPage += delta;
-        if (currentPage < 1) currentPage = 1;
-        const searchTerm = document.getElementById('searchInput').value;
-        fetchAgents(currentPage, searchTerm);
-    }
-
-    function openAddAgentModal() {
-        document.getElementById('basicInfoModalTitle').textContent = 'Add Agent';
-        document.getElementById('agentId').value = '';
-        document.getElementById('basicInfoForm').reset();
-        new bootstrap.Modal(document.getElementById('basicInfoModal')).show();
-    }
-
-    function editBasicInfo(agentId) {
-        fetch(`/api/agents/${agentId}`)
-            .then(response => response.json())
-            .then(agent => {
-                document.getElementById('basicInfoModalTitle').textContent = 'Edit Agent Basic Info';
-                document.getElementById('agentId').value = agent.AgentID;
-                document.getElementById('fullname').value = agent.Fullname;
-                document.getElementById('email').value = agent.Email;
-                document.getElementById('tenantId').value = agent.TenantID;
-                new bootstrap.Modal(document.getElementById('basicInfoModal')).show();
-            })
-            .catch(error => console.error('Error fetching agent details:', error));
-    }
-
-    function editBankingInfo(agentId) {
-        fetch(`/api/agents/${agentId}/banking-info`)
-            .then(response => response.json())
-            .then(bankingInfo => {
-                document.getElementById('bankingAgentId').value = agentId;
-                document.getElementById('bankName').value = bankingInfo.BankName || '';
-                document.getElementById('iban').value = bankingInfo.IBAN || '';
-                document.getElementById('bic').value = bankingInfo.BIC || '';
-                document.getElementById('accountHolderName').value = bankingInfo.AccountHolderName || '';
-                document.getElementById('paymentMethod').value = bankingInfo.PaymentMethod || '';
-                new bootstrap.Modal(document.getElementById('bankingInfoModal')).show();
-            })
-            .catch(error => {
-                console.error('Error fetching banking info:', error);
-                alert('Failed to fetch banking information. Please try again.');
-            });
-    }
-
-    function editCommissionRules(agentId) {
-        fetch(`/api/agents/${agentId}/commission-rules`)
-            .then(response => response.json())
-            .then(commissionRules => {
-                const commissionRulesFields = document.getElementById('commissionRulesFields');
-                commissionRulesFields.innerHTML = '';
-                document.getElementById('commissionAgentId').value = agentId;
-                
-                if (commissionRules.length === 0) {
-                    addCommissionRule();
-                } else {
-                    commissionRules.forEach(rule => addCommissionRule(rule));
-                }
-                
-                new bootstrap.Modal(document.getElementById('commissionRulesModal')).show();
-            })
-            .catch(error => console.error('Error fetching commission rules:', error));
-    }
-
-    function addCommissionRule(rule = null) {
-        const commissionRulesFields = document.getElementById('commissionRulesFields');
-        const ruleDiv = document.createElement('div');
-        ruleDiv.className = 'commission-rule';
-        ruleDiv.innerHTML = `
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <select name="CoverageID" class="form-select" required>
-                        <option value="">Select Coverage</option>
-                        ${coverages.map(coverage => `<option value="${coverage.CoverageID}"${rule && rule.CoverageID === coverage.CoverageID ? ' selected' : ''}>${coverage.CoverageDescription}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <input type="number" name="Premium_Commission_Percentage" class="form-control" placeholder="Commission from Premium (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Premium_Commission_Percentage : ''}">
-                </div>
-                <div class="col-md-6">
-                    <input type="number" name="Percentage_In_Advance" class="form-control" placeholder="Portion paid in Advance (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_In_Advance : ''}">
-                </div>
-                <div class="col-md-6">
-                    <input type="number" name="Percentage_On_Installments" class="form-control" placeholder="Portion paid with Installments (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_On_Installments : ''}">
-                </div>
-                <div class="col-md-6">
-                    <input type="date" name="StartDate" class="form-control" required value="${rule ? rule.StartDate.split('T')[0] : ''}">
-                </div>
-                <div class="col-md-6">
-                    <input type="date" name="EndDate" class="form-control" required value="${rule ? rule.EndDate.split('T')[0] : ''}">
-                </div>
-                <div class="col-12">
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.commission-rule').remove()">Remove Rule</button>
-                </div>
-            </div>
-        `;
-        commissionRulesFields.appendChild(ruleDiv);
-    }
-
-    function deleteAgent(agentId) {
-        if (confirm('Are you sure you want to delete this agent?')) {
-            fetch(`/api/agents/${agentId}`, { method: 'DELETE' })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    fetchAgents(currentPage);
-                })
-                .catch(error => console.error('Error deleting agent:', error));
-        }
-    }
-
-    function toggleSelectAll() {
-        const selectAll = document.getElementById('selectAll');
-        const checkboxes = document.getElementsByClassName('agentCheckbox');
-        for (let checkbox of checkboxes) {
-            checkbox.checked = selectAll.checked;
-        }
-    }
-
-    function deleteSelectedAgents() {
-        const selectedAgents = Array.from(document.getElementsByClassName('agentCheckbox'))
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
-
-        if (selectedAgents.length === 0) {
-            alert('No agents selected');
-            return;
-        }
-
-        if (confirm(`Are you sure you want to delete ${selectedAgents.length} agent(s)?`)) {
-            fetch('/api/agents/bulk-delete', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ agentIds: selectedAgents }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                fetchAgents(currentPage);
-            })
-            .catch(error => console.error('Error deleting agents:', error));
-        }
-    }
-
-    document.getElementById('basicInfoForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const agentId = document.getElementById('agentId').value;
-        const formData = new FormData(this);
-        const agentData = Object.fromEntries(formData.entries());
-
-        const url = agentId ? `/api/agents/${agentId}` : '/api/agents';
-        const method = agentId ? 'PUT' : 'POST';
-
-        fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(agentData),
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            bootstrap.Modal.getInstance(document.getElementById('basicInfoModal')).hide();
-            fetchAgents(currentPage);
-        })
-        .catch(error => console.error('Error saving agent:', error));
-    });
-
-    document.getElementById('bankingInfoForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const agentId = document.getElementById('bankingAgentId').value;
-        const formData = new FormData(this);
-        const bankingData = Object.fromEntries(formData.entries());
-
-        fetch(`/api/agents/${agentId}/banking-info`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(bankingData),
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            bootstrap.Modal.getInstance(document.getElementById('bankingInfoModal')).hide();
-            fetchAgents(currentPage);
-        })
-        .catch(error => console.error('Error saving banking info:', error));
-    });
-
-    document.getElementById('commissionRulesForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const agentId = document.getElementById('commissionAgentId').value;
-        const rules = Array.from(this.querySelectorAll('.commission-rule')).map(ruleDiv => {
-            const rule = {};
-            ruleDiv.querySelectorAll('select, input').forEach(input => {
-                rule[input.name] = input.value;
-            });
-            return rule;
-        });
-
-        fetch(`/api/agents/${agentId}/commission-rules`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(rules),
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);
-            bootstrap.Modal.getInstance(document.getElementById('commissionRulesModal')).hide();
-            fetchAgents(currentPage);
-        })
-        .catch(error => console.error('Error saving commission rules:', error));
-    });
-
-    function toggleDebugInfo() {
-        const debugInfo = document.getElementById('debugInfo');
-        debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
-        if (debugInfo.style.display === 'block') {
-            updateDebugInfo();
-        }
-    }
-
-    function updateDebugInfo() {
-        const debugInfo = document.getElementById('debugInfo');
-        debugInfo.innerHTML = `
-            <h3>Debug Information</h3>
-            <p>Current Page: ${currentPage}</p>
-            <p>Page Size: ${pageSize}</p>
-            <p>Search Term: ${document.getElementById('searchInput').value}</p>
-            <p>Last API Call: ${new Date().toLocaleString()}</p>
-            <p>Last Error: ${lastError}</p>
-        `;
-    }
-
-    function initTooltips() {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
-    }
-
-    // Initial fetch
-    fetchAgents(currentPage);
-
-    // Fetch tenants for the dropdown
-    fetch('/api/tenants')
-        .then(response => response.json())
-        .then(tenants => {
-            const select = document.getElementById('tenantId');
-            tenants.forEach(tenant => {
-                const option = document.createElement('option');
-                option.value = tenant.TenantID;
-                option.textContent = tenant.Name;
-                select.appendChild(option);
-            });
-        })
-        .catch(error => console.error('Error fetching tenants:', error));
-
-    // Fetch coverages
-    fetch('/api/coverages')
-        .then(response => response.json())
-        .then(data => {
-            coverages = data;
-        })
-        .catch(error => console.error('Error fetching coverages:', error));
-    </script>
-</body>
-</html>
+                       
