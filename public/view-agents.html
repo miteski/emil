@@ -23,6 +23,7 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
+            max-width: 600px;
         }
         .close {
             color: #aaa;
@@ -47,6 +48,9 @@
             color: red;
             font-weight: bold;
             margin-bottom: 10px;
+        }
+        .form-section {
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -99,22 +103,43 @@
         </div>
     </div>
 
-    <div id="addAgentModal" class="modal">
+    <div id="agentModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal('addAgentModal')">&times;</span>
-            <h2 id="modalTitle">Add Agent</h2>
+            <span class="close" onclick="closeModal('agentModal')">&times;</span>
+            <h2 id="modalTitle">Add/Edit Agent</h2>
             <form id="agentForm">
                 <input type="hidden" id="agentId">
-                <label for="fullname">Full Name:</label>
-                <input type="text" id="fullname" name="fullname" required>
+                <div class="form-section">
+                    <h3>Agent Details</h3>
+                    <label for="fullname">Full Name:</label>
+                    <input type="text" id="fullname" name="fullname" required>
+                    
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                    
+                    <label for="tenantId">Tenant:</label>
+                    <select id="tenantId" name="tenantId" required>
+                        <option value="">Select Tenant</option>
+                    </select>
+                </div>
                 
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                
-                <label for="tenantId">Tenant:</label>
-                <select id="tenantId" name="tenantId" required>
-                    <option value="">Select Tenant</option>
-                </select>
+                <div class="form-section">
+                    <h3>Banking Information</h3>
+                    <label for="bankName">Bank Name:</label>
+                    <input type="text" id="bankName" name="bankName" required>
+                    
+                    <label for="iban">IBAN:</label>
+                    <input type="text" id="iban" name="iban" required>
+                    
+                    <label for="bic">BIC:</label>
+                    <input type="text" id="bic" name="bic" required>
+                    
+                    <label for="accountHolderName">Account Holder Name:</label>
+                    <input type="text" id="accountHolderName" name="accountHolderName" required>
+                    
+                    <label for="paymentMethod">Payment Method:</label>
+                    <input type="text" id="paymentMethod" name="paymentMethod" required>
+                </div>
                 
                 <button type="submit">Save Agent</button>
             </form>
@@ -198,7 +223,7 @@
         document.getElementById('modalTitle').textContent = 'Add Agent';
         document.getElementById('agentId').value = '';
         document.getElementById('agentForm').reset();
-        document.getElementById('addAgentModal').style.display = 'block';
+        document.getElementById('agentModal').style.display = 'block';
     }
 
     function closeModal(modalId) {
@@ -214,7 +239,15 @@
                 document.getElementById('fullname').value = agent.Fullname;
                 document.getElementById('email').value = agent.Email;
                 document.getElementById('tenantId').value = agent.TenantID;
-                document.getElementById('addAgentModal').style.display = 'block';
+                
+                // Populate banking information
+                document.getElementById('bankName').value = agent.BankName || '';
+                document.getElementById('iban').value = agent.IBAN || '';
+                document.getElementById('bic').value = agent.BIC || '';
+                document.getElementById('accountHolderName').value = agent.AccountHolderName || '';
+                document.getElementById('paymentMethod').value = agent.PaymentMethod || '';
+                
+                document.getElementById('agentModal').style.display = 'block';
             })
             .catch(error => console.error('Error fetching agent details:', error));
     }
@@ -285,7 +318,7 @@
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            closeModal('addAgentModal');
+            closeModal('agentModal');
             fetchAgents(currentPage);
         })
         .catch(error => console.error('Error saving agent:', error));
