@@ -1,9 +1,11 @@
 {
   "name": "emil-insurance-management",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Insurance Management System for Emil",
+  "main": "api/index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node api/index.js",
+    "dev": "nodemon api/index.js"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -11,6 +13,13 @@
     "multer": "^1.4.5-lts.1",
     "csv-parse": "^5.3.0",
     "axios": "^0.27.2",
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
