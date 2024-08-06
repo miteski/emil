@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Agents - Insurance Management System</title>
+    <link rel="stylesheet" href="/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -14,24 +15,42 @@
             padding: 0;
             background-color: #f4f4f4;
         }
-        .header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 1rem 0;
-            margin-bottom: 0;
-        }
-        .sub-header {
-            background-color: #34495e;
-            color: white;
-            padding: 0.5rem 0;
-            font-size: 1.2rem;
-            font-weight: 300;
-        }
         .container {
             width: 80%;
             margin: auto;
             overflow: hidden;
             padding: 0 20px;
+        }
+        nav {
+            background-color: #1a237e;
+            color: white;
+            padding: 1rem 0;
+            margin-bottom: 0;
+        }
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0 15px;
+        }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .sub-header {
+            background-color: #424242;
+            color: white;
+            padding: 0.5rem 0;
+            margin: 0;
+        }
+        .sub-header h1 {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: 300;
         }
         .modal {
             display: none;
@@ -87,6 +106,23 @@
         .add-rule-btn {
             margin-top: 10px;
         }
+        .green-check {
+            color: green;
+        }
+        .red-x {
+            color: red;
+        }
+        button {
+            background-color: #1a237e;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3949ab;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -98,41 +134,24 @@
             border-bottom: 1px solid #ddd;
         }
         th {
-            background-color: #34495e;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .green-check {
-            color: green;
-        }
-        .red-x {
-            color: red;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 5px;
-        }
-        button:hover {
-            background-color: #2980b9;
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <header class="header">
+    <nav>
         <div class="container">
-            <h1>Insurance Management System</h1>
+            <a href="/" class="logo">emil</a>
+            <div>
+                <a href="/add-agent.html">Add Agent</a>
+                <a href="/view-agents.html">View Agents</a>
+                <a href="/upload-csv.html">Upload CSV</a>
+            </div>
         </div>
-    </header>
+    </nav>
     <div class="sub-header">
         <div class="container">
-            <h2>View Agents</h2>
+            <h1>View Agents</h1>
         </div>
     </div>
     
@@ -378,7 +397,7 @@
         ruleDiv.innerHTML = `
             <select name="CoverageID" required>
                 <option value="">Select Coverage</option>
-                ${coverages.map(coverage => `<option value="${coverage.CoverageID}"${rule && rule.CoverageID === coverage.CoverageID ? ' selected' : ''}>${coverage.CoverageDescription}</option>`).join('')}
+                          ${coverages.map(coverage => `<option value="${coverage.CoverageID}"${rule && rule.CoverageID === coverage.CoverageID ? ' selected' : ''}>${coverage.CoverageDescription}</option>`).join('')}
             </select>
             <input type="number" name="Premium_Commission_Percentage" placeholder="Commission from Premium (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Premium_Commission_Percentage : ''}">
             <input type="number" name="Percentage_In_Advance" placeholder="Portion of Commission paid in Advance (%)" step="0.01" min="0" max="100" required value="${rule ? rule.Percentage_In_Advance : ''}">
