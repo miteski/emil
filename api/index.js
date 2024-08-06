@@ -5,10 +5,12 @@ const { parse } = require('csv-parse');
 const axios = require('axios');
 const crypto = require('crypto');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 app.use(express.json());
 app.use(express.static('public'));
+app.use(cors());
 
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
@@ -20,29 +22,15 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Simple test function
-async function runTests() {
-  console.log('Running tests...');
-  
-  try {
-    // Test database connection
-    await pool.query('SELECT 1');
-    console.log('Database connection test passed');
-
-    // Test tenant fetch
-    const [tenants] = await pool.query('SELECT * FROM Tenant LIMIT 1');
-    if (tenants.length > 0) {
-      console.log('Tenant fetch test passed');
-    } else {
-      console.log('Tenant fetch test failed: No tenants found');
-    }
-
-    console.log('All tests passed');
-  } catch (error) {
-    console.error('Test failed:', error);
-    process.exit(1);  // Exit with error code
-  }
-}
+// Test database connection
+pool.getConnection()
+    .then(connection => {
+        console.log("Database connected successfully");
+        connection.release();
+    })
+    .catch(error => {
+        console.error("Database connection failed:", error);
+    });
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -76,6 +64,7 @@ async function getTenants(req, res) {
 
 async function getAgents(req, res) {
     console.log('Fetching agents...');
+    console.log('Query params:', req.query);
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.pageSize) || 10;
     const search = req.query.search || '';
@@ -268,49 +257,12 @@ function parseCSV(csvBuffer) {
 }
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
-// Run tests before starting the server
-runTests().then(() => {
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-  });
-}).catch(error => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
-
-// Debugging Information
-console.log('=== Debugging Information ===');
-console.log('Node.js version:', process.version);
-console.log('Environment:', process.env.NODE_ENV);
-console.log('Database Host:', process.env.MYSQL_HOST);
-console.log('Database Name:', process.env.MYSQL_DATABASE);
-console.log('VirusTotal API Key:', process.env.VIRUSTOTAL_API_KEY ? 'Set' : 'Not Set');
-console.log('=============================');
 
 module.exports = app;
-```
-
-3. `package.json` (full file):
-
-```json
-{
-  "name": "emil-insurance-management",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "build": "mkdir -p public && cp *.html public/"
-  },
-  "dependencies": {
-    "express": "^4.17.1",
-    "mysql2": "^2.3.3",
-    "multer": "^1.4.5-lts.1",
-    "csv-parse": "^5.3.0",
-    "axios": "^0.27.2",
-    "dotenv": "^10.0.0"
-  }
-}
