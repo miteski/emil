@@ -201,46 +201,32 @@
                 }
             }, []);
 
-            const handleLogin = async (username, password) => {
-                try {
-                    const response = await fetch('/api/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ username, password }),
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        setIsLoggedIn(true);
-                        setMessage('Login successful!');
-                        setToken(data.token);
-                        localStorage.setItem('token', data.token);
-                    } else {
-                        setMessage(data.message);
-                    }
-                } catch (error) {
-                    setMessage('An error occurred. Please try again.');
-                }
-            };
-
-          const handleLogout = async () => {
+   const handleLogin = async (username, password) => {
     try {
-        await fetch('/api/logout', {
+        const response = await fetch('/api/login', {
             method: 'POST',
             headers: {
-                'Authorization': token,
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ username, password }),
         });
-        setIsLoggedIn(false);
-        setMessage('Logged out successfully.');
-        setToken('');
-        localStorage.removeItem('token');
+        const data = await response.json();
+        if (data.success) {
+            setIsLoggedIn(true);
+            setMessage('Login successful!');
+            setToken(data.token);
+            localStorage.setItem('token', data.token);
+        } else {
+            setMessage(data.message);
+        }
+        // Add this line to display the full response
+        setDebugInfo(JSON.stringify(data, null, 2));
     } catch (error) {
-        setMessage('An error occurred during logout. Please try again.');
+        setMessage('An error occurred. Please try again.');
+        // Add this line to display the error
+        setDebugInfo(JSON.stringify(error, null, 2));
     }
 };
-
             const fetchProtectedData = async () => {
                 try {
                     const response = await fetch('/api/protected', {
