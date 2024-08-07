@@ -422,6 +422,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/upload-csv.html">Upload Policies</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">Logout</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -609,9 +612,26 @@
     let lastError = '';
     let coverages = [];
 
+     function checkAuthentication() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login.html';
+    }
+} 
+        checkAuthentication();
+        function logout() {
+                            localStorage.removeItem('token');
+                            window.location.href = '/login.html';
+                            }
+
     function fetchAgents(page, search = '') {
         console.log(`Fetching agents for page ${page}, search: "${search}"`);
-        fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`)
+   const token = localStorage.getItem('token');
+fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
+    headers: {
+        'Authorization': token
+    }
+})
             .then(response => {
                 console.log('Response status:', response.status);
                 if (!response.ok) {
@@ -660,14 +680,19 @@
                 document.getElementById('errorMessage').style.display = 'none';
                 lastError = '';
             })
-            .catch(error => {
-                console.error('Error fetching agents:', error);
-                document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Failed to load records</td></tr>';
-                document.getElementById('errorMessage').textContent = 'Failed to load records';
-                document.getElementById('errorMessage').style.display = 'block';
-                lastError = error.message;
-                updateDebugInfo();
-            });
+    .catch(error => {
+    console.error('Error fetching agents:', error);
+    if (error.message.includes('401') || error.message.includes('403')) {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    } else {
+        document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Failed to load records</td></tr>';
+        document.getElementById('errorMessage').textContent = 'Failed to load records';
+        document.getElementById('errorMessage').style.display = 'block';
+        lastError = error.message;
+        updateDebugInfo();
+    }
+});
     }
 
     function searchAgents() {
