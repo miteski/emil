@@ -18,6 +18,11 @@ app.post('/api/login', login);
 app.post('/api/logout', logout);
 app.post('/api/register', register);
 
+app.get('/api/test', (req, res) => {
+    console.log('Test route hit');
+    res.json({ message: 'API is working' });
+});
+
 // Example of a protected route
 app.get('/api/protected', authenticateSession, (req, res) => {
     res.json({ message: 'This is a protected route', user: req.user });
