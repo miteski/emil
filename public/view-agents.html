@@ -11,10 +11,10 @@
     <link href="/css/styles.css" rel="stylesheet">
 <style>
     :root {
-        --primary-color: #32cccc; /* Emil green */
-        --secondary-color: #5bd7d7; /* Light green accent */
-        --background-color: #ffffff; /* White background */
-        --text-color: #333333; /* Dark gray for text */
+        --primary-color: #32cccc;
+        --secondary-color: #5bd7d7;
+        --background-color: #ffffff;
+        --text-color: #333333;
         --light-gray: #f8f9fa;
         --dark-gray: #212529;
         --success-color: #28a745;
@@ -27,7 +27,7 @@
         color: var(--text-color);
         font-size: 16px;
         line-height: 1.5;
-        padding-top: 70px; /* Adjusted for fixed navbar */
+        padding-top: 70px;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -49,6 +49,18 @@
         color: var(--text-color) !important;
         font-weight: 500;
         transition: color 0.3s ease;
+        position: relative;
+    }
+
+    .navbar-nav .nav-link.active::after,
+    .navbar-nav .nav-link:hover::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--primary-color);
     }
 
     .navbar-nav .nav-link.active,
@@ -69,6 +81,10 @@
 
     .btn:hover {
         transform: translateY(-2px);
+    }
+
+    .btn-primary, .btn-danger {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     .btn-primary {
@@ -104,12 +120,26 @@
         box-shadow: 0 0 0 0.2rem rgba(50, 204, 204, 0.25);
     }
 
+    .table-container {
+        position: relative;
+        overflow: auto;
+        max-height: calc(100vh - 200px);
+    }
+
     .table {
         background-color: var(--background-color);
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         margin-top: 2rem;
+    }
+
+    .table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: var(--primary-color);
+        color: white;
     }
 
     .table th, .table td {
@@ -130,6 +160,10 @@
 
     .table-hover tbody tr:hover {
         background-color: var(--light-gray);
+    }
+
+    .table tbody tr.selected {
+        background-color: rgba(50, 204, 204, 0.1);
     }
 
     .pagination .page-link {
@@ -161,10 +195,29 @@
         background-color: var(--primary-color);
         color: #ffffff;
         border-bottom: none;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
     }
 
     .modal-footer {
         border-top: none;
+    }
+
+    .btn-close {
+        background-color: white;
+        opacity: 1;
+        padding: 0.5rem;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .btn-close:hover {
+        transform: scale(1.1);
     }
 
     .alert {
@@ -230,6 +283,25 @@
 
     .text-primary {
         color: var(--primary-color) !important;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--dark-gray);
+    }
+
+    .form-control {
+        color: var(--text-color);
+        font-size: 0.9em;
+    }
+
+    #debugInfo {
+        background-color: var(--light-gray);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 2rem;
+        font-family: 'Inter', sans-serif;
+        display: none;
     }
 
     /* Responsive adjustments */
