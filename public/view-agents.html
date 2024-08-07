@@ -361,16 +361,18 @@
                     <i class="bi bi-trash"></i> Delete Selected Agents
                 </button>
             </div>
-            <div class="col-md-6">
-                 <div class="input-group">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
-                <button class="btn btn-outline-secondary" type="button" onclick="searchAgents()">
-                    <i class="bi bi-search"></i>
-                </button>
-                    <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
+               <div class="col-md-6">
+                <form id="searchForm" onsubmit="searchAgents(); return false;">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
@@ -582,6 +584,7 @@
         const searchTerm = document.getElementById('searchInput').value;
         currentPage = 1;
         fetchAgents(currentPage, searchTerm);
+        return false; // Prevent form submission
     }
 
     function clearSearch() {
