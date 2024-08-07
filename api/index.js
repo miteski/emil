@@ -7,6 +7,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
+const { authenticateSession } = require('./auth');
 
 const { login, logout, authenticateSession, register } = require('./auth');
 
@@ -52,7 +53,7 @@ app.get('/api/test', (req, res) => {
 });
 
 app.get('/api/tenants', getTenants);
-app.get('/api/agents', getAgents);
+app.get('/api/agents', authenticateSession, getAgents);
 app.post('/api/agents', addAgent);
 app.get('/api/agents/:id', getAgent);
 app.put('/api/agents/:id', updateAgent);
