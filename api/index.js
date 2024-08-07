@@ -7,8 +7,6 @@ const axios = require('axios');
 const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
-const { authenticateSession } = require('./auth');
-
 const { login, logout, authenticateSession, register } = require('./auth');
 
 const app = express();
