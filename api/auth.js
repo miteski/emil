@@ -44,10 +44,10 @@ function verifyToken(token) {
 
 async function login(req, res) {
     const { username, password } = req.body;
+    console.log('Login attempt:', { username, password: '********' });
     try {
-        console.log('Login attempt for username:', username);
         const [users] = await pool.query('SELECT * FROM Users WHERE Username = ?', [username]);
-        console.log('Query result:', users);
+        console.log('Query result:', users.map(u => ({ ...u, PasswordHash: '********' })));
         if (users.length === 0) {
             console.log('No user found');
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -55,14 +55,17 @@ async function login(req, res) {
         const user = users[0];
 
         const hashedPassword = hashPassword(password);
-        console.log('Comparing passwords:', { stored: user.PasswordHash, provided: hashedPassword });
+        console.log('Password comparison:', { 
+            stored: user.PasswordHash.substring(0, 10) + '...', 
+            provided: hashedPassword.substring(0, 10) + '...' 
+        });
         if (hashedPassword !== user.PasswordHash) {
             console.log('Password mismatch');
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
         const token = generateToken(user.UserID, user.Role);
-        console.log('Generated token:', token);
+        console.log('Generated token:', token.substring(0, 10) + '...');
 
         await pool.query('UPDATE Users SET LastLogin = CURRENT_TIMESTAMP WHERE UserID = ?', [user.UserID]);
 
