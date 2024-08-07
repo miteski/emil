@@ -612,6 +612,22 @@
     let lastError = '';
     let coverages = [];
 
+        // Check authentication status
+    fetch('/api/check-auth', {
+        headers: {
+            'Authorization': localStorage.getItem('token')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.isAuthenticated) {
+            window.location.href = '/login.html?redirect=/view-agents.html';
+        }
+    })
+    .catch(error => {
+        console.error('Error checking authentication:', error);
+    });
+
      function checkAuthentication() {
     const token = localStorage.getItem('token');
     if (!token) {
