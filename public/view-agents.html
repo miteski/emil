@@ -11,8 +11,8 @@
     <link href="/css/styles.css" rel="stylesheet">
 <style>
     :root {
-        --primary-color: #0077c8; /* EMIL blue */
-        --secondary-color: #5bd7d7; /* Light blue accent */
+        --primary-color: #32cccc; /* Emil green */
+        --secondary-color: #5bd7d7; /* Light green accent */
         --background-color: #ffffff; /* White background */
         --text-color: #333333; /* Dark gray for text */
         --light-gray: #f8f9fa;
@@ -78,8 +78,8 @@
     }
 
     .btn-primary:hover {
-        background-color: #005fa0;
-        border-color: #005fa0;
+        background-color: #2ba3a3;
+        border-color: #2ba3a3;
     }
 
     .btn-danger {
@@ -101,7 +101,7 @@
 
     .form-control:focus {
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(0, 119, 200, 0.25);
+        box-shadow: 0 0 0 0.2rem rgba(50, 204, 204, 0.25);
     }
 
     .table {
@@ -226,6 +226,10 @@
     .table .btn-outline-danger:hover {
         color: #ffffff;
         background-color: var(--danger-color);
+    }
+
+    .text-primary {
+        color: var(--primary-color) !important;
     }
 
     /* Responsive adjustments */
@@ -448,20 +452,22 @@
                             <td>${agent.TenantName || 'N/A'}</td>
                             <td>${agent.hasBankingInfo ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>'}</td>
                             <td>${agent.hasCommissionRules ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>'}</td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="editBasicInfo(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Basic Info">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-info" onclick="editBankingInfo(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Banking Info">
-                                    <i class="bi bi-bank"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-success" onclick="editCommissionRules(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Commission Rules">
-                                    <i class="bi bi-percent"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteAgent(${agent.AgentID})" data-bs-toggle="tooltip" title="Delete Agent">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
+                           <td>
+                                <div class="btn-group" role="group" aria-label="Agent actions">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="editBasicInfo(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Basic Info">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info" onclick="editBankingInfo(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Banking Info">
+                                        <i class="bi bi-bank"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="editCommissionRules(${agent.AgentID})" data-bs-toggle="tooltip" title="Edit Commission Rules">
+                                        <i class="bi bi-percent"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteAgent(${agent.AgentID})" data-bs-toggle="tooltip" title="Delete Agent">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    </div>
+                                </td>
                         </tr>`;
                         tableBody.innerHTML += row;
                     });
