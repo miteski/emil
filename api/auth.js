@@ -11,9 +11,6 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Use this secret for token generation and verification
-const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
-
 // Helper function to hash passwords
 function hashPassword(password) {
     return crypto.createHash('sha256').update(password).digest('hex');
@@ -21,21 +18,12 @@ function hashPassword(password) {
 
 // Helper function to generate a token
 function generateToken(userId, role) {
-    const header = {
-        alg: 'HS256',
-        typ: 'JWT'
-    };
     const payload = {
         userId: userId,
         role: role,
         exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour expiration
     };
-    const headerEncoded = Buffer.from(JSON.stringify(header)).toString('base64url');
-    const payloadEncoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
-    const signature = crypto.createHmac('sha256', JWT_SECRET)
-        .update(headerEncoded + '.' + payloadEncoded)
-        .digest('base64url');
-    return `${headerEncoded}.${payloadEncoded}.${signature}`;
+    return Buffer.from(JSON.stringify(payload)).toString('base64');
 }
 
 // Helper function to verify a token
@@ -45,14 +33,6 @@ function verifyToken(token) {
         if (payload.exp < Math.floor(Date.now() / 1000)) {
             return null;
         }
-        // Verify the signature
-        const [header, payload, signature] = token.split('.');
-        const verifySignature = crypto.createHmac('sha256', JWT_SECRET)
-            .update(header + '.' + payload)
-            .digest('base64url');
-        if (signature !== verifySignature) {
-            return null;
-        }
         return payload;
     } catch (error) {
         return null;
@@ -60,11 +40,13 @@ function verifyToken(token) {
 }
 
 async function login(req, res) {
+    console.log("Login attempt received");
     const { username, password } = req.body;
-    console.log('Login attempt:', { username, password: '********' });
+    console.log("Username:", username);
     try {
+        console.log("Querying database");
         const [users] = await pool.query('SELECT * FROM Users WHERE Username = ?', [username]);
-        console.log('Query result:', users.map(u => ({ ...u, PasswordHash: '********' })));
+        console.log("Query completed, users found:", users.length);
         if (users.length === 0) {
             console.log('No user found');
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -88,7 +70,7 @@ async function login(req, res) {
 
         res.json({ success: true, message: 'Login successful', token });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error("Login error:", error);
         res.status(500).json({ 
             success: false, 
             message: 'An error occurred during login', 
