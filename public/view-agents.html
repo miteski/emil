@@ -27,9 +27,8 @@
         color: var(--text-color);
         font-size: 16px;
         line-height: 1.5;
-        padding-top: 60px;
+        padding-top: 120px;
         padding-bottom: 60px;
-        overflow: hidden;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -72,7 +71,8 @@
 
     .container {
         max-width: 1200px;
-        padding: 0.5rem 1rem;
+        margin: 0 auto;
+        padding: 0 15px;
     }
 
     .btn {
@@ -122,10 +122,22 @@
         box-shadow: 0 0 0 0.2rem rgba(50, 204, 204, 0.25);
     }
 
+    .top-controls {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background-color: var(--background-color);
+        z-index: 1000;
+        padding: 15px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
     .table-container {
         position: relative;
         overflow-y: auto;
         height: calc(100vh - 200px);
+        margin-top: 60px;
         margin-bottom: 0.5rem;
     }
 
@@ -140,7 +152,7 @@
     .table thead {
         position: sticky;
         top: 0;
-        z-index: 1;
+        z-index: 2;
         background-color: var(--primary-color);
         color: white;
     }
@@ -148,7 +160,7 @@
     .table th, .table td {
         vertical-align: middle;
         text-align: center;
-        padding: 0.75rem;
+        padding: 0.5rem;
     }
 
     .table td i {
@@ -177,6 +189,7 @@
         background-color: white;
         padding: 10px 0;
         box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
     }
 
     .pagination .page-link {
@@ -361,8 +374,21 @@
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
+        body {
+            padding-top: 180px;
+        }
+
+        .top-controls {
+            padding: 10px 0;
+        }
+
+        .table-container {
+            height: calc(100vh - 260px);
+            margin-top: 120px;
+        }
+
         .container {
-            padding: 0.5rem;
+            padding: 0 10px;
         }
     }
 </style>
