@@ -44,6 +44,15 @@
         function LoginPage() {
             const [isLoggedIn, setIsLoggedIn] = React.useState(false);
             const [message, setMessage] = React.useState('');
+            const [token, setToken] = React.useState('');
+
+            React.useEffect(() => {
+                const storedToken = localStorage.getItem('token');
+                if (storedToken) {
+                    setIsLoggedIn(true);
+                    setToken(storedToken);
+                }
+            }, []);
 
             const handleLogin = async (username, password) => {
                 try {
@@ -58,34 +67,51 @@
                     if (data.success) {
                         setIsLoggedIn(true);
                         setMessage('Login successful!');
+                        setToken(data.token);
+                        localStorage.setItem('token', data.token);
                     } else {
                         setMessage(data.message);
                     }
                 } catch (error) {
                     setMessage('An error occurred. Please try again.');
                 }
-                updateDebugInfo();
             };
 
-            const handleLogout = () => {
-                setIsLoggedIn(false);
-                setMessage('Logged out successfully.');
-                updateDebugInfo();
+            const handleLogout = async () => {
+                try {
+                    const response = await fetch('/api/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': token,
+                        },
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        setIsLoggedIn(false);
+                        setMessage('Logged out successfully.');
+                        setToken('');
+                        localStorage.removeItem('token');
+                    } else {
+                        setMessage(data.message);
+                    }
+                } catch (error) {
+                    setMessage('An error occurred during logout. Please try again.');
+                }
             };
 
-            function updateDebugInfo() {
-                const debugElement = document.getElementById('debug');
-                debugElement.innerHTML = `
-                    <h3>Debug Information:</h3>
-                    <p>Is Logged In: ${isLoggedIn}</p>
-                    <p>Current Time: ${new Date().toLocaleString()}</p>
-                    <p>Last Message: ${message}</p>
-                `;
-            }
-
-            React.useEffect(() => {
-                updateDebugInfo();
-            }, [isLoggedIn, message]);
+            const fetchProtectedData = async () => {
+                try {
+                    const response = await fetch('/api/protected', {
+                        headers: {
+                            'Authorization': token,
+                        },
+                    });
+                    const data = await response.json();
+                    setMessage(`Protected data: ${JSON.stringify(data)}`);
+                } catch (error) {
+                    setMessage('Error fetching protected data.');
+                }
+            };
 
             return (
                 <div>
@@ -94,6 +120,7 @@
                         <div>
                             <p>You are logged in!</p>
                             <button onClick={handleLogout}>Logout</button>
+                            <button onClick={fetchProtectedData}>Fetch Protected Data</button>
                         </div>
                     ) : (
                         <div>
@@ -102,6 +129,11 @@
                         </div>
                     )}
                     <p>{message}</p>
+                    <div id="debug">
+                        <h3>Debug Information:</h3>
+                        <p>Is Logged In: {isLoggedIn.toString()}</p>
+                        <p>Token: {token ? token.substring(0, 10) + '...' : 'None'}</p>
+                    </div>
                 </div>
             );
         }
