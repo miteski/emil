@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emil Insurance Management</title>
+    <title>EMIL Insurance Suite - Commission Management Solution</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
@@ -22,11 +22,7 @@
             background-color: var(--background-color);
             color: var(--text-color);
             font-size: 16px;
-            line-height: 1.5;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            padding-top: 60px;
+            line-height: 1.6;
         }
 
         .navbar {
@@ -45,7 +41,6 @@
             position: relative;
         }
 
-        .navbar-nav .nav-link.active::after,
         .navbar-nav .nav-link:hover::after {
             content: '';
             position: absolute;
@@ -56,22 +51,11 @@
             background-color: var(--primary-color);
         }
 
-        .navbar-nav .nav-link.active,
         .navbar-nav .nav-link:hover {
             color: var(--primary-color) !important;
         }
 
-        main {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 2rem;
-        }
-
-        h1 {
+        h1, h2, h3, h4, h5, h6 {
             color: var(--primary-color);
             margin-bottom: 1rem;
         }
@@ -96,30 +80,40 @@
             border-color: #2ba3a3;
         }
 
-        .btn-secondary {
-            background-color: var(--secondary-color);
-            border-color: var(--secondary-color);
+        .hero {
+            background-color: var(--light-gray);
+            padding: 4rem 0;
         }
 
-        .btn-secondary:hover {
-            background-color: #4ac0c0;
-            border-color: #4ac0c0;
+        .section {
+            padding: 4rem 0;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .testimonial {
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
 
         footer {
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
-            text-align: center;
-            padding: 1rem;
-            margin-top: auto;
+            background-color: var(--dark-gray);
+            color: var(--light-gray);
+            padding: 2rem 0;
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-                <img src="https://assets-global.website-files.com/5f801bd9152353d350740da6/5f84488e52cbbcea02631cbc_emillogo.svg" alt="emil logo">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="https://assets-global.website-files.com/5f801bd9152353d350740da6/5f84488e52cbbcea02631cbc_emillogo.svg" alt="EMIL logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -127,16 +121,158 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/view-agents.html">View Agents</a>
+                        <a class="nav-link" href="#features">Features</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/upload-csv.html">Upload Policies</a>
+                        <a class="nav-link" href="#benefits">Benefits</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-    
-    <main class="container">
-        <h1>Welcome to Emil Insurance Management</h1>
-        <p class="lead mb-4">Manage your insurance agents an
+
+    <header class="hero">
+        <div class="container text-center">
+            <h1 class="display-4">Simplify Your Commission Management with EMIL Insurance Suite</h1>
+            <p class="lead mb-4">Automate, Calculate, and Payout Commissions with Ease</p>
+            <a href="#" class="btn btn-primary btn-lg">Get Started Today</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <h2>Welcome to EMIL Insurance Suite</h2>
+                <p>EMIL Insurance Suite is a comprehensive Software-as-a-Service (SaaS) solution designed to streamline the lifecycle management of insurance products. From initial applications to final claims, our platform ensures efficient handling and robust management of insurance policies.</p>
+            </div>
+        </section>
+
+        <section class="section bg-light">
+            <div class="container">
+                <h2>The Challenge</h2>
+                <p>Managing commissions manually is time-consuming and prone to errors. Power MGA, a mid-sized managing general agent, faced significant overheads and potential inaccuracies while calculating commissions for their warranty extension insurance sold through various intermediaries.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container">
+                <h2>Our Solution</h2>
+                <p>Introducing the Commission Management System within the EMIL Insurance Suite – a holistic solution designed to automate commission calculations and payouts. Our system integrates seamlessly with existing policy data, reducing manual efforts and eliminating errors.</p>
+            </div>
+        </section>
+
+        <section id="features" class="section bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">Key Features</h2>
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <i class="bi bi-calculator feature-icon"></i>
+                            <h3>Automated Calculations</h3>
+                            <p>Effortlessly calculate commissions at multiple levels, reducing manual workload.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <i class="bi bi-cash-coin feature-icon"></i>
+                            <h3>Accurate Payouts</h3>
+                            <p>Ensure precise commission payouts to your intermediaries.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <i class="bi bi-file-earmark-text feature-icon"></i>
+                            <h3>Customizable Reports</h3>
+                            <p>Generate detailed commission reports tailored to your business needs.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <i class="bi bi-diagram-3 feature-icon"></i>
+                            <h3>API Integration</h3>
+                            <p>Seamlessly integrate with existing systems and intermediaries via our robust API.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center">
+                            <i class="bi bi-hand-index-thumb feature-icon"></i>
+                            <h3>User-Friendly Interface</h3>
+                            <p>Navigate and manage commissions with an intuitive and easy-to-use interface.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="benefits" class="section">
+            <div class="container">
+                <h2 class="text-center mb-5">Why Choose EMIL Insurance Suite?</h2>
+                <div class="row">
+                    <div class="col-md-3 mb-4">
+                        <h3><i class="bi bi-speedometer2"></i> Efficiency</h3>
+                        <p>Save time and reduce operational overheads with automated processes.</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <h3><i class="bi bi-check-circle"></i> Accuracy</h3>
+                        <p>Minimize errors with precise calculations and reliable data integration.</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <h3><i class="bi bi-graph-up"></i> Scalability</h3>
+                        <p>Customize the system to fit the unique needs of your business.</p>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <h3><i class="bi bi-headset"></i> Support</h3>
+                        <p>Benefit from our dedicated customer support and comprehensive documentation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">What Our Clients Say</h2>
+                <div class="testimonial">
+                    <p class="lead">"The new commission management feature has significantly reduced our workload and improved accuracy in payouts. EMIL Insurance Suite has truly transformed our operations."</p>
+                    <p class="font-weight-bold">- John Doe, Operations Manager, Power MGA</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container text-center">
+                <h2>Ready to Transform Your Commission Management?</h2>
+                <p class="mb-4">Join the growing number of businesses that trust EMIL Insurance Suite to handle their commission management needs. Experience the efficiency and accuracy of our solution today.</p>
+                <a href="#" class="btn btn-primary btn-lg">Get Started Now</a>
+            </div>
+        </section>
+
+        <section id="contact" class="section bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">Get in Touch</h2>
+                <p class="text-center mb-4">Have questions or need more information? Our team is here to help. Reach out to us via email or phone, and we'll be happy to assist you.</p>
+                <div class="row justify-content-center">
+                    <div class="col-md-4 text-center">
+                        <h3><i class="bi bi-envelope"></i> Email</h3>
+                        <p><a href="mailto:support@emilgroup.com">support@emilgroup.com</a></p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h3><i class="bi bi-telephone"></i> Phone</h3>
+                        <p>+123-456-7890</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container text-center">
+            <p>&copy; 2024 EMIL Group. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
