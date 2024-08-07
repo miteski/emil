@@ -11,15 +11,12 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-// Use this secret for token generation and verification
 const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
 
-// Helper function to hash passwords
 function hashPassword(password) {
     return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-// Helper function to generate a token
 function generateToken(userId, role) {
     const payload = {
         userId: userId,
@@ -29,7 +26,6 @@ function generateToken(userId, role) {
     return Buffer.from(JSON.stringify(payload)).toString('base64');
 }
 
-// Helper function to verify a token
 function verifyToken(token) {
     try {
         const [headerPart, payloadPart, signaturePart] = token.split('.');
@@ -39,7 +35,6 @@ function verifyToken(token) {
             return null;
         }
 
-        // Verify the signature (you may want to implement actual signature verification here)
         const verifySignature = crypto.createHmac('sha256', JWT_SECRET)
             .update(headerPart + '.' + payloadPart)
             .digest('base64url');
@@ -58,6 +53,7 @@ function verifyToken(token) {
 async function login(req, res) {
     console.log("Login attempt received");
     const { username, password } = req.body;
+    const redirectUrl = req.body.redirectUrl || '/view-agents.html';
     console.log("Username:", username, "Password:", password ? "[REDACTED]" : "undefined");
     try {
         console.log("Querying database");
@@ -85,7 +81,7 @@ async function login(req, res) {
         await pool.query('UPDATE Users SET LastLogin = CURRENT_TIMESTAMP WHERE UserID = ?', [user.UserID]);
 
         console.log('Login successful');
-        res.json({ success: true, message: 'Login successful', token });
+        res.json({ success: true, message: 'Login successful', token, redirectUrl });
     } catch (error) {
         console.error("Login error:", error);
         res.status(500).json({ 
@@ -98,8 +94,6 @@ async function login(req, res) {
 }
 
 async function logout(req, res) {
-    // Since we're not storing tokens server-side, logout is handled client-side
-    // by removing the token. We'll just send a success response.
     res.json({ success: true, message: 'Logout successful' });
 }
 
@@ -141,5 +135,6 @@ module.exports = {
     login,
     logout,
     authenticateSession,
-    register
+    register,
+    verifyToken
 };
