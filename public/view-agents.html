@@ -285,7 +285,87 @@
     .table .btn-sm {
         padding: 0.25rem 0.5rem;
         border: 1px solid;
-        margin: 0.1re
+        margin: 0.1rem;
+    }
+
+    .table .btn-outline-primary {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .table .btn-outline-primary:hover {
+        color: #ffffff;
+        background-color: var(--primary-color);
+    }
+
+    .table .btn-outline-info {
+        color: #17a2b8;
+        border-color: #17a2b8;
+    }
+
+    .table .btn-outline-info:hover {
+        color: #ffffff;
+        background-color: #17a2b8;
+    }
+
+    .table .btn-outline-success {
+        color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .table .btn-outline-success:hover {
+        color: #ffffff;
+        background-color: var(--success-color);
+    }
+
+    .table .btn-outline-danger {
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+    .table .btn-outline-danger:hover {
+        color: #ffffff;
+        background-color: var(--danger-color);
+    }
+
+    .text-primary {
+        color: var(--primary-color) !important;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--dark-gray);
+    }
+
+    .form-control, .form-select {
+        color: var(--text-color);
+        font-size: 0.9em;
+    }
+
+    #debugInfo {
+        background-color: var(--light-gray);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 2rem;
+        font-family: 'Inter', sans-serif;
+        display: none;
+    }
+
+    #debugInfo h3 {
+        background-color: #e9ecef;
+        padding: 0.5rem 1rem;
+        margin: -1rem -1rem 1rem -1rem;
+        border-radius: 8px 8px 0 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .container {
+            padding: 0.5rem;
+        }
+    }
+</style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top">
