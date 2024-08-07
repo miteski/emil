@@ -42,7 +42,7 @@ function verifyToken(token) {
 async function login(req, res) {
     console.log("Login attempt received");
     const { username, password } = req.body;
-    console.log("Username:", username);
+    console.log("Username:", username, "Password:", password ? "[REDACTED]" : "undefined");
     try {
         console.log("Querying database");
         const [users] = await pool.query('SELECT * FROM Users WHERE Username = ?', [username]);
@@ -68,6 +68,7 @@ async function login(req, res) {
 
         await pool.query('UPDATE Users SET LastLogin = CURRENT_TIMESTAMP WHERE UserID = ?', [user.UserID]);
 
+        console.log('Login successful');
         res.json({ success: true, message: 'Login successful', token });
     } catch (error) {
         console.error("Login error:", error);
