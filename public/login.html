@@ -13,28 +13,65 @@
     <div id="debug"></div>
 
     <script type="text/babel">
-        function LoginButton() {
-            return (
-                <button onClick={() => console.log('Login clicked')}>Sign in</button>
-            );
-        }
+        function LoginForm({ onLogin }) {
+            const [username, setUsername] = React.useState('');
+            const [password, setPassword] = React.useState('');
 
-        function LogoutButton() {
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onLogin(username, password);
+            };
+
             return (
-                <button onClick={() => console.log('Logout clicked')}>Sign out</button>
+                <form onSubmit={handleSubmit}>
+                    <input 
+                        type="text" 
+                        value={username} 
+                        onChange={(e) => setUsername(e.target.value)} 
+                        placeholder="Username" 
+                    />
+                    <input 
+                        type="password" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                        placeholder="Password" 
+                    />
+                    <button type="submit">Login</button>
+                </form>
             );
         }
 
         function LoginPage() {
             const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+            const [message, setMessage] = React.useState('');
 
-            React.useEffect(() => {
-                // Simulate checking login status
-                setTimeout(() => {
-                    setIsLoggedIn(false);
-                    updateDebugInfo();
-                }, 1000);
-            }, []);
+            const handleLogin = async (username, password) => {
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, password }),
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        setIsLoggedIn(true);
+                        setMessage('Login successful!');
+                    } else {
+                        setMessage(data.message);
+                    }
+                } catch (error) {
+                    setMessage('An error occurred. Please try again.');
+                }
+                updateDebugInfo();
+            };
+
+            const handleLogout = () => {
+                setIsLoggedIn(false);
+                setMessage('Logged out successfully.');
+                updateDebugInfo();
+            };
 
             function updateDebugInfo() {
                 const debugElement = document.getElementById('debug');
@@ -42,8 +79,13 @@
                     <h3>Debug Information:</h3>
                     <p>Is Logged In: ${isLoggedIn}</p>
                     <p>Current Time: ${new Date().toLocaleString()}</p>
+                    <p>Last Message: ${message}</p>
                 `;
             }
+
+            React.useEffect(() => {
+                updateDebugInfo();
+            }, [isLoggedIn, message]);
 
             return (
                 <div>
@@ -51,14 +93,15 @@
                     {isLoggedIn ? (
                         <div>
                             <p>You are logged in!</p>
-                            <LogoutButton />
+                            <button onClick={handleLogout}>Logout</button>
                         </div>
                     ) : (
                         <div>
                             <p>Please log in</p>
-                            <LoginButton />
+                            <LoginForm onLogin={handleLogin} />
                         </div>
                     )}
+                    <p>{message}</p>
                 </div>
             );
         }
