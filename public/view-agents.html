@@ -416,29 +416,33 @@
     </nav>
 
     <div class="container mt-4">
-        <div class="row mb-3">
-            <div class="col-md-6 d-flex align-items-center">
-                <button class="btn btn-primary me-2" onclick="openAddAgentModal()">
-                    <i class="bi bi-person-plus"></i> Add Agent
-                </button>
-                <button class="btn btn-danger" onclick="deleteSelectedAgents()">
-                    <i class="bi bi-trash"></i> Delete Selected Agents
-                </button>
-            </div>
-               <div class="col-md-6">
-                <form id="searchForm" onsubmit="searchAgents(); return false;">
-                    <div class="input-group">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
-                        <button class="btn btn-outline-secondary" type="submit">
-                            <i class="bi bi-search"></i>
-                        </button>
-                        <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    </div>
-                </form>
+   div class="top-controls">
+    <div class="container">
+            <div class="row mb-3">
+                <div class="col-md-6 d-flex align-items-center">
+                    <button class="btn btn-primary me-2" onclick="openAddAgentModal()">
+                        <i class="bi bi-person-plus"></i> Add Agent
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSelectedAgents()">
+                        <i class="bi bi-trash"></i> Delete Selected Agents
+                    </button>
+                </div>
+                <div class="col-md-6">
+                    <form id="searchForm" onsubmit="searchAgents(); return false;">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
+                            <button class="btn btn-outline-secondary" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
 
         <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
 
