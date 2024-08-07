@@ -192,6 +192,7 @@
             const [isLoggedIn, setIsLoggedIn] = React.useState(false);
             const [message, setMessage] = React.useState('');
             const [token, setToken] = React.useState('');
+            const [debugInfo, setDebugInfo] = React.useState('');
 
             React.useEffect(() => {
                 const storedToken = localStorage.getItem('token');
@@ -201,32 +202,40 @@
                 }
             }, []);
 
-   const handleLogin = async (username, password) => {
-    try {
-        const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username, password }),
-        });
-        const data = await response.json();
-        if (data.success) {
-            setIsLoggedIn(true);
-            setMessage('Login successful!');
-            setToken(data.token);
-            localStorage.setItem('token', data.token);
-        } else {
-            setMessage(data.message);
-        }
-        // Add this line to display the full response
-        setDebugInfo(JSON.stringify(data, null, 2));
-    } catch (error) {
-        setMessage('An error occurred. Please try again.');
-        // Add this line to display the error
-        setDebugInfo(JSON.stringify(error, null, 2));
-    }
-};
+            const handleLogin = async (username, password) => {
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, password }),
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        setIsLoggedIn(true);
+                        setMessage('Login successful!');
+                        setToken(data.token);
+                        localStorage.setItem('token', data.token);
+                    } else {
+                        setMessage(data.message);
+                    }
+                    // Add this line to display the full response
+                    setDebugInfo(JSON.stringify(data, null, 2));
+                } catch (error) {
+                    setMessage('An error occurred. Please try again.');
+                    // Add this line to display the error
+                    setDebugInfo(JSON.stringify(error, null, 2));
+                }
+            };
+
+            const handleLogout = () => {
+                setIsLoggedIn(false);
+                setMessage('Logged out successfully.');
+                setToken('');
+                localStorage.removeItem('token');
+            };
+
             const fetchProtectedData = async () => {
                 try {
                     const response = await fetch('/api/protected', {
@@ -236,8 +245,10 @@
                     });
                     const data = await response.json();
                     setMessage(`Protected data: ${JSON.stringify(data)}`);
+                    setDebugInfo(JSON.stringify(data, null, 2));
                 } catch (error) {
                     setMessage('Error fetching protected data.');
+                    setDebugInfo(JSON.stringify(error, null, 2));
                 }
             };
 
@@ -262,6 +273,7 @@
                         <h3>Debug Information:</h3>
                         <p>Is Logged In: {isLoggedIn.toString()}</p>
                         <p>Token: {token ? token.substring(0, 10) + '...' : 'None'}</p>
+                        <pre>{debugInfo}</pre>
                     </div>
                 </div>
             );
