@@ -7,26 +7,12 @@ const axios = require('axios');
 const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
-const { login, logout, authenticateSession, register } = require('./auth');
+const { login, logout, authenticateSession, register, verifyToken } = require('./auth');
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(cors());
-
-app.post('/api/login', login);
-app.post('/api/logout', logout);
-app.post('/api/register', register);
-
-app.get('/api/test', (req, res) => {
-    console.log('Test route hit');
-    res.json({ message: 'API is working' });
-});
-
-// Example of a protected route
-app.get('/api/protected', authenticateSession, (req, res) => {
-    res.json({ message: 'This is a protected route', user: req.user });
-});
 
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
@@ -50,6 +36,27 @@ pool.getConnection()
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Authentication routes
+app.post('/api/login', login);
+app.post('/api/logout', logout);
+app.post('/api/register', register);
+
+app.get('/api/protected', authenticateSession, (req, res) => {
+    res.json({ message: 'This is a protected route', user: req.user });
+});
+
+app.get('/api/check-auth', (req, res) => {
+    const token = req.headers['authorization'];
+    if (!token) {
+        return res.json({ isAuthenticated: false });
+    }
+    const payload = verifyToken(token);
+    if (!payload) {
+        return res.json({ isAuthenticated: false });
+    }
+    res.json({ isAuthenticated: true, user: payload });
+});
+
 // API Routes
 app.get('/api/test', (req, res) => {
     res.json({ message: 'API is working' });
@@ -57,17 +64,17 @@ app.get('/api/test', (req, res) => {
 
 app.get('/api/tenants', getTenants);
 app.get('/api/agents', authenticateSession, getAgents);
-app.post('/api/agents', addAgent);
-app.get('/api/agents/:id', getAgent);
-app.put('/api/agents/:id', updateAgent);
-app.delete('/api/agents/:id', deleteAgent);
-app.post('/api/agents/bulk-delete', bulkDeleteAgents);
-app.get('/api/agents/:id/banking-info', getBankingInfo);
-app.put('/api/agents/:id/banking-info', updateBankingInfo);
-app.get('/api/agents/:id/commission-rules', getCommissionRules);
-app.put('/api/agents/:id/commission-rules', updateCommissionRules);
-app.get('/api/coverages', getCoverages);
-app.post('/api/upload-csv', upload.single('file'), uploadCSV);
+app.post('/api/agents', authenticateSession, addAgent);
+app.get('/api/agents/:id', authenticateSession, getAgent);
+app.put('/api/agents/:id', authenticateSession, updateAgent);
+app.delete('/api/agents/:id', authenticateSession, deleteAgent);
+app.post('/api/agents/bulk-delete', authenticateSession, bulkDeleteAgents);
+app.get('/api/agents/:id/banking-info', authenticateSession, getBankingInfo);
+app.put('/api/agents/:id/banking-info', authenticateSession, updateBankingInfo);
+app.get('/api/agents/:id/commission-rules', authenticateSession, getCommissionRules);
+app.put('/api/agents/:id/commission-rules', authenticateSession, updateCommissionRules);
+app.get('/api/coverages', authenticateSession, getCoverages);
+app.post('/api/upload-csv', authenticateSession, upload.single('file'), uploadCSV);
 
 // Route Handlers
 async function getTenants(req, res) {
@@ -383,24 +390,34 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'login.html'));
 });
 
+// Handle view-agents.html route
+app.get('/view-agents.html', (req, res, next) => {
+    const token = req.headers['authorization'];
+    if (!token || !verifyToken(token)) {
+        return res.redirect('/login.html?redirect=/view-agents.html');
+    }
+    next();
+});
+
 // Handle all other routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Global error handler:', err);
+    res.status(500).json({
+        success: false,
+        message: 'An unexpected error occurred',
+        error: err.message,
+        stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
+    });
+});
+
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
-});
-
-app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-  res.status(500).json({
-    success: false,
-    message: 'An unexpected error occurred',
-    error: err.message,
-    stack: err.stack
-  });
 });
 
 module.exports = app;
