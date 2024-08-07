@@ -388,9 +388,15 @@ const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
+
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  console.error('Global error handler:', err);
+  res.status(500).json({
+    success: false,
+    message: 'An unexpected error occurred',
+    error: err.message,
+    stack: err.stack
+  });
 });
 
 module.exports = app;
