@@ -21,12 +21,21 @@ function hashPassword(password) {
 
 // Helper function to generate a token
 function generateToken(userId, role) {
+    const header = {
+        alg: 'HS256',
+        typ: 'JWT'
+    };
     const payload = {
         userId: userId,
         role: role,
         exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour expiration
     };
-    return Buffer.from(JSON.stringify(payload)).toString('base64');
+    const headerEncoded = Buffer.from(JSON.stringify(header)).toString('base64url');
+    const payloadEncoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    const signature = crypto.createHmac('sha256', JWT_SECRET)
+        .update(headerEncoded + '.' + payloadEncoded)
+        .digest('base64url');
+    return `${headerEncoded}.${payloadEncoded}.${signature}`;
 }
 
 // Helper function to verify a token
@@ -34,6 +43,14 @@ function verifyToken(token) {
     try {
         const payload = JSON.parse(Buffer.from(token, 'base64').toString());
         if (payload.exp < Math.floor(Date.now() / 1000)) {
+            return null;
+        }
+        // Verify the signature
+        const [header, payload, signature] = token.split('.');
+        const verifySignature = crypto.createHmac('sha256', JWT_SECRET)
+            .update(header + '.' + payload)
+            .digest('base64url');
+        if (signature !== verifySignature) {
             return null;
         }
         return payload;
