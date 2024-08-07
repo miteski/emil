@@ -45,25 +45,31 @@ function verifyToken(token) {
 async function login(req, res) {
     const { username, password } = req.body;
     try {
+        console.log('Login attempt for username:', username);
         const [users] = await pool.query('SELECT * FROM Users WHERE Username = ?', [username]);
+        console.log('Query result:', users);
         if (users.length === 0) {
+            console.log('No user found');
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
         const user = users[0];
 
         const hashedPassword = hashPassword(password);
+        console.log('Comparing passwords:', { stored: user.PasswordHash, provided: hashedPassword });
         if (hashedPassword !== user.PasswordHash) {
+            console.log('Password mismatch');
             return res.status(401).json({ success: false, message: 'Invalid credentials' });
         }
 
         const token = generateToken(user.UserID, user.Role);
+        console.log('Generated token:', token);
 
         await pool.query('UPDATE Users SET LastLogin = CURRENT_TIMESTAMP WHERE UserID = ?', [user.UserID]);
 
         res.json({ success: true, message: 'Login successful', token });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ success: false, message: 'An error occurred during login' });
+        res.status(500).json({ success: false, message: 'An error occurred during login', error: error.message });
     }
 }
 
