@@ -1,46 +1,76 @@
 const crypto = require('crypto');
+const mysql = require('mysql2/promise');
 
-const sessions = {};
+const pool = mysql.createPool({
+    host: process.env.MYSQL_HOST,
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASSWORD,
+    database: process.env.MYSQL_DATABASE,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
-function generateToken() {
-    return crypto.randomBytes(32).toString('hex');
+// Use this secret for token generation and verification
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
+
+// Helper function to hash passwords
+function hashPassword(password) {
+    return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-function login(req, res) {
+// Helper function to generate a token
+function generateToken(userId, role) {
+    const payload = {
+        userId: userId,
+        role: role,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour expiration
+    };
+    return Buffer.from(JSON.stringify(payload)).toString('base64');
+}
+
+// Helper function to verify a token
+function verifyToken(token) {
+    try {
+        const payload = JSON.parse(Buffer.from(token, 'base64').toString());
+        if (payload.exp < Math.floor(Date.now() / 1000)) {
+            return null;
+        }
+        return payload;
+    } catch (error) {
+        return null;
+    }
+}
+
+async function login(req, res) {
     const { username, password } = req.body;
-    // This is still a mock authentication. 
-    // In a real app, you'd check these credentials against your database.
-    if (username === 'admin' && password === 'password') {
-        const token = generateToken();
-        sessions[token] = { username, loggedInAt: new Date() };
+    try {
+        const [users] = await pool.query('SELECT * FROM Users WHERE Username = ?', [username]);
+        if (users.length === 0) {
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        }
+        const user = users[0];
+
+        const hashedPassword = hashPassword(password);
+        if (hashedPassword !== user.PasswordHash) {
+            return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        }
+
+        const token = generateToken(user.UserID, user.Role);
+
+        await pool.query('UPDATE Users SET LastLogin = CURRENT_TIMESTAMP WHERE UserID = ?', [user.UserID]);
+
         res.json({ success: true, message: 'Login successful', token });
-    } else {
-        res.status(401).json({ success: false, message: 'Invalid credentials' });
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ success: false, message: 'An error occurred during login' });
     }
 }
 
-function logout(req, res) {
-    const token = req.headers['authorization'];
-    if (token && sessions[token]) {
-        delete sessions[token];
-        res.json({ success: true, message: 'Logged out successfully' });
-    } else {
-        res.status(401).json({ success: false, message: 'No active session' });
-    }
+async function logout(req, res) {
+    // Since we're not storing tokens server-side, logout is handled client-side
+    // by removing the token. We'll just send a success response.
+    res.json({ success: true, message: 'Logout successful' });
 }
 
-function authenticateSession(req, res, next) {
-    const token = req.headers['authorization'];
-    if (token && sessions[token]) {
-        req.user = sessions[token];
-        next();
-    } else {
-        res.status(401).json({ success: false, message: 'Unauthorized' });
-    }
-}
-
-module.exports = {
-    login,
-    logout,
-    authenticateSession
-};
+function authenticateSession(req, res, n
