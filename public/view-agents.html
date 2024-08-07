@@ -10,8 +10,9 @@
     <link href="/css/styles.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #32cccc; /* Navigation bar color */
-            --secondary-color: #5bd7d7; /* Sub-menu label color */
+            --primary-color: #32cccc; /* Green for text */
+            --secondary-color: #5bd7d7; /* Light green for selected item */
+            --background-color: #f5f5f5; /* Background color for page */
             --success-color: #28a745;
             --danger-color: #dc3545;
             --light-gray: #f8f9fa;
@@ -20,13 +21,13 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--light-gray);
+            background-color: var(--background-color);
             color: var(--dark-gray);
             padding-top: 56px; /* To ensure content doesn't hide under fixed navbar */
         }
 
         .navbar {
-            background-color: var(--primary-color);
+            background-color: white;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
@@ -35,38 +36,22 @@
         }
 
         .navbar-nav .nav-link {
-            color: white !important;
+            color: var(--dark-gray) !important;
         }
 
         .navbar-nav .nav-link.active {
-            font-weight: 600;
+            color: var(--secondary-color) !important;
+            border-bottom: 3px solid var(--secondary-color);
+            font-weight: bold;
         }
 
-        .submenu-label {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 0.5rem 1rem;
-            font-family: 'Roboto', sans-serif;
-            font-weight: 700;
-            text-align: center;
-            margin-top: -1px; /* To cover the border of navbar */
-            width: 100%;
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
         }
 
         .container {
             max-width: 1200px;
             margin-top: 2rem;
-        }
-
-        .page-title {
-            margin-bottom: 1.5rem;
-        }
-
-        .page-title h1 {
-            font-family: 'Roboto', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            color: white;
         }
 
         .btn {
@@ -113,6 +98,24 @@
             text-align: center;
         }
 
+        .pagination .page-link {
+            border-radius: 50%;
+            border: none;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination .page-item .page-link {
+            color: var(--primary-color);
+        }
+
+        .pagination .page-link:hover {
+            background-color: var(--secondary-color);
+        }
+
         .modal-content {
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -142,6 +145,10 @@
             margin-bottom: 1rem;
         }
 
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .container {
@@ -151,7 +158,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="/">
                 <img src="https://assets-global.website-files.com/5f801bd9152353d350740da6/5f84488e52cbbcea02631cbc_emillogo.svg" alt="emil logo">
@@ -172,10 +179,6 @@
         </div>
     </nav>
 
-    <div class="submenu-label">
-        <h1>View Agents</h1>
-    </div>
-
     <div class="container mt-4">
         <div class="row mb-3">
             <div class="col-md-6 d-flex align-items-center">
@@ -189,10 +192,10 @@
             <div class="col-md-6">
                 <div class="input-group">
                     <input type="text" id="searchInput" class="form-control" placeholder="Search by name or email">
-                    <button class="btn btn-outline-secondary" type="button" onclick="searchAgents()">
+                    <button class="btn btn-outline-secondary rounded-end" type="button" onclick="searchAgents()">
                         <i class="bi bi-search"></i>
                     </button>
-                    <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
+                    <button class="btn btn-outline-secondary rounded-end" type="button" onclick="clearSearch()">
                         <i class="bi bi-x-lg"></i>
                     </button>
                 </div>
@@ -223,7 +226,7 @@
             <ul class="pagination justify-content-center">
                 <li class="page-item">
                     <a class="page-link" href="#" onclick="changePage(-1)" aria-label="Previous">
-                        <i class="bi bi-chevron-left"></i>
+                        <i class="bi bi-chevron-double-left"></i>
                     </a>
                 </li>
                 <li class="page-item disabled">
@@ -231,7 +234,7 @@
                 </li>
                 <li class="page-item">
                     <a class="page-link" href="#" onclick="changePage(1)" aria-label="Next">
-                        <i class="bi bi-chevron-right"></i>
+                        <i class="bi bi-chevron-double-right"></i>
                     </a>
                 </li>
             </ul>
@@ -320,8 +323,10 @@
                     <form id="commissionRulesForm">
                         <input type="hidden" id="commissionAgentId">
                         <div id="commissionRulesFields"></div>
-                        <button type="button" class="btn btn-secondary mb-3" onclick="addCommissionRule()">Add Rule</button>
-                        <button type="submit" class="btn btn-primary">Save Commission Rules</button>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary mb-3 me-2" onclick="addCommissionRule()">Add Rule</button>
+                            <button type="submit" class="btn btn-primary mb-3">Save Commission Rules</button>
+                        </div>
                     </form>
                 </div>
             </div>
