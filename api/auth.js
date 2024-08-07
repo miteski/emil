@@ -69,7 +69,12 @@ async function login(req, res) {
         res.json({ success: true, message: 'Login successful', token });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(500).json({ success: false, message: 'An error occurred during login', error: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: 'An error occurred during login', 
+            error: error.message,
+            stack: error.stack
+        });
     }
 }
 
