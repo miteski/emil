@@ -11,6 +11,9 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
+// Use this secret for token generation and verification
+const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(64).toString('hex');
+
 // Helper function to hash passwords
 function hashPassword(password) {
     return crypto.createHash('sha256').update(password).digest('hex');
@@ -29,12 +32,25 @@ function generateToken(userId, role) {
 // Helper function to verify a token
 function verifyToken(token) {
     try {
-        const payload = JSON.parse(Buffer.from(token, 'base64').toString());
+        const [headerPart, payloadPart, signaturePart] = token.split('.');
+        const payload = JSON.parse(Buffer.from(payloadPart, 'base64').toString());
+        
         if (payload.exp < Math.floor(Date.now() / 1000)) {
             return null;
         }
+
+        // Verify the signature (you may want to implement actual signature verification here)
+        const verifySignature = crypto.createHmac('sha256', JWT_SECRET)
+            .update(headerPart + '.' + payloadPart)
+            .digest('base64url');
+
+        if (signaturePart !== verifySignature) {
+            return null;
+        }
+
         return payload;
     } catch (error) {
+        console.error('Token verification error:', error);
         return null;
     }
 }
