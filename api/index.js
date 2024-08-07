@@ -8,21 +8,20 @@ const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
 
+const { login, logout, authenticateSession } = require('./auth');
+
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(cors());
 
-// Login route
-app.post('/api/login', async (req, res) => {
-    const { username, password } = req.body;
-    // This is a mock authentication. 
-    // In a real app, you'd check these credentials against your database.
-    if (username === 'admin' && password === 'password') {
-        res.json({ success: true, message: 'Login successful' });
-    } else {
-        res.status(401).json({ success: false, message: 'Invalid credentials' });
-    }
+// Authentication routes
+app.post('/api/login', login);
+app.post('/api/logout', logout);
+
+// Example of a protected route
+app.get('/api/protected', authenticateSession, (req, res) => {
+    res.json({ message: 'This is a protected route', user: req.user });
 });
 
 const pool = mysql.createPool({
