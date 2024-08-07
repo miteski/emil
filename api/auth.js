@@ -87,4 +87,43 @@ async function logout(req, res) {
     res.json({ success: true, message: 'Logout successful' });
 }
 
-function authenticateSession(req, res, n
+function authenticateSession(req, res, next) {
+    const token = req.headers['authorization'];
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'No token provided' });
+    }
+
+    const payload = verifyToken(token);
+    if (!payload) {
+        return res.status(403).json({ success: false, message: 'Invalid or expired token' });
+    }
+
+    req.user = payload;
+    next();
+}
+
+async function register(req, res) {
+    const { username, password, email, firstName, lastName, role } = req.body;
+    try {
+        const hashedPassword = hashPassword(password);
+        const [result] = await pool.query(
+            'INSERT INTO Users (Username, PasswordHash, Email, FirstName, LastName, Role) VALUES (?, ?, ?, ?, ?, ?)',
+            [username, hashedPassword, email, firstName, lastName, role]
+        );
+        res.status(201).json({ success: true, message: 'User registered successfully', userId: result.insertId });
+    } catch (error) {
+        console.error('Registration error:', error);
+        if (error.code === 'ER_DUP_ENTRY') {
+            res.status(400).json({ success: false, message: 'Username or email already exists' });
+        } else {
+            res.status(500).json({ success: false, message: 'An error occurred during registration' });
+        }
+    }
+}
+
+module.exports = {
+    login,
+    logout,
+    authenticateSession,
+    register
+};
