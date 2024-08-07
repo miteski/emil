@@ -7,43 +7,60 @@
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/next-auth/dist/next-auth.js"></script>
 </head>
 <body>
     <div id="root"></div>
+    <div id="debug"></div>
 
     <script type="text/babel">
         function LoginButton() {
             return (
-                <button onClick={() => NextAuth.signIn()}>Sign in</button>
+                <button onClick={() => console.log('Login clicked')}>Sign in</button>
             );
         }
 
         function LogoutButton() {
             return (
-                <button onClick={() => NextAuth.signOut()}>Sign out</button>
+                <button onClick={() => console.log('Logout clicked')}>Sign out</button>
             );
         }
 
         function LoginPage() {
-            const [session, setSession] = React.useState(null);
+            const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 
             React.useEffect(() => {
-                NextAuth.getSession().then((session) => {
-                    setSession(session);
-                });
+                // Simulate checking login status
+                setTimeout(() => {
+                    setIsLoggedIn(false);
+                    updateDebugInfo();
+                }, 1000);
             }, []);
 
-            if (session) {
-                return (
-                    <div>
-                        <p>Signed in as {session.user.email}</p>
-                        <LogoutButton />
-                    </div>
-                );
+            function updateDebugInfo() {
+                const debugElement = document.getElementById('debug');
+                debugElement.innerHTML = `
+                    <h3>Debug Information:</h3>
+                    <p>Is Logged In: ${isLoggedIn}</p>
+                    <p>Current Time: ${new Date().toLocaleString()}</p>
+                `;
             }
 
-            return <LoginButton />;
+            return (
+                <div>
+                    <h1>Login Page</h1>
+                    {isLoggedIn ? (
+                        <div>
+                            <p>You are logged in!</p>
+                            <LogoutButton />
+                        </div>
+                    ) : (
+                        <div>
+                            <p>Please log in</p>
+                            <LoginButton />
+                        </div>
+                    )}
+                </div>
+            );
         }
 
         ReactDOM.render(<LoginPage />, document.getElementById('root'));
