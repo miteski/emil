@@ -456,96 +456,104 @@
     </div>
 
     <!-- Basic Info Modal -->
-    <div class="modal fade" id="basicInfoModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="basicInfoModalTitle">Agent Basic Info</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="basicInfoForm">
-                        <input type="hidden" id="agentId">
-                        <div class="mb-3">
-                            <label for="fullname" class="form-label">Full Name:</label>
-                            <input type="text" class="form-control" id="fullname" name="fullname" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email:</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="tenantId" class="form-label">Tenant:</label>
-                            <select class="form-select" id="tenantId" name="tenantId" required>
-                                <option value="">Select Tenant</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Basic Info</button>
-                    </form>
+         <div class="modal fade" id="basicInfoModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="basicInfoModalTitle">Agent Basic Info</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="basicInfoForm">
+                            <input type="hidden" id="agentId">
+                            <div class="mb-3">
+                                <label for="fullname" class="form-label">Full Name:</label>
+                                <input type="text" class="form-control" id="fullname" name="fullname" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tenantId" class="form-label">Tenant:</label>
+                                <select class="form-select" id="tenantId" name="tenantId" required>
+                                    <option value="">Select Tenant</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" form="basicInfoForm" class="btn btn-primary">Save Basic Info</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Banking Info Modal -->
-    <div class="modal fade" id="bankingInfoModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Agent Banking Info</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="bankingInfoForm">
-                        <input type="hidden" id="bankingAgentId">
-                        <div class="mb-3">
-                            <label for="bankName" class="form-label">Bank Name:</label>
-                            <input type="text" class="form-control" id="bankName" name="bankName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="iban" class="form-label">IBAN:</label>
-                            <input type="text" class="form-control" id="iban" name="iban" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="bic" class="form-label">BIC:</label>
-                            <input type="text" class="form-control" id="bic" name="bic" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="accountHolderName" class="form-label">Account Holder Name:</label>
-                            <input type="text" class="form-control" id="accountHolderName" name="accountHolderName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="paymentMethod" class="form-label">Payment Method:</label>
-                            <input type="text" class="form-control" id="paymentMethod" name="paymentMethod" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Banking Info</button>
-                    </form>
+         <div class="modal fade" id="bankingInfoModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agent Banking Info</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="bankingInfoForm">
+                            <input type="hidden" id="bankingAgentId">
+                            <div class="mb-3">
+                                <label for="bankName" class="form-label">Bank Name:</label>
+                                <input type="text" class="form-control" id="bankName" name="bankName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="iban" class="form-label">IBAN:</label>
+                                <input type="text" class="form-control" id="iban" name="iban" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="bic" class="form-label">BIC:</label>
+                                <input type="text" class="form-control" id="bic" name="bic" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="accountHolderName" class="form-label">Account Holder Name:</label>
+                                <input type="text" class="form-control" id="accountHolderName" name="accountHolderName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="paymentMethod" class="form-label">Payment Method:</label>
+                                <input type="text" class="form-control" id="paymentMethod" name="paymentMethod" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" form="bankingInfoForm" class="btn btn-primary">Save Banking Info</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Commission Rules Modal -->
-    <div class="modal fade" id="commissionRulesModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Agent Commission Rules</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="commissionRulesForm">
-                        <input type="hidden" id="commissionAgentId">
-                        <div id="commissionRulesFields"></div>
-                        <div class="d-flex justify-content-end">
-                            <button type="button" class="btn btn-secondary mb-3 me-2" onclick="addCommissionRule()">Add Rule</button>
-                            <button type="submit" class="btn btn-primary mb-3">Save Commission Rules</button>
-                        </div>
-                    </form>
-                </div>
+   <div class="modal fade" id="commissionRulesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agent Commission Rules</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="commissionRulesForm">
+                    <input type="hidden" id="commissionAgentId">
+                    <div class="commission-rule-actions">
+                        <button type="button" class="btn btn-secondary" onclick="addCommissionRule()">Add Rule</button>
+                    </div>
+                    <div id="commissionRulesFields">
+                        <!-- Commission rules will be added here -->
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="commissionRulesForm" class="btn btn-primary">Save Commission Rules</button>
             </div>
         </div>
     </div>
+</div>
 
       <button class="btn btn-sm btn-secondary position-fixed bottom-0 end-0 m-3" onclick="toggleDebugInfo()">
         <i class="bi bi-bug"></i>
