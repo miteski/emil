@@ -355,22 +355,34 @@
         font-size: 0.9em;
     }
 
-    #debugInfo {
-        background-color: var(--light-gray);
-        border-radius: 8px;
-        padding: 1rem;
-        margin-top: 2rem;
-        font-family: 'Inter', sans-serif;
-        display: none;
-    }
+   #debugButton {
+    z-index: 2000;
+}
 
-    #debugInfo h3 {
-        background-color: #e9ecef;
-        padding: 0.5rem 1rem;
-        margin: -1rem -1rem 1rem -1rem;
-        border-radius: 8px 8px 0 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+#debugInfo {
+    background-color: var(--light-gray);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 2rem;
+    font-family: 'Inter', sans-serif;
+    display: none;
+    position: fixed;
+    bottom: 50px;
+    right: 20px;
+    max-width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1999;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+#debugInfo h3, #debugInfo h4 {
+    background-color: #e9ecef;
+    padding: 0.5rem 1rem;
+    margin: -1rem -1rem 1rem -1rem;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
@@ -895,24 +907,56 @@
 
 function toggleDebugInfo() {
     const debugInfo = document.getElementById('debugInfo');
-    debugInfo.style.display = debugInfo.style.display === 'none' ? 'block' : 'none';
-    if (debugInfo.style.display === 'block') {
+    const debugButton = document.getElementById('debugButton');
+    if (debugInfo.style.display === 'none') {
+        debugInfo.style.display = 'block';
         updateDebugInfo();
-        debugInfo.scrollIntoView({ behavior: 'smooth' });
+        debugButton.textContent = 'Hide Debug';
+    } else {
+        debugInfo.style.display = 'none';
+        debugButton.textContent = 'Debug';
     }
 }
 
-    function updateDebugInfo() {
-        const debugInfo = document.getElementById('debugInfo');
-        debugInfo.innerHTML = `
-            <h3>Debug Information</h3>
-            <p>Current Page: ${currentPage}</p>
-            <p>Page Size: ${pageSize}</p>
-            <p>Search Term: ${document.getElementById('searchInput').value}</p>
-            <p>Last API Call: ${new Date().toLocaleString()}</p>
-            <p>Last Error: ${lastError}</p>
-        `;
-    }
+function updateDebugInfo() {
+    const debugInfo = document.getElementById('debugInfo');
+    const windowSize = `Window size: ${window.innerWidth}x${window.innerHeight}`;
+    const scrollPosition = `Scroll position: ${window.pageXOffset}x${window.pageYOffset}`;
+    const tableContainerInfo = getElementInfo('table-container');
+    const topControlsInfo = getElementInfo('top-controls');
+    const paginationInfo = getElementInfo('pagination-container');
+
+    debugInfo.innerHTML = `
+        <h3>Debug Information</h3>
+        <p>${windowSize}</p>
+        <p>${scrollPosition}</p>
+        <p>Current Page: ${currentPage}</p>
+        <p>Page Size: ${pageSize}</p>
+        <p>Search Term: ${document.getElementById('searchInput').value}</p>
+        <p>Last API Call: ${new Date().toLocaleString()}</p>
+        <p>Last Error: ${lastError}</p>
+        <h4>Element Information:</h4>
+        <p>Table Container: ${tableContainerInfo}</p>
+        <p>Top Controls: ${topControlsInfo}</p>
+        <p>Pagination: ${paginationInfo}</p>
+    `;
+}
+
+function getElementInfo(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return 'Not found';
+    const rect = element.getBoundingClientRect();
+    return `Position: (${rect.left}, ${rect.top}), Size: ${rect.width}x${rect.height}`;
+}
+
+// Call this function whenever the window is resized
+window.addEventListener('resize', updateDebugInfo);
+
+// Call this function after loading the agents
+function afterLoadingAgents() {
+    updateDebugInfo();
+    // ... any other code you want to run after loading agents
+}
 
     function initTooltips() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -946,5 +990,11 @@ function toggleDebugInfo() {
         })
         .catch(error => console.error('Error fetching coverages:', error));
     </script>
+   
+    <button id="debugButton" class="btn btn-sm btn-secondary position-fixed bottom-0 end-0 m-3" onclick="toggleDebugInfo()">
+    <i class="bi bi-bug"></i> Debug
+</button>
+<div id="debugInfo" class="container mt-4"></div>
+    
 </body>
 </html>
