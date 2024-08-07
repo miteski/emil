@@ -8,16 +8,16 @@ const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
 
-const { login, logout, authenticateSession } = require('./auth');
+const { login, logout, authenticateSession, register } = require('./auth');
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(cors());
 
-// Authentication routes
 app.post('/api/login', login);
 app.post('/api/logout', logout);
+app.post('/api/register', register);
 
 // Example of a protected route
 app.get('/api/protected', authenticateSession, (req, res) => {
