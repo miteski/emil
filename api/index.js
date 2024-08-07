@@ -13,6 +13,18 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(cors());
 
+// Login route
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    // This is a mock authentication. 
+    // In a real app, you'd check these credentials against your database.
+    if (username === 'admin' && password === 'password') {
+        res.json({ success: true, message: 'Login successful' });
+    } else {
+        res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+});
+
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
