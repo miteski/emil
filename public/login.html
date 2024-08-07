@@ -224,27 +224,22 @@
                 }
             };
 
-            const handleLogout = async () => {
-                try {
-                    const response = await fetch('/api/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': token,
-                        },
-                    });
-                    const data = await response.json();
-                    if (data.success) {
-                        setIsLoggedIn(false);
-                        setMessage('Logged out successfully.');
-                        setToken('');
-                        localStorage.removeItem('token');
-                    } else {
-                        setMessage(data.message);
-                    }
-                } catch (error) {
-                    setMessage('An error occurred during logout. Please try again.');
-                }
-            };
+          const handleLogout = async () => {
+    try {
+        await fetch('/api/logout', {
+            method: 'POST',
+            headers: {
+                'Authorization': token,
+            },
+        });
+        setIsLoggedIn(false);
+        setMessage('Logged out successfully.');
+        setToken('');
+        localStorage.removeItem('token');
+    } catch (error) {
+        setMessage('An error occurred during logout. Please try again.');
+    }
+};
 
             const fetchProtectedData = async () => {
                 try {
