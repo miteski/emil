@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/next-auth/dist/next-auth.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function LoginButton() {
+            return (
+                <button onClick={() => NextAuth.signIn()}>Sign in</button>
+            );
+        }
+
+        function LogoutButton() {
+            return (
+                <button onClick={() => NextAuth.signOut()}>Sign out</button>
+            );
+        }
+
+        function LoginPage() {
+            const [session, setSession] = React.useState(null);
+
+            React.useEffect(() => {
+                NextAuth.getSession().then((session) => {
+                    setSession(session);
+                });
+            }, []);
+
+            if (session) {
+                return (
+                    <div>
+                        <p>Signed in as {session.user.email}</p>
+                        <LogoutButton />
+                    </div>
+                );
+            }
+
+            return <LoginButton />;
+        }
+
+        ReactDOM.render(<LoginPage />, document.getElementById('root'));
+    </script>
+</body>
+</html>
