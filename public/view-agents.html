@@ -27,20 +27,20 @@
         color: var(--text-color);
         font-size: 16px;
         line-height: 1.5;
-        padding-top: 70px;
+        padding-top: 60px;
+        padding-bottom: 60px;
+        overflow: hidden;
     }
 
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Inter', sans-serif;
         font-weight: 700;
     }
-    .navbar {
-        margin-bottom: 1rem;
-    }
+
     .navbar {
         background-color: var(--background-color);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
+        margin-bottom: 0.5rem;
     }
 
     .navbar-brand img {
@@ -72,7 +72,7 @@
 
     .container {
         max-width: 1200px;
-        padding: 1rem 1rem;
+        padding: 0.5rem 1rem;
     }
 
     .btn {
@@ -125,7 +125,7 @@
     .table-container {
         position: relative;
         overflow-y: auto;
-        height: calc(100vh - 220px);
+        height: calc(100vh - 200px);
         margin-bottom: 0.5rem;
     }
 
@@ -134,7 +134,7 @@
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-top: 2rem;
+        margin-bottom: 0;
     }
 
     .table thead {
@@ -148,7 +148,7 @@
     .table th, .table td {
         vertical-align: middle;
         text-align: center;
-        padding: 1rem;
+        padding: 0.75rem;
     }
 
     .table td i {
@@ -167,6 +167,16 @@
 
     .table tbody tr.selected {
         background-color: rgba(50, 204, 204, 0.1);
+    }
+
+    .pagination-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: white;
+        padding: 10px 0;
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .pagination .page-link {
@@ -188,27 +198,6 @@
         transform: none;
     }
 
-    .table-container {
-    position: relative;
-    overflow: auto;
-    height: calc(100vh - 250px);
-    margin-bottom: 1rem;
-}
-
-    .pagination-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: white;
-        padding: 10px 0;
-        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-    }
-    
-    body {
-        padding-bottom: 60px;
-    }
-
     .modal-content {
         border-radius: 8px;
         border: none;
@@ -224,7 +213,7 @@
     }
 
     .modal-body {
-        max-height: 70vh;
+        max-height: 60vh;
         overflow-y: auto;
         padding-bottom: 70px;
     }
@@ -348,7 +337,7 @@
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .container {
-            padding: 1rem;
+            padding: 0.5rem;
         }
     }
 </style>
