@@ -176,11 +176,17 @@ body {
 #searchForm .btn-outline-secondary {
     border-color: #ced4da;
     color: #6c757d;
+    font-weight: normal;
+    box-shadow: none;
 }
 
 #searchForm .btn-outline-secondary:hover {
     background-color: #f8f9fa;
     color: #495057;
+}
+
+#searchForm .input-group {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .modal-body {
