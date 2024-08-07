@@ -3,15 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Insurance Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #32cccc;
+            --secondary-color: #5bd7d7;
+            --background-color: #ffffff;
+            --text-color: #333333;
+            --light-gray: #f8f9fa;
+            --dark-gray: #212529;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-size: 16px;
+            line-height: 1.5;
+            padding-top: 60px;
+        }
+
+        .navbar {
+            background-color: var(--background-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand img {
+            height: 40px;
+        }
+
+        .navbar-nav .nav-link {
+            color: var(--text-color) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .navbar-nav .nav-link.active::after,
+        .navbar-nav .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .navbar-nav .nav-link.active,
+        .navbar-nav .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .container {
+            max-width: 1200px;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .form-control {
+            border-radius: 4px;
+            border: 1px solid var(--light-gray);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(50, 204, 204, 0.25);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #ffffff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #2ba3a3;
+            border-color: #2ba3a3;
+            transform: translateY(-2px);
+        }
+
+        #message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+
+        #message.success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        #message.error {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        #debug {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: var(--light-gray);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="https://assets-global.website-files.com/5f801bd9152353d350740da6/5f84488e52cbbcea02631cbc_emillogo.svg" alt="emil logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/view-agents.html">View Agents</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/upload-csv.html">Upload Policies</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container" id="root"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-</head>
-<body>
-    <div id="root"></div>
-    <div id="debug"></div>
-
     <script type="text/babel">
         function LoginForm({ onLogin }) {
             const [username, setUsername] = React.useState('');
@@ -24,19 +159,31 @@
 
             return (
                 <form onSubmit={handleSubmit}>
-                    <input 
-                        type="text" 
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)} 
-                        placeholder="Username" 
-                    />
-                    <input 
-                        type="password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                        placeholder="Password" 
-                    />
-                    <button type="submit">Login</button>
+                    <div className="mb-3">
+                        <label htmlFor="username" className="form-label">Username</label>
+                        <input 
+                            type="text" 
+                            className="form-control"
+                            id="username"
+                            value={username} 
+                            onChange={(e) => setUsername(e.target.value)} 
+                            placeholder="Enter username" 
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="password" className="form-label">Password</label>
+                        <input 
+                            type="password" 
+                            className="form-control"
+                            id="password"
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                            placeholder="Enter password" 
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary">
+                        <i className="bi bi-box-arrow-in-right"></i> Login
+                    </button>
                 </form>
             );
         }
@@ -115,20 +262,21 @@
 
             return (
                 <div>
-                    <h1>Login Page</h1>
+                    <h1>{isLoggedIn ? 'Welcome' : 'Login'}</h1>
                     {isLoggedIn ? (
                         <div>
                             <p>You are logged in!</p>
-                            <button onClick={handleLogout}>Logout</button>
-                            <button onClick={fetchProtectedData}>Fetch Protected Data</button>
+                            <button onClick={handleLogout} className="btn btn-primary me-2">
+                                <i className="bi bi-box-arrow-right"></i> Logout
+                            </button>
+                            <button onClick={fetchProtectedData} className="btn btn-secondary">
+                                <i className="bi bi-shield-lock"></i> Fetch Protected Data
+                            </button>
                         </div>
                     ) : (
-                        <div>
-                            <p>Please log in</p>
-                            <LoginForm onLogin={handleLogin} />
-                        </div>
+                        <LoginForm onLogin={handleLogin} />
                     )}
-                    <p>{message}</p>
+                    {message && <div id="message" className={isLoggedIn ? 'success' : 'error'}>{message}</div>}
                     <div id="debug">
                         <h3>Debug Information:</h3>
                         <p>Is Logged In: {isLoggedIn.toString()}</p>
