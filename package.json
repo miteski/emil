@@ -15,8 +15,8 @@
     "axios": "^0.27.2",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
-    "next-auth": "^4.0.0"
-     "puppeteer-core": "^10.0.0",
+    "next-auth": "^4.0.0",
+    "puppeteer-core": "^10.0.0",
     "chrome-aws-lambda": "^10.1.0"
   },
   "devDependencies": {
