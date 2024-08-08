@@ -450,7 +450,7 @@
                             <i class="bi bi-search"></i>
                         </button>
                         <button class="btn btn-outline-secondary" type="button" onclick="clearSearch()">
-                            <i class="bi bi-x-lg"></i>
+                   <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
                 </form>
@@ -612,42 +612,38 @@
     let lastError = '';
     let coverages = [];
 
-        // Check authentication status
-    fetch('/api/check-auth', {
-        headers: {
-            'Authorization': localStorage.getItem('token')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.isAuthenticated) {
-            window.location.href = '/login.html?redirect=/view-agents.html';
-        }
-    })
-    .catch(error => {
-        console.error('Error checking authentication:', error);
-    });
+    function fetchWithAuth(url, options = {}) {
+        const token = localStorage.getItem('token');
+        return fetch(url, {
+            ...options,
+            headers: {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    }
 
-     function checkAuthentication() {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    // Check authentication status
+    fetchWithAuth('/api/check-auth')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.isAuthenticated) {
+                window.location.href = '/login.html?redirect=/view-agents.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking authentication:', error);
+            window.location.href = '/login.html?redirect=/view-agents.html';
+        });
+
+    function logout() {
+        localStorage.removeItem('token');
         window.location.href = '/login.html';
     }
-} 
-        checkAuthentication();
-        function logout() {
-                            localStorage.removeItem('token');
-                            window.location.href = '/login.html';
-                            }
 
     function fetchAgents(page, search = '') {
         console.log(`Fetching agents for page ${page}, search: "${search}"`);
-   const token = localStorage.getItem('token');
-fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
-    headers: {
-        'Authorization': token
-    }
-})
+        fetchWithAuth(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`)
             .then(response => {
                 console.log('Response status:', response.status);
                 if (!response.ok) {
@@ -696,19 +692,19 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
                 document.getElementById('errorMessage').style.display = 'none';
                 lastError = '';
             })
-    .catch(error => {
-    console.error('Error fetching agents:', error);
-    if (error.message.includes('401') || error.message.includes('403')) {
-        localStorage.removeItem('token');
-        window.location.href = '/login.html';
-    } else {
-        document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Failed to load records</td></tr>';
-        document.getElementById('errorMessage').textContent = 'Failed to load records';
-        document.getElementById('errorMessage').style.display = 'block';
-        lastError = error.message;
-        updateDebugInfo();
-    }
-});
+            .catch(error => {
+                console.error('Error fetching agents:', error);
+                if (error.message.includes('401') || error.message.includes('403')) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login.html';
+                } else {
+                    document.getElementById('agentsTableBody').innerHTML = '<tr><td colspan="6" class="text-center">Failed to load records</td></tr>';
+                    document.getElementById('errorMessage').textContent = 'Failed to load records';
+                    document.getElementById('errorMessage').style.display = 'block';
+                    lastError = error.message;
+                    updateDebugInfo();
+                }
+            });
     }
 
     function searchAgents() {
@@ -739,7 +735,7 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
     }
 
     function editBasicInfo(agentId) {
-        fetch(`/api/agents/${agentId}`)
+        fetchWithAuth(`/api/agents/${agentId}`)
             .then(response => response.json())
             .then(agent => {
                 document.getElementById('basicInfoModalTitle').textContent = 'Edit Agent Basic Info';
@@ -753,7 +749,7 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
     }
 
     function editBankingInfo(agentId) {
-        fetch(`/api/agents/${agentId}/banking-info`)
+        fetchWithAuth(`/api/agents/${agentId}/banking-info`)
             .then(response => response.json())
             .then(bankingInfo => {
                 document.getElementById('bankingAgentId').value = agentId;
@@ -771,7 +767,7 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
     }
 
     function editCommissionRules(agentId) {
-        fetch(`/api/agents/${agentId}/commission-rules`)
+        fetchWithAuth(`/api/agents/${agentId}/commission-rules`)
             .then(response => response.json())
             .then(commissionRules => {
                 const commissionRulesFields = document.getElementById('commissionRulesFields');
@@ -788,7 +784,6 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
             })
             .catch(error => console.error('Error fetching commission rules:', error));
     }
-
     function addCommissionRule(rule = null) {
         const commissionRulesFields = document.getElementById('commissionRulesFields');
         const ruleDiv = document.createElement('div');
@@ -826,7 +821,7 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
 
     function deleteAgent(agentId) {
         if (confirm('Are you sure you want to delete this agent?')) {
-            fetch(`/api/agents/${agentId}`, { method: 'DELETE' })
+            fetchWithAuth(`/api/agents/${agentId}`, { method: 'DELETE' })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
@@ -855,7 +850,7 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
         }
 
         if (confirm(`Are you sure you want to delete ${selectedAgents.length} agent(s)?`)) {
-            fetch('/api/agents/bulk-delete', {
+            fetchWithAuth('/api/agents/bulk-delete', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -881,7 +876,7 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
         const url = agentId ? `/api/agents/${agentId}` : '/api/agents';
         const method = agentId ? 'PUT' : 'POST';
 
-        fetch(url, {
+        fetchWithAuth(url, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
@@ -903,7 +898,7 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
         const formData = new FormData(this);
         const bankingData = Object.fromEntries(formData.entries());
 
-        fetch(`/api/agents/${agentId}/banking-info`, {
+        fetchWithAuth(`/api/agents/${agentId}/banking-info`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -930,7 +925,7 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
             return rule;
         });
 
-        fetch(`/api/agents/${agentId}/commission-rules`, {
+        fetchWithAuth(`/api/agents/${agentId}/commission-rules`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -946,58 +941,55 @@ fetch(`/api/agents?page=${page}&pageSize=${pageSize}&search=${search}`, {
         .catch(error => console.error('Error saving commission rules:', error));
     });
 
-function toggleDebugInfo() {
-    const debugInfo = document.getElementById('debugInfo');
-    const debugButton = document.getElementById('debugButton');
-    if (debugInfo.style.display === 'none') {
-        debugInfo.style.display = 'block';
-        updateDebugInfo();
-        debugButton.textContent = 'Hide Debug';
-    } else {
-        debugInfo.style.display = 'none';
-        debugButton.textContent = 'Debug';
+    function toggleDebugInfo() {
+        const debugInfo = document.getElementById('debugInfo');
+        const debugButton = document.getElementById('debugButton');
+        if (debugInfo.style.display === 'none') {
+            debugInfo.style.display = 'block';
+            updateDebugInfo();
+            debugButton.textContent = 'Hide Debug';
+        } else {
+            debugInfo.style.display = 'none';
+            debugButton.textContent = 'Debug';
+        }
     }
-}
 
-function updateDebugInfo() {
-    const debugInfo = document.getElementById('debugInfo');
-    const windowSize = `Window size: ${window.innerWidth}x${window.innerHeight}`;
-    const scrollPosition = `Scroll position: ${window.pageXOffset}x${window.pageYOffset}`;
-    const tableContainerInfo = getElementInfo('table-container');
-    const topControlsInfo = getElementInfo('top-controls');
-    const paginationInfo = getElementInfo('pagination-container');
+    function updateDebugInfo() {
+        const debugInfo = document.getElementById('debugInfo');
+        const windowSize = `Window size: ${window.innerWidth}x${window.innerHeight}`;
+        const scrollPosition = `Scroll position: ${window.pageXOffset}x${window.pageYOffset}`;
+        const tableContainerInfo = getElementInfo('table-container');
+        const topControlsInfo = getElementInfo('top-controls');
+        const paginationInfo = getElementInfo('pagination-container');
 
-    debugInfo.innerHTML = `
-        <h3>Debug Information</h3>
-        <p>${windowSize}</p>
-        <p>${scrollPosition}</p>
-        <p>Current Page: ${currentPage}</p>
-        <p>Page Size: ${pageSize}</p>
-        <p>Search Term: ${document.getElementById('searchInput').value}</p>
-        <p>Last API Call: ${new Date().toLocaleString()}</p>
-        <p>Last Error: ${lastError}</p>
-        <h4>Element Information:</h4>
-        <p>Table Container: ${tableContainerInfo}</p>
-        <p>Top Controls: ${topControlsInfo}</p>
-        <p>Pagination: ${paginationInfo}</p>
-    `;
-}
+        debugInfo.innerHTML = `
+            <h3>Debug Information</h3>
+            <p>${windowSize}</p>
+            <p>${scrollPosition}</p>
+            <p>Current Page: ${currentPage}</p>
+            <p>Page Size: ${pageSize}</p>
+            <p>Search Term: ${document.getElementById('searchInput').value}</p>
+            <p>Last API Call: ${new Date().toLocaleString()}</p>
+            <p>Last Error: ${lastError}</p>
+            <h4>Element Information:</h4>
+            <p>Table Container: ${tableContainerInfo}</p>
+            <p>Top Controls: ${topControlsInfo}</p>
+            <p>Pagination: ${paginationInfo}</p>
+        `;
+    }
 
-function getElementInfo(elementId) {
-    const element = document.getElementById(elementId);
-    if (!element) return 'Not found';
-    const rect = element.getBoundingClientRect();
-    return `Position: (${rect.left}, ${rect.top}), Size: ${rect.width}x${rect.height}`;
-}
+    function getElementInfo(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element) return 'Not found';
+        const rect = element.getBoundingClientRect();
+        return `Position: (${rect.left}, ${rect.top}), Size: ${rect.width}x${rect.height}`;
+    }
 
-// Call this function whenever the window is resized
-window.addEventListener('resize', updateDebugInfo);
+    window.addEventListener('resize', updateDebugInfo);
 
-// Call this function after loading the agents
-function afterLoadingAgents() {
-    updateDebugInfo();
-    // ... any other code you want to run after loading agents
-}
+    function afterLoadingAgents() {
+        updateDebugInfo();
+    }
 
     function initTooltips() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
@@ -1006,11 +998,9 @@ function afterLoadingAgents() {
         })
     }
 
-    // Initial fetch
     fetchAgents(currentPage);
 
-    // Fetch tenants for the dropdown
-    fetch('/api/tenants')
+    fetchWithAuth('/api/tenants')
         .then(response => response.json())
         .then(tenants => {
             const select = document.getElementById('tenantId');
@@ -1023,19 +1013,12 @@ function afterLoadingAgents() {
         })
         .catch(error => console.error('Error fetching tenants:', error));
 
-    // Fetch coverages
-    fetch('/api/coverages')
+    fetchWithAuth('/api/coverages')
         .then(response => response.json())
         .then(data => {
             coverages = data;
         })
         .catch(error => console.error('Error fetching coverages:', error));
     </script>
-   
-    <button id="debugButton" class="btn btn-sm btn-secondary position-fixed bottom-0 end-0 m-3" onclick="toggleDebugInfo()">
-    <i class="bi bi-bug"></i> Debug
-</button>
-<div id="debugInfo" class="container mt-4"></div>
-    
 </body>
 </html>
