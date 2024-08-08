@@ -46,7 +46,8 @@ app.get('/api/protected', authenticateSession, (req, res) => {
 });
 
 app.get('/api/check-auth', (req, res) => {
-    const token = req.headers['authorization'];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];  // Bearer TOKEN
     if (!token) {
         return res.json({ isAuthenticated: false });
     }
