@@ -18,12 +18,21 @@ function hashPassword(password) {
 }
 
 function generateToken(userId, role) {
+    const header = {
+        alg: 'HS256',
+        typ: 'JWT'
+    };
     const payload = {
         userId: userId,
         role: role,
         exp: Math.floor(Date.now() / 1000) + (60 * 60) // 1 hour expiration
     };
-    return Buffer.from(JSON.stringify(payload)).toString('base64');
+    const headerEncoded = Buffer.from(JSON.stringify(header)).toString('base64url');
+    const payloadEncoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    const signature = crypto.createHmac('sha256', JWT_SECRET)
+        .update(headerEncoded + '.' + payloadEncoded)
+        .digest('base64url');
+    return `${headerEncoded}.${payloadEncoded}.${signature}`;
 }
 
 function verifyToken(token) {
@@ -98,18 +107,24 @@ async function logout(req, res) {
 }
 
 function authenticateSession(req, res, next) {
-    const token = req.headers['authorization'];
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];  // Bearer TOKEN
+
     if (!token) {
         return res.status(401).json({ success: false, message: 'No token provided' });
     }
 
-    const payload = verifyToken(token);
-    if (!payload) {
-        return res.status(403).json({ success: false, message: 'Invalid or expired token' });
+    try {
+        const payload = verifyToken(token);
+        if (!payload) {
+            return res.status(403).json({ success: false, message: 'Invalid or expired token' });
+        }
+        req.user = payload;
+        next();
+    } catch (error) {
+        console.error('Token verification error:', error);
+        return res.status(403).json({ success: false, message: 'Token verification failed' });
     }
-
-    req.user = payload;
-    next();
 }
 
 async function register(req, res) {
