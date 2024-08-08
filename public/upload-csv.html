@@ -161,6 +161,9 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/upload-csv.html">Upload Policies</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">Logout</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -189,16 +192,50 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+    function fetchWithAuth(url, options = {}) {
+        const token = localStorage.getItem('token');
+        return fetch(url, {
+            ...options,
+            headers: {
+                ...options.headers,
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    }
+
+    // Check authentication status
+    fetchWithAuth('/api/check-auth')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.isAuthenticated) {
+                window.location.href = '/login.html?redirect=/upload-csv.html';
+            }
+        })
+        .catch(error => {
+            console.error('Error checking authentication:', error);
+            window.location.href = '/login.html?redirect=/upload-csv.html';
+        });
+
+    function logout() {
+        localStorage.removeItem('token');
+        window.location.href = '/login.html';
+    }
+
     document.getElementById('csvUploadForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const file = document.getElementById('csvFile').files[0];
         const formData = new FormData();
         formData.append('file', file);
-        fetch('/api/upload-csv', {
+        fetchWithAuth('/api/upload-csv', {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             displayCSV(data);
         })
@@ -206,6 +243,10 @@
             console.error('Error:', error);
             document.getElementById('result').textContent = 'Error uploading file: ' + error.message;
             document.getElementById('result').className = 'alert alert-danger';
+            if (error.message.includes('401')) {
+                localStorage.removeItem('token');
+                window.location.href = '/login.html?redirect=/upload-csv.html';
+            }
         });
     });
 
