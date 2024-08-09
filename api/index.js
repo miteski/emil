@@ -22,11 +22,11 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 app.get('/api/test-email', async (req, res) => {
     try {
         const testPdfBuffer = Buffer.from('This is a test PDF content');
-        const testEmail = 'miteski.stefan@gmail.com'; // Replace with your test email address
+        const testEmail = 'test-recipient@example.com'; // Replace with your test email address
 
         const msg = {
             to: testEmail,
-            from: 'stefan.miteski@gmail.com', // Replace with your SendGrid verified sender
+            from: 'your-verified-sender@example.com', // Replace with your SendGrid verified sender
             subject: 'Test Email from Insurance Management System',
             text: 'This is a test email from the insurance management system.',
             attachments: [
@@ -43,7 +43,12 @@ app.get('/api/test-email', async (req, res) => {
         res.json({ message: 'Test email sent successfully' });
     } catch (error) {
         console.error('Error sending test email:', error);
-        res.status(500).json({ error: 'Failed to send test email', details: error.message });
+        let errorDetails = error.message;
+        if (error.response) {
+            console.error(error.response.body);
+            errorDetails = JSON.stringify(error.response.body);
+        }
+        res.status(500).json({ error: 'Failed to send test email', details: errorDetails });
     }
 });
 
