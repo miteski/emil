@@ -20,7 +20,7 @@ app.use(cors());
 // Set up SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-app.get('/api/test-email/:agentId', async (req, res) => {
+app.get('/api/test-email/:agentId', authenticateSession, async (req, res) => {
     try {
         const agentId = req.params.agentId;
         
@@ -41,7 +41,7 @@ app.get('/api/test-email/:agentId', async (req, res) => {
 
         const msg = {
             to: agent.Email,
-            from: process.env.SENDGRID_VERIFIED_SENDER, // Make sure to set this environment variable
+            from: process.env.SENDGRID_VERIFIED_SENDER,
             subject: 'Test Email from Insurance Management System',
             text: `This is a test email for agent ${agent.Fullname} from the insurance management system.`,
             attachments: [
