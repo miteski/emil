@@ -8,6 +8,7 @@ const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
 const { login, logout, authenticateSession, register, verifyToken } = require('./auth');
+const { generatePDF } = require('./generate-pdf');
 
 const app = express();
 app.use(express.json());
@@ -61,6 +62,18 @@ app.get('/api/check-auth', (req, res) => {
 // API Routes
 app.get('/api/test', (req, res) => {
     res.json({ message: 'API is working' });
+});
+
+app.post('/api/generate-commission-statement', authenticateSession, async (req, res) => {
+    try {
+        const pdfBuffer = await generatePDF(req.body);
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=commission_statement.pdf');
+        res.send(Buffer.from(pdfBuffer));
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).json({ error: 'Error generating PDF', details: error.message });
+    }
 });
 
 app.get('/api/tenants', getTenants);
