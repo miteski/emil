@@ -8,6 +8,7 @@ const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
 const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const { login, logout, authenticateSession, register, verifyToken } = require('./auth');
 const { generatePDF } = require('./generate-pdf');
 
@@ -19,16 +20,28 @@ app.use(cors());
 // Set up SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-app.get('/api/test-email', async (req, res) => {
+app.get('/api/test-email/:agentId', async (req, res) => {
     try {
+        const agentId = req.params.agentId;
+        
+        // Fetch agent details
+        const [agent] = await pool.query('SELECT * FROM Agent WHERE AgentID = ?', [agentId]);
+        
+        if (agent.length === 0) {
+            return res.status(404).json({ error: 'Agent not found' });
+        }
+        
+        if (!agent[0].Email) {
+            return res.status(400).json({ error: 'There is no email for this agent, please set an email before sending a test email' });
+        }
+
         const testPdfBuffer = Buffer.from('This is a test PDF content');
-        const testEmail = 'miteski.stefan@gmail.com'; // Replace with your test email address
 
         const msg = {
-            to: testEmail,
-            from: 'stefan@systemsforenterprise.com', // Replace with your SendGrid verified sender
+            to: agent[0].Email,
+            from: process.env.SENDGRID_VERIFIED_SENDER, // Make sure to set this environment variable
             subject: 'Test Email from Insurance Management System',
-            text: 'This is a test email from the insurance management system.',
+            text: `This is a test email for agent ${agent[0].Fullname} from the insurance management system.`,
             attachments: [
                 {
                     content: testPdfBuffer.toString('base64'),
@@ -38,6 +51,19 @@ app.get('/api/test-email', async (req, res) => {
                 }
             ]
         };
+
+        await sgMail.send(msg);
+        res.json({ message: 'Test email sent successfully', sentTo: agent[0].Email });
+    } catch (error) {
+        console.error('Error sending test email:', error);
+        let errorDetails = error.message;
+        if (error.response) {
+            console.error(error.response.body);
+            errorDetails = JSON.stringify(error.response.body);
+        }
+        res.status(500).json({ error: 'Failed to send test email', details: errorDetails });
+    }
+});
 
         await sgMail.send(msg);
         res.json({ message: 'Test email sent successfully' });
