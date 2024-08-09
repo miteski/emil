@@ -464,7 +464,7 @@ async function generateStatementData(agentId) {
 async function sendEmail(email, pdfBuffer) {
     const msg = {
         to: email,
-        from: 'your-verified-sender@example.com', // Change to your verified sender
+        from: 'miteski.stefan@gmail.com', // Change to your verified sender
         subject: 'Your Monthly Commission Statement',
         text: 'Please find attached your monthly commission statement.',
         attachments: [
