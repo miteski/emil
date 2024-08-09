@@ -7,6 +7,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
+const nodemailer = require('nodemailer');
 const { login, logout, authenticateSession, register, verifyToken } = require('./auth');
 const { generatePDF } = require('./generate-pdf');
 
@@ -64,18 +65,6 @@ app.get('/api/test', (req, res) => {
     res.json({ message: 'API is working' });
 });
 
-app.post('/api/generate-commission-statement', authenticateSession, async (req, res) => {
-    try {
-        const pdfBuffer = await generatePDF(req.body);
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=commission_statement.pdf');
-        res.send(Buffer.from(pdfBuffer));
-    } catch (error) {
-        console.error('Error generating PDF:', error);
-        res.status(500).json({ error: 'Error generating PDF', details: error.message });
-    }
-});
-
 app.get('/api/tenants', getTenants);
 app.get('/api/agents', authenticateSession, getAgents);
 app.post('/api/agents', authenticateSession, addAgent);
@@ -89,6 +78,36 @@ app.get('/api/agents/:id/commission-rules', authenticateSession, getCommissionRu
 app.put('/api/agents/:id/commission-rules', authenticateSession, updateCommissionRules);
 app.get('/api/coverages', authenticateSession, getCoverages);
 app.post('/api/upload-csv', authenticateSession, upload.single('file'), uploadCSV);
+
+// New route for sending commission statement
+app.post('/api/send-commission-statement/:agentId', authenticateSession, async (req, res) => {
+    const agentId = req.params.agentId;
+    
+    try {
+        // Fetch agent details
+        const [agent] = await pool.query('SELECT * FROM Agent WHERE AgentID = ?', [agentId]);
+        
+        if (agent.length === 0) {
+            return res.status(404).json({ error: 'Agent not found' });
+        }
+        
+        if (!agent[0].Email) {
+            return res.status(400).json({ error: 'There is no email for this user set, please set an email before triggering sending emails' });
+        }
+        
+        // Generate PDF
+        const statementData = await generateStatementData(agentId);
+        const pdfBuffer = await generatePDF(statementData);
+        
+        // Send email
+        await sendEmail(agent[0].Email, pdfBuffer);
+        
+        res.json({ message: 'Commission statement sent successfully' });
+    } catch (error) {
+        console.error('Error sending commission statement:', error);
+        res.status(500).json({ error: 'Error sending commission statement', details: error.message });
+    }
+});
 
 // Route Handlers
 async function getTenants(req, res) {
@@ -358,8 +377,6 @@ async function uploadCSV(req, res) {
     }
 }
 
-
-
 // Helper Functions
 async function virusScan(fileBuffer) {
     const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
@@ -399,6 +416,74 @@ function parseCSV(csvBuffer) {
             }
         });
     });
+}
+
+async function generateStatementData(agentId) {
+    // Fetch agent details
+    const [agent] = await pool.query('SELECT * FROM Agent WHERE AgentID = ?', [agentId]);
+    
+    // Fetch commission rules
+    const [commissionRules] = await pool.query(`
+        SELECT acc.*, c.CoverageDescription
+        FROM Agent_Coverage_Commission acc
+        JOIN Coverages c ON acc.CoverageID = c.CoverageID
+        WHERE acc.AgentID = ?
+    `, [agentId]);
+    
+    // Define the date range for the statement (e.g., last month)
+    const endDate = new Date();
+    const startDate = new Date(endDate.getFullYear(), endDate.getMonth() - 1, 1);
+    
+    // Fetch policies
+    const [policies] = await pool.query(`
+        SELECT * FROM Policies WHERE AgentID = ? AND PolicyDate BETWEEN ? AND ?
+    `, [agentId, startDate, endDate]);
+    
+    // Calculate commissions
+    const calculatedPolicies = policies.map(policy => {
+        const rule = commissionRules.find(r => r.CoverageID === policy.CoverageID);
+        const commission = policy.Premium * (rule.Premium_Commission_Percentage / 100);
+        return {
+            ...policy,
+            commission
+        };
+    });
+    
+    const totalCommission = calculatedPolicies.reduce((sum, policy) => sum + policy.commission, 0);
+    
+    return {
+        agentName: agent[0].Fullname,
+        statementPeriod: `${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
+        policies: calculatedPolicies,
+        totalCommission
+    };
+}
+
+async function sendEmail(email, pdfBuffer) {
+    let transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        }
+    });
+
+    let info = await transporter.sendMail({
+        from: '"Your Company" <noreply@yourcompany.com>',
+        to: email,
+        subject: "Your Monthly Commission Statement",
+        text: "Please find attached your monthly commission statement.",
+        attachments: [
+            {
+                filename: 'commission_statement.pdf',
+                content: pdfBuffer
+            }
+        ]
+    });
+
+    console.log("Message sent: %s", info.messageId);
 }
 
 // Serve login page
