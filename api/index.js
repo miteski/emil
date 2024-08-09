@@ -22,11 +22,11 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 app.get('/api/test-email', async (req, res) => {
     try {
         const testPdfBuffer = Buffer.from('This is a test PDF content');
-        const testEmail = 'test-recipient@example.com'; // Replace with your test email address
+        const testEmail = 'miteski.stefan@gmail.com'; // Replace with your test email address
 
         const msg = {
             to: testEmail,
-            from: 'your-verified-sender@example.com', // Replace with your SendGrid verified sender
+            from: 'stefan@systemsforenterprise.com', // Replace with your SendGrid verified sender
             subject: 'Test Email from Insurance Management System',
             text: 'This is a test email from the insurance management system.',
             attachments: [
