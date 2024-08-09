@@ -19,6 +19,34 @@ app.use(cors());
 // Set up SendGrid
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+app.get('/api/test-email', async (req, res) => {
+    try {
+        const testPdfBuffer = Buffer.from('This is a test PDF content');
+        const testEmail = 'test-recipient@example.com'; // Replace with your test email address
+
+        const msg = {
+            to: testEmail,
+            from: 'stefan.miteski@gmail.com', // Replace with your SendGrid verified sender
+            subject: 'Test Email from Insurance Management System',
+            text: 'This is a test email from the insurance management system.',
+            attachments: [
+                {
+                    content: testPdfBuffer.toString('base64'),
+                    filename: 'test.pdf',
+                    type: 'application/pdf',
+                    disposition: 'attachment'
+                }
+            ]
+        };
+
+        await sgMail.send(msg);
+        res.json({ message: 'Test email sent successfully' });
+    } catch (error) {
+        console.error('Error sending test email:', error);
+        res.status(500).json({ error: 'Failed to send test email', details: error.message });
+    }
+});
+
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
