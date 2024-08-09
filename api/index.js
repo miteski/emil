@@ -7,7 +7,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const path = require('path');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const { login, logout, authenticateSession, register, verifyToken } = require('./auth');
 const { generatePDF } = require('./generate-pdf');
 
@@ -15,6 +15,9 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(cors());
+
+// Set up SendGrid
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const pool = mysql.createPool({
     host: process.env.MYSQL_HOST,
@@ -356,7 +359,6 @@ async function getCoverages(req, res) {
         res.status(500).json({ error: 'Error fetching coverages', details: error.message });
     }
 }
-
 async function uploadCSV(req, res) {
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
@@ -460,30 +462,31 @@ async function generateStatementData(agentId) {
 }
 
 async function sendEmail(email, pdfBuffer) {
-    let transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS
-        }
-    });
-
-    let info = await transporter.sendMail({
-        from: '"Your Company" <noreply@yourcompany.com>',
+    const msg = {
         to: email,
-        subject: "Your Monthly Commission Statement",
-        text: "Please find attached your monthly commission statement.",
+        from: 'your-verified-sender@example.com', // Change to your verified sender
+        subject: 'Your Monthly Commission Statement',
+        text: 'Please find attached your monthly commission statement.',
         attachments: [
             {
+                content: pdfBuffer.toString('base64'),
                 filename: 'commission_statement.pdf',
-                content: pdfBuffer
+                type: 'application/pdf',
+                disposition: 'attachment'
             }
         ]
-    });
+    };
 
-    console.log("Message sent: %s", info.messageId);
+    try {
+        await sgMail.send(msg);
+        console.log('Email sent successfully');
+    } catch (error) {
+        console.error('Error sending email:', error);
+        if (error.response) {
+            console.error(error.response.body);
+        }
+        throw new Error('Failed to send email');
+    }
 }
 
 // Serve login page
@@ -522,4 +525,3 @@ app.listen(port, () => {
 });
 
 module.exports = app;
-
