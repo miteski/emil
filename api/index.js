@@ -22,7 +22,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 app.get('/api/test-email', async (req, res) => {
     try {
         const testPdfBuffer = Buffer.from('This is a test PDF content');
-        const testEmail = 'test-recipient@example.com'; // Replace with your test email address
+        const testEmail = 'miteski.stefan@gmail.com'; // Replace with your test email address
 
         const msg = {
             to: testEmail,
