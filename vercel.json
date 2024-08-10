@@ -1,4 +1,4 @@
-{
+
   "version": 2,
   "builds": [
     {
@@ -19,14 +19,6 @@
     {
       "src": "^/static/(.*)",
       "dest": "/static/$1"
-    },
-    {
-      "src": "/view-agents2",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
     },
     {
       "src": ".*",
