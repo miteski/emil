@@ -65,7 +65,11 @@ const ViewAgents2 = () => {
       }
       const data = await response.json();
       console.log('Fetched tenants:', data);
-      setTenants(data);
+      if (Array.isArray(data) && data.length > 0) {
+        setTenants(data);
+      } else {
+        console.warn('Unexpected tenants data format:', data);
+      }
     } catch (error) {
       console.error('Error fetching tenants:', error);
       setError('Failed to fetch tenants');
@@ -76,6 +80,10 @@ const ViewAgents2 = () => {
     fetchAgents();
     fetchTenants();
   }, [fetchAgents, fetchTenants]);
+
+  useEffect(() => {
+    console.log('Tenants state updated:', tenants);
+  }, [tenants]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -181,6 +189,7 @@ const ViewAgents2 = () => {
             setSelectedAgents={setSelectedAgents}
             onEditAgent={openEditModal}
             tenants={tenants}
+            tenantsKey={tenants.length}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
           {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
