@@ -1,11 +1,17 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ViewAgents2 from './components/ViewAgents2';
 
 function App() {
   return (
-    <div className="App">
-      <h1>EMIL Insurance Suite</h1>
-      <p>React is working!</p>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/view-agents2" element={<ViewAgents2 />} />
+          <Route path="/" element={<Navigate to="/view-agents2" replace />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
