@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 
-const AddAgentModal = ({ show, onClose, onAddAgent }) => {
-  const [fullName, setFullName] = useState('');
+const AddAgentModal = ({ show, onClose, onAddAgent, tenants }) => {
+  const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [tenantId, setTenantId] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAddAgent({ fullName, email, tenantId });
-    setFullName('');
+    const newAgent = {
+      Fullname: fullname,
+      Email: email,
+      TenantID: tenantId
+    };
+    console.log('Submitting new agent:', newAgent); // Debug log
+    onAddAgent(newAgent);
+    setFullname('');
     setEmail('');
     setTenantId('');
     onClose();
@@ -31,13 +37,13 @@ const AddAgentModal = ({ show, onClose, onAddAgent }) => {
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label htmlFor="fullName">Full Name</label>
+                <label htmlFor="fullname">Full Name</label>
                 <input
                   type="text"
                   className="form-control"
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  id="fullname"
+                  value={fullname}
+                  onChange={(e) => setFullname(e.target.value)}
                   required
                 />
               </div>
@@ -53,15 +59,21 @@ const AddAgentModal = ({ show, onClose, onAddAgent }) => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="tenantId">Tenant ID</label>
-                <input
-                  type="text"
+                <label htmlFor="tenantId">Tenant</label>
+                <select
                   className="form-control"
                   id="tenantId"
                   value={tenantId}
                   onChange={(e) => setTenantId(e.target.value)}
                   required
-                />
+                >
+                  <option value="">Select a tenant</option>
+                  {tenants.map(tenant => (
+                    <option key={tenant.TenantID} value={tenant.TenantID}>
+                      {tenant.Name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <button type="submit" className="btn btn-primary">Add Agent</button>
             </form>
