@@ -9,7 +9,9 @@
     "react-start": "react-scripts start",
     "react-build": "react-scripts build",
     "react-test": "react-scripts test",
-    "react-eject": "react-scripts eject"
+    "react-eject": "react-scripts eject",
+    "build": "npm run react-build",
+    "vercel-build": "npm run react-build"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -34,5 +36,17 @@
   },
   "engines": {
     "node": ">=14.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
