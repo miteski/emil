@@ -221,21 +221,15 @@ async function getAgents(req, res) {
 }
 
 async function addAgent(req, res) {
-    console.log('Received request to add agent:', req.body);
-    const { Fullname, Email, TenantID } = req.body;
-    
-    if (!Fullname || !Email || !TenantID) {
-        console.error('Missing required fields:', { Fullname, Email, TenantID });
-        return res.status(400).json({ error: 'All fields are required' });
-    }
+    const { fullname, email, tenantId } = req.body;
     
     try {
         const [result] = await pool.query(
             'INSERT INTO Agent (Fullname, Email, TenantID) VALUES (?, ?, ?)',
-            [Fullname, Email, TenantID]
+            [fullname, email, tenantId]
         );
         const agentId = result.insertId;
-        console.log('Agent added successfully:', { agentId, Fullname, Email, TenantID });
+
         res.status(201).json({ message: 'Agent added successfully', agentId: agentId });
     } catch (error) {
         console.error('Error adding agent:', error);
