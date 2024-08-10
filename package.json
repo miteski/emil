@@ -5,7 +5,11 @@
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js",
-    "dev": "nodemon api/index.js"
+    "dev": "nodemon api/index.js",
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "react-test": "react-scripts test",
+    "react-eject": "react-scripts eject"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -22,7 +26,8 @@
     "@sendgrid/mail": "^7.7.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-router-dom": "^5.2.0"
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
@@ -30,12 +35,4 @@
   "engines": {
     "node": ">=14.0.0"
   }
-  {
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  }
-}
 }
