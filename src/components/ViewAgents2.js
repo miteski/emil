@@ -17,6 +17,16 @@ const ViewAgents2 = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState(null);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found in localStorage');
+      setError('You are not authenticated. Please log in.');
+    } else {
+      console.log('Token found in localStorage');
+    }
+  }, []);
+
   const fetchAgents = useCallback(async () => {
     console.log('Fetching agents...');
     if (!hasMore || loading) return;
@@ -24,13 +34,16 @@ const ViewAgents2 = () => {
     setError(null);
     try {
       const token = localStorage.getItem('token');
+      console.log('Using token:', token);
       const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       if (!response.ok) {
-        throw new Error('Failed to fetch agents');
+        const errorData = await response.json();
+        console.error('Error fetching agents:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch agents');
       }
       const data = await response.json();
       console.log('Fetched agents data:', data);
@@ -95,37 +108,41 @@ const ViewAgents2 = () => {
     }
   };
 
-const handleAddAgent = async (newAgent) => {
-  console.log('Received new agent data in ViewAgents2:', newAgent);
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('/api/agents', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(newAgent)
-    });
+  const handleAddAgent = async (newAgent) => {
+    console.log('Received new agent data in ViewAgents2:', newAgent);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/agents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          fullname: newAgent.Fullname,
+          email: newAgent.Email,
+          tenantId: newAgent.TenantID
+        })
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error response from server:', errorData);
-      throw new Error(errorData.error || 'Failed to add agent');
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error response from server:', errorData);
+        throw new Error(errorData.error || 'Failed to add agent');
+      }
+
+      const responseData = await response.json();
+      console.log('Server response after adding agent:', responseData);
+
+      setAgents([]);
+      setPage(1);
+      setHasMore(true);
+      fetchAgents();
+    } catch (error) {
+      setError(error.message);
+      console.error('Error adding agent:', error);
     }
-
-    const responseData = await response.json();
-    console.log('Server response after adding agent:', responseData);
-
-    setAgents([]);
-    setPage(1);
-    setHasMore(true);
-    fetchAgents();
-  } catch (error) {
-    setError(error.message);
-    console.error('Error adding agent:', error);
-  }
-};
+  };
 
   const handleEditAgent = async (agentId, updatedAgent) => {
     console.log('Editing agent:', agentId, updatedAgent);
@@ -137,7 +154,11 @@ const handleAddAgent = async (newAgent) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(updatedAgent)
+        body: JSON.stringify({
+          fullname: updatedAgent.Fullname,
+          email: updatedAgent.Email,
+          tenantId: updatedAgent.TenantID
+        })
       });
 
       if (!response.ok) {
@@ -149,7 +170,7 @@ const handleAddAgent = async (newAgent) => {
       setAgents(agents.map(agent => 
         agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
       ));
-      fetchAgents(); // Fetch the updated list from the server
+      fetchAgents();
     } catch (error) {
       setError(error.message);
       console.error('Error updating agent:', error);
