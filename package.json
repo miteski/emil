@@ -7,9 +7,10 @@
     "start": "node api/index.js",
     "dev": "nodemon api/index.js",
     "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
     "react-test": "react-scripts test",
     "react-eject": "react-scripts eject",
-    "build": "react-scripts build && cp public/react-app.html build/",
+    "build": "npm run react-build",
     "vercel-build": "npm run build"
   },
   "dependencies": {
@@ -28,8 +29,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
-    "react-scripts": "5.0.1",
-    "next": "^14.2.5"
+    "react-scripts": "5.0.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
