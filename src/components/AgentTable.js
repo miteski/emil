@@ -1,8 +1,6 @@
 import React from 'react';
 
-const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents }) => {
-  console.log('AgentTable rendered, agents:', agents.length, 'selectedAgents:', selectedAgents.length);
-
+const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent }) => {
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -66,7 +64,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents }) => 
               </td>
               <td>
                 <div className="btn-group" role="group">
-                  <button className="btn btn-sm btn-outline-primary" onClick={() => {/* Edit basic info */}}>Edit</button>
+                  <button className="btn btn-sm btn-outline-primary" onClick={() => onEditAgent(agent)}>Edit</button>
                   <button className="btn btn-sm btn-outline-info" onClick={() => {/* Edit banking info */}}>Banking</button>
                   <button className="btn btn-sm btn-outline-warning" onClick={() => {/* Edit commission rules */}}>Commission</button>
                   <button className="btn btn-sm btn-outline-success" onClick={() => {/* Send commission report */}}>Report</button>
