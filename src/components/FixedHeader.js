@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 const FixedHeader = ({ onSearch, selectedCount }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  console.log('FixedHeader rendered, selectedCount:', selectedCount);
-
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    console.log('Search submitted:', searchQuery);
     onSearch(searchQuery);
+  };
+
+  const handleClear = () => {
+    setSearchQuery('');
+    onSearch('');  // Trigger a search with an empty string
   };
 
   return (
@@ -29,7 +31,7 @@ const FixedHeader = ({ onSearch, selectedCount }) => {
             placeholder="Search agents..."
           />
           <button type="submit" className="btn btn-outline-secondary">Search</button>
-          <button type="button" className="btn btn-outline-secondary" onClick={() => setSearchQuery('')}>Clear</button>
+          <button type="button" className="btn btn-outline-secondary" onClick={handleClear}>Clear</button>
         </div>
       </form>
     </div>
