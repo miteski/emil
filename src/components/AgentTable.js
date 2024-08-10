@@ -14,11 +14,23 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents }) => 
   };
 
   return (
-    <div className="agent-table-container" onScroll={onScroll}>
-      <table className="table">
-        <thead>
+    <div className="table-responsive" onScroll={onScroll} style={{maxHeight: '600px', overflowY: 'auto'}}>
+      <table className="table table-striped table-hover">
+        <thead className="sticky-top bg-light">
           <tr>
-            <th></th>
+            <th>
+              <input 
+                type="checkbox" 
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedAgents(agents.map(agent => agent.AgentID));
+                  } else {
+                    setSelectedAgents([]);
+                  }
+                }}
+                checked={selectedAgents.length === agents.length}
+              />
+            </th>
             <th>Name</th>
             <th>Email</th>
             <th>Tenant</th>
@@ -29,7 +41,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents }) => 
         </thead>
         <tbody>
           {agents.map(agent => (
-            <tr key={agent.AgentID} className="agent-row">
+            <tr key={agent.AgentID}>
               <td>
                 <input 
                   type="checkbox" 
@@ -37,21 +49,27 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents }) => 
                   onChange={() => handleSelectAgent(agent.AgentID)}
                 />
               </td>
-              <td className="text-left">{truncate(agent.Fullname, 50)}</td>
-              <td className="text-left">{truncate(agent.Email, 50)}</td>
-              <td className="text-left">{truncate(agent.TenantName, 50)}</td>
+              <td>{truncate(agent.Fullname, 30)}</td>
+              <td>{truncate(agent.Email, 30)}</td>
+              <td>{truncate(agent.TenantName, 20)}</td>
               <td className="text-center">
-                {agent.hasBankingInfo ? '✓' : '✗'}
+                {agent.hasBankingInfo ? 
+                  <span className="badge bg-success">✓</span> : 
+                  <span className="badge bg-danger">✗</span>}
               </td>
               <td className="text-center">
-                {agent.hasCommissionRules ? '✓' : '✗'}
+                {agent.hasCommissionRules ? 
+                  <span className="badge bg-success">✓</span> : 
+                  <span className="badge bg-danger">✗</span>}
               </td>
               <td>
-                <button onClick={() => {/* Edit basic info */}}>Edit</button>
-                <button onClick={() => {/* Edit banking info */}}>Banking</button>
-                <button onClick={() => {/* Edit commission rules */}}>Commission</button>
-                <button onClick={() => {/* Send commission report */}}>Report</button>
-                <button onClick={() => {/* Delete agent */}}>Delete</button>
+                <div className="btn-group" role="group">
+                  <button className="btn btn-sm btn-outline-primary" onClick={() => {/* Edit basic info */}}>Edit</button>
+                  <button className="btn btn-sm btn-outline-info" onClick={() => {/* Edit banking info */}}>Banking</button>
+                  <button className="btn btn-sm btn-outline-warning" onClick={() => {/* Edit commission rules */}}>Commission</button>
+                  <button className="btn btn-sm btn-outline-success" onClick={() => {/* Send commission report */}}>Report</button>
+                  <button className="btn btn-sm btn-outline-danger" onClick={() => {/* Delete agent */}}>Delete</button>
+                </div>
               </td>
             </tr>
           ))}
