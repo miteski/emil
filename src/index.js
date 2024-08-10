@@ -34,5 +34,4 @@ try {
   console.error('Error details:', error);
 }
 
-// Add this for additional debugging
 console.log('React index.js execution completed');
