@@ -7,6 +7,7 @@ import EditAgentModal from './EditAgentModal';
 
 const ViewAgents2 = () => {
   const [agents, setAgents] = useState([]);
+  const [tenants, setTenants] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAgents, setSelectedAgents] = useState([]);
   const [page, setPage] = useState(1);
@@ -50,9 +51,29 @@ const ViewAgents2 = () => {
     setLoading(false);
   }, [page, searchQuery, hasMore, loading]);
 
+  const fetchTenants = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/tenants', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch tenants');
+      }
+      const data = await response.json();
+      setTenants(data);
+    } catch (error) {
+      console.error('Error fetching tenants:', error);
+      setError('Failed to fetch tenants');
+    }
+  }, []);
+
   useEffect(() => {
     fetchAgents();
-  }, [fetchAgents]);
+    fetchTenants();
+  }, [fetchAgents, fetchTenants]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -161,12 +182,14 @@ const ViewAgents2 = () => {
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
         onAddAgent={handleAddAgent}
+        tenants={tenants}
       />
       <EditAgentModal
         show={showEditModal}
         onClose={() => setShowEditModal(false)}
         onEditAgent={handleEditAgent}
         agent={editingAgent}
+        tenants={tenants}
       />
     </div>
   );
