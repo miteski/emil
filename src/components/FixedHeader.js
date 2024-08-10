@@ -1,21 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const FixedHeader = ({ onSearch, selectedCount }) => {
   const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.ctrlKey && event.key === 'f') {
-        event.preventDefault();
-        document.getElementById('search-input').focus();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -23,23 +9,25 @@ const FixedHeader = ({ onSearch, selectedCount }) => {
   };
 
   return (
-    <div className="fixed-header">
-      <div className="button-group">
+    <div className="mb-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
         <button className="btn btn-primary">Add Agent</button>
         <button className="btn btn-danger" disabled={selectedCount === 0}>
           Bulk Delete ({selectedCount})
         </button>
       </div>
-      <form onSubmit={handleSearchSubmit} className="search-form">
-        <input
-          id="search-input"
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search agents..."
-        />
-        <button type="submit">Search</button>
-        <button type="button" onClick={() => setSearchQuery('')}>Clear</button>
+      <form onSubmit={handleSearchSubmit}>
+        <div className="input-group">
+          <input
+            type="text"
+            className="form-control"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search agents..."
+          />
+          <button type="submit" className="btn btn-outline-secondary">Search</button>
+          <button type="button" className="btn btn-outline-secondary" onClick={() => setSearchQuery('')}>Clear</button>
+        </div>
       </form>
     </div>
   );
