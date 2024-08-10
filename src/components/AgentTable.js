@@ -1,6 +1,10 @@
 import React from 'react';
 
 const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
+  console.log('Rendering AgentTable component'); // Debug log
+  console.log('Agents:', agents); // Debug log
+  console.log('Tenants:', tenants); // Debug log
+
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -15,7 +19,6 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
 
   const getTenantName = (tenantId) => {
     console.log('Getting tenant name for ID:', tenantId); // Debug log
-    console.log('Available tenants:', tenants); // Debug log
     const tenant = tenants.find(t => t.TenantID === tenantId);
     return tenant ? tenant.Name : 'N/A';
   };
