@@ -17,6 +17,10 @@
       "dest": "api/index.js"
     },
     {
+      "src": "/view-agents2",
+      "dest": "/react-app.html"
+    },
+    {
       "src": "^/static/(.*)",
       "dest": "/static/$1"
     },
