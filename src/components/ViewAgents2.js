@@ -51,29 +51,25 @@ const ViewAgents2 = () => {
     setLoading(false);
   }, [page, searchQuery, hasMore, loading]);
 
-  const fetchTenants = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/tenants', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch tenants');
+ const fetchTenants = useCallback(async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/tenants', {
+      headers: {
+        'Authorization': `Bearer ${token}`
       }
-      const data = await response.json();
-      setTenants(data);
-    } catch (error) {
-      console.error('Error fetching tenants:', error);
-      setError('Failed to fetch tenants');
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch tenants');
     }
-  }, []);
-
-  useEffect(() => {
-    fetchAgents();
-    fetchTenants();
-  }, [fetchAgents, fetchTenants]);
+    const data = await response.json();
+    console.log('Fetched tenants:', data); // Debug log
+    setTenants(data);
+  } catch (error) {
+    console.error('Error fetching tenants:', error);
+    setError('Failed to fetch tenants');
+  }
+}, []);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -90,64 +86,71 @@ const ViewAgents2 = () => {
     }
   };
 
-  const handleAddAgent = async (newAgent) => {
-    try {
-      console.log('Sending new agent data:', newAgent); // Debug log
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/agents', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(newAgent)
-      });
+const handleAddAgent = async (newAgent) => {
+  try {
+    console.log('Sending new agent data:', newAgent); // Debug log
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/agents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        Fullname: newAgent.Fullname,
+        Email: newAgent.Email,
+        TenantID: newAgent.TenantID
+      })
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to add agent');
-      }
-
-      // Refresh the agent list
-      setAgents([]);
-      setPage(1);
-      setHasMore(true);
-      fetchAgents();
-    } catch (error) {
-      // await handleApiError(error);
-      setError(error.message);
-      console.error('Error adding agent:', error);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to add agent');
     }
-  };
 
-  const handleEditAgent = async (agentId, updatedAgent) => {
-    try {
-      console.log('Sending updated agent data:', updatedAgent); // Debug log
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/agents/${agentId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(updatedAgent)
-      });
+    // Refresh the agent list
+    setAgents([]);
+    setPage(1);
+    setHasMore(true);
+    fetchAgents();
+  } catch (error) {
+    setError(error.message);
+    console.error('Error adding agent:', error);
+  }
+};
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update agent');
-      }
+ const handleEditAgent = async (agentId, updatedAgent) => {
+  try {
+    console.log('Sending updated agent data:', updatedAgent); // Debug log
+    const token = localStorage.getItem('token');
+    const response = await fetch(`/api/agents/${agentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        Fullname: updatedAgent.Fullname,
+        Email: updatedAgent.Email,
+        TenantID: updatedAgent.TenantID
+      })
+    });
 
-      // Refresh the agent list
-      setAgents(agents.map(agent => 
-        agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
-      ));
-    } catch (error) {
-      // await handleApiError(error);
-      setError(error.message);
-      console.error('Error updating agent:', error);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to update agent');
     }
-  };
+
+    // Refresh the agent list
+    setAgents(agents.map(agent => 
+      agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
+    ));
+    fetchAgents(); // Fetch the updated list from the server
+  } catch (error) {
+    setError(error.message);
+    console.error('Error updating agent:', error);
+  }
+};
 
   const openEditModal = (agent) => {
     setEditingAgent(agent);
