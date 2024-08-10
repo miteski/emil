@@ -14,6 +14,8 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
   };
 
   const getTenantName = (tenantId) => {
+    console.log('Getting tenant name for ID:', tenantId); // Debug log
+    console.log('Available tenants:', tenants); // Debug log
     const tenant = tenants.find(t => t.TenantID === tenantId);
     return tenant ? tenant.Name : 'N/A';
   };
