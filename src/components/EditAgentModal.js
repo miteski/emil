@@ -15,13 +15,8 @@ const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const updatedAgent = {
-      Fullname: fullname,
-      Email: email,
-      TenantID: tenantId
-    };
-    console.log('Submitting updated agent:', updatedAgent); // Debug log
-    onEditAgent(agent.AgentID, updatedAgent);
+    console.log('Submitting updated agent:', { Fullname: fullname, Email: email, TenantID: tenantId });
+    onEditAgent(agent.AgentID, { Fullname: fullname, Email: email, TenantID: tenantId });
     onClose();
   };
 
