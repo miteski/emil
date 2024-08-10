@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
 
 const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
-  const [Fullname, setFullname] = useState('');
-  const [Email, setEmail] = useState('');
-  const [TenantID, setTenantID] = useState('');
+  const [fullname, setFullname] = useState('');
+  const [email, setEmail] = useState('');
+  const [tenantId, setTenantId] = useState('');
 
   useEffect(() => {
     if (agent) {
       setFullname(agent.Fullname || '');
       setEmail(agent.Email || '');
-      setTenantID(agent.TenantID || '');
+      setTenantId(agent.TenantID || '');
     }
   }, [agent]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onEditAgent(agent.AgentID, { Fullname, Email, TenantID });
+    const updatedAgent = {
+      Fullname: fullname,
+      Email: email,
+      TenantID: tenantId
+    };
+    console.log('Submitting updated agent:', updatedAgent); // Debug log
+    onEditAgent(agent.AgentID, updatedAgent);
     onClose();
   };
 
@@ -36,34 +42,34 @@ const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
           <div className="modal-body">
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label htmlFor="Fullname">Full Name</label>
+                <label htmlFor="fullname">Full Name</label>
                 <input
                   type="text"
                   className="form-control"
-                  id="Fullname"
-                  value={Fullname}
+                  id="fullname"
+                  value={fullname}
                   onChange={(e) => setFullname(e.target.value)}
                   required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="Email">Email</label>
+                <label htmlFor="email">Email</label>
                 <input
                   type="email"
                   className="form-control"
-                  id="Email"
-                  value={Email}
+                  id="email"
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="TenantID">Tenant</label>
+                <label htmlFor="tenantId">Tenant</label>
                 <select
                   className="form-control"
-                  id="TenantID"
-                  value={TenantID}
-                  onChange={(e) => setTenantID(e.target.value)}
+                  id="tenantId"
+                  value={tenantId}
+                  onChange={(e) => setTenantId(e.target.value)}
                   required
                 >
                   <option value="">Select a tenant</option>
