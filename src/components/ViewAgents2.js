@@ -92,6 +92,7 @@ const ViewAgents2 = () => {
 
   const handleAddAgent = async (newAgent) => {
     try {
+      console.log('Sending new agent data:', newAgent); // Debug log
       const token = localStorage.getItem('token');
       const response = await fetch('/api/agents', {
         method: 'POST',
@@ -103,7 +104,8 @@ const ViewAgents2 = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add agent');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add agent');
       }
 
       // Refresh the agent list
@@ -120,6 +122,7 @@ const ViewAgents2 = () => {
 
   const handleEditAgent = async (agentId, updatedAgent) => {
     try {
+      console.log('Sending updated agent data:', updatedAgent); // Debug log
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/agents/${agentId}`, {
         method: 'PUT',
@@ -131,7 +134,8 @@ const ViewAgents2 = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update agent');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update agent');
       }
 
       // Refresh the agent list
@@ -172,6 +176,7 @@ const ViewAgents2 = () => {
             selectedAgents={selectedAgents}
             setSelectedAgents={setSelectedAgents}
             onEditAgent={openEditModal}
+            tenants={tenants}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
           {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
