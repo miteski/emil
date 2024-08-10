@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
+const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent, tenants, tenantsKey }) => {
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -13,10 +13,18 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
     return (str && str.length > n) ? str.substr(0, n-1) + '...' : str;
   };
 
+  const tenantsMap = useMemo(() => {
+    return tenants.reduce((acc, tenant) => {
+      acc[tenant.TenantID] = tenant.Name;
+      return acc;
+    }, {});
+  }, [tenants]);
+
   const getTenantName = (tenantId) => {
-    const tenant = tenants.find(t => t.TenantID === tenantId);
-    return tenant ? tenant.Name : 'N/A';
+    return tenantsMap[tenantId] || 'N/A';
   };
+
+  console.log('Rendering AgentTable with tenants:', tenants);
 
   return (
     <div className="table-responsive" onScroll={onScroll} style={{maxHeight: '600px', overflowY: 'auto'}}>
