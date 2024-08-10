@@ -59,10 +59,10 @@ const ViewAgents2 = () => {
     <div className="container-fluid">
       <nav className="navbar navbar-light bg-light fixed-top">
         <div className="container-fluid">
-          <a className="navbar-brand" href="/">EMIL Insurance Suite</a>
+          <span className="navbar-brand mb-0 h1">EMIL Insurance Suite</span>
         </div>
       </nav>
-      <div className="row">
+      <div className="row mt-5">
         <div className="col-12">
           <h1 className="mt-4 mb-4">Agent Management</h1>
           <FixedHeader 
