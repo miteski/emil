@@ -21,15 +21,16 @@
       "dest": "/static/$1"
     },
     {
-      "src": "/view-agents2",
-      "dest": "/react-app.html"
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
     },
     {
-      "handle": "filesystem"
+      "src": "/manifest.json",
+      "dest": "/manifest.json"
     },
     {
       "src": "/(.*)",
-      "dest": "/react-app.html"
+      "dest": "/index.html"
     }
   ]
 }
