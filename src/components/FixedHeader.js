@@ -3,8 +3,11 @@ import React, { useState } from 'react';
 const FixedHeader = ({ onSearch, selectedCount }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
+  console.log('FixedHeader rendered, selectedCount:', selectedCount);
+
   const handleSearchSubmit = (event) => {
     event.preventDefault();
+    console.log('Search submitted:', searchQuery);
     onSearch(searchQuery);
   };
 
