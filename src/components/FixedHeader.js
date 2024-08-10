@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const FixedHeader = ({ onSearch, selectedCount }) => {
+const FixedHeader = ({ onSearch, selectedCount, onAddAgent }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchSubmit = (event) => {
@@ -10,13 +10,13 @@ const FixedHeader = ({ onSearch, selectedCount }) => {
 
   const handleClear = () => {
     setSearchQuery('');
-    onSearch('');  // Trigger a search with an empty string
+    onSearch('');
   };
 
   return (
     <div className="mb-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <button className="btn btn-primary">Add Agent</button>
+        <button className="btn btn-primary" onClick={onAddAgent}>Add Agent</button>
         <button className="btn btn-danger" disabled={selectedCount === 0}>
           Bulk Delete ({selectedCount})
         </button>
