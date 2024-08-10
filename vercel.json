@@ -29,7 +29,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/react-app.html"
+      "dest": "/index.html"
     }
   ]
 }
