@@ -17,19 +17,16 @@
       "dest": "api/index.js"
     },
     {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
       "src": "/view-agents2",
       "dest": "/react-app.html"
     },
     {
-      "src": "^/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/react-app.html"
+      "dest": "/index.html"
     }
   ]
 }
