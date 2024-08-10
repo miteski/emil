@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
 
-const AddAgentModal = ({ show, onClose, onAddAgent, tenants }) => {
+const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
   const [Fullname, setFullname] = useState('');
   const [Email, setEmail] = useState('');
   const [TenantID, setTenantID] = useState('');
 
+  useEffect(() => {
+    if (agent) {
+      setFullname(agent.Fullname || '');
+      setEmail(agent.Email || '');
+      setTenantID(agent.TenantID || '');
+    }
+  }, [agent]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAddAgent({ Fullname, Email, TenantID });
-    setFullname('');
-    setEmail('');
-    setTenantID('');
+    onEditAgent(agent.AgentID, { Fullname, Email, TenantID });
     onClose();
   };
 
@@ -23,7 +28,7 @@ const AddAgentModal = ({ show, onClose, onAddAgent, tenants }) => {
       <div className="modal-dialog" role="document">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Add New Agent</h5>
+            <h5 className="modal-title">Edit Agent</h5>
             <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={onClose}>
               <span aria-hidden="true">&times;</span>
             </button>
@@ -69,7 +74,7 @@ const AddAgentModal = ({ show, onClose, onAddAgent, tenants }) => {
                   ))}
                 </select>
               </div>
-              <button type="submit" className="btn btn-primary">Add Agent</button>
+              <button type="submit" className="btn btn-primary">Save Changes</button>
             </form>
           </div>
         </div>
@@ -78,4 +83,4 @@ const AddAgentModal = ({ show, onClose, onAddAgent, tenants }) => {
   );
 };
 
-export default AddAgentModal;
+export default EditAgentModal;
