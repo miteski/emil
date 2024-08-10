@@ -9,23 +9,28 @@ const ViewAgents2 = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const fetchAgents = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`);
-      const data = await response.json();
-      setAgents(prevAgents => [...prevAgents, ...data.agents]);
-      setPage(prevPage => prevPage + 1);
-    } catch (error) {
-      console.error('Error fetching agents:', error);
+const fetchAgents = useCallback(async () => {
+  setLoading(true);
+  try {
+    const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
+    const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch agents');
     }
-    setLoading(false);
-  }, [page, searchQuery]);
+    const data = await response.json();
+    setAgents(prevAgents => [...prevAgents, ...(data.agents || [])]);
+    setPage(prevPage => prevPage + 1);
+  } catch (error) {
+    console.error('Error fetching agents:', error);
+  }
+  setLoading(false);
+}, [page, searchQuery]);
 
-  useEffect(() => {
-    fetchAgents();
-  }, [fetchAgents]);
-
+  
   const handleSearch = (query) => {
     setSearchQuery(query);
     setAgents([]);
