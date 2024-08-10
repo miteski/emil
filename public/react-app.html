@@ -3,19 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMIL Insurance Suite - Agent Management</title>
+    <title>EMIL Insurance Suite - Agent Management (Debug)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <div id="debug"></div>
     <div id="root">
         <p>If you see this, React hasn't rendered anything yet.</p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.log('Global error:', message, source, lineno, colno, error);
-            document.getElementById('root').innerHTML += '<p>Error: ' + message + '</p>';
+        function addDebugInfo(message) {
+            var debugElement = document.getElementById('debug');
+            debugElement.innerHTML += '<p>' + message + '</p>';
         }
+
+        addDebugInfo('Page loaded');
+
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('Global error:', message, source, lineno, colno, error);
+            addDebugInfo('Error: ' + message);
+        }
+
+        window.addEventListener('DOMContentLoaded', (event) => {
+            addDebugInfo('DOM fully loaded and parsed');
+        });
+
+        window.addEventListener('load', (event) => {
+            addDebugInfo('All resources finished loading');
+        });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
