@@ -10,7 +10,10 @@ const ViewAgents2 = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  console.log('ViewAgents2 component rendered');
+
   const fetchAgents = useCallback(async () => {
+    console.log('Fetching agents...');
     setLoading(true);
     setError(null);
     try {
@@ -24,6 +27,7 @@ const ViewAgents2 = () => {
         throw new Error('Failed to fetch agents');
       }
       const data = await response.json();
+      console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
         setAgents(prevAgents => [...prevAgents, ...data.agents]);
         setPage(prevPage => prevPage + 1);
@@ -43,6 +47,7 @@ const ViewAgents2 = () => {
   }, [fetchAgents]);
 
   const handleSearch = (query) => {
+    console.log('Search query:', query);
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
@@ -56,13 +61,13 @@ const ViewAgents2 = () => {
   };
 
   return (
-    <div className="container-fluid">
+    <div className="container-fluid" style={{minHeight: '100vh', paddingTop: '60px'}}>
       <nav className="navbar navbar-light bg-light fixed-top">
         <div className="container-fluid">
           <span className="navbar-brand mb-0 h1">EMIL Insurance Suite</span>
         </div>
       </nav>
-      <div className="row mt-5">
+      <div className="row">
         <div className="col-12">
           <h1 className="mt-4 mb-4">Agent Management</h1>
           <FixedHeader 
