@@ -11,25 +11,16 @@ const ViewAgents2 = () => {
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true);
 
-  console.log('ViewAgents2 component rendered');
-
   const fetchAgents = useCallback(async () => {
     if (!hasMore || loading) return;
-    console.log('Fetching agents...');
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`);
       if (!response.ok) {
         throw new Error('Failed to fetch agents');
       }
       const data = await response.json();
-      console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
         if (data.agents.length === 0) {
           setHasMore(false);
@@ -38,11 +29,9 @@ const ViewAgents2 = () => {
           setPage(prevPage => prevPage + 1);
         }
       } else {
-        console.error('Unexpected API response:', data);
-        setError('Unexpected API response format');
+        throw new Error('Unexpected API response format');
       }
     } catch (error) {
-      console.error('Error fetching agents:', error);
       setError(error.message);
     }
     setLoading(false);
@@ -50,16 +39,23 @@ const ViewAgents2 = () => {
 
   useEffect(() => {
     fetchAgents();
-  }, []);  // Only run on mount
+  }, []);
 
   const handleSearch = (query) => {
-    console.log('Search query:', query);
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
     setHasMore(true);
-    fetchAgents();
   };
+
+  useEffect(() => {
+    if (searchQuery) {
+      const delayDebounceFn = setTimeout(() => {
+        fetchAgents();
+      }, 300);
+      return () => clearTimeout(delayDebounceFn);
+    }
+  }, [searchQuery, fetchAgents]);
 
   const handleScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
@@ -90,7 +86,8 @@ const ViewAgents2 = () => {
             setSelectedAgents={setSelectedAgents}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
-          {!hasMore && <div className="text-center mt-3">No more agents to load</div>}
+          {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
+          {!hasMore && agents.length === 0 && <div className="text-center mt-3">No agents found</div>}
         </div>
       </div>
     </div>
