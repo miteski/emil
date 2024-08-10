@@ -35,3 +35,24 @@ try {
 }
 
 console.log('React index.js execution completed');
+
+// Hide loading spinner after React app is rendered
+document.getElementById('loading-spinner').style.display = 'none';
+
+// Handle route changes
+function handleRouteChange() {
+  const path = window.location.pathname;
+  const staticContent = document.getElementById('static-content');
+
+  if (path === '/' || path === '/index.html') {
+    staticContent.style.display = 'block';
+  } else {
+    staticContent.style.display = 'none';
+  }
+}
+
+// Initial call
+handleRouteChange();
+
+// Listen for route changes (if using client-side routing)
+window.addEventListener('popstate', handleRouteChange);
