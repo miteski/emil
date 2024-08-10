@@ -18,7 +18,7 @@ const ViewAgents2 = () => {
   const [editingAgent, setEditingAgent] = useState(null);
 
   const fetchAgents = useCallback(async () => {
-    console.log('Fetching agents...'); // Debug log
+    console.log('Fetching agents...');
     if (!hasMore || loading) return;
     setLoading(true);
     setError(null);
@@ -33,7 +33,7 @@ const ViewAgents2 = () => {
         throw new Error('Failed to fetch agents');
       }
       const data = await response.json();
-      console.log('Fetched agents data:', data); // Debug log
+      console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
         if (data.agents.length === 0) {
           setHasMore(false);
@@ -52,7 +52,7 @@ const ViewAgents2 = () => {
   }, [page, searchQuery, hasMore, loading]);
 
   const fetchTenants = useCallback(async () => {
-    console.log('Fetching tenants...'); // Debug log
+    console.log('Fetching tenants...');
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/tenants', {
@@ -64,7 +64,7 @@ const ViewAgents2 = () => {
         throw new Error('Failed to fetch tenants');
       }
       const data = await response.json();
-      console.log('Fetched tenants:', data); // Debug log
+      console.log('Fetched tenants:', data);
       setTenants(data);
     } catch (error) {
       console.error('Error fetching tenants:', error);
@@ -73,13 +73,13 @@ const ViewAgents2 = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Component mounted, fetching data...'); // Debug log
+    console.log('Component mounted, fetching data...');
     fetchAgents();
     fetchTenants();
   }, [fetchAgents, fetchTenants]);
 
   const handleSearch = (query) => {
-    console.log('Search query:', query); // Debug log
+    console.log('Search query:', query);
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
@@ -90,13 +90,13 @@ const ViewAgents2 = () => {
   const handleScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
     if (scrollHeight - scrollTop <= clientHeight + 10 && !loading && hasMore) {
-      console.log('Triggering fetch on scroll'); // Debug log
+      console.log('Triggering fetch on scroll');
       fetchAgents();
     }
   };
 
   const handleAddAgent = async (newAgent) => {
-    console.log('Adding new agent:', newAgent); // Debug log
+    console.log('Adding new agent:', newAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/agents', {
@@ -113,7 +113,7 @@ const ViewAgents2 = () => {
         throw new Error(errorData.error || 'Failed to add agent');
       }
 
-      console.log('Agent added successfully'); // Debug log
+      console.log('Agent added successfully');
       setAgents([]);
       setPage(1);
       setHasMore(true);
@@ -125,7 +125,7 @@ const ViewAgents2 = () => {
   };
 
   const handleEditAgent = async (agentId, updatedAgent) => {
-    console.log('Editing agent:', agentId, updatedAgent); // Debug log
+    console.log('Editing agent:', agentId, updatedAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/agents/${agentId}`, {
@@ -142,10 +142,11 @@ const ViewAgents2 = () => {
         throw new Error(errorData.error || 'Failed to update agent');
       }
 
-      console.log('Agent updated successfully'); // Debug log
+      console.log('Agent updated successfully');
       setAgents(agents.map(agent => 
         agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
       ));
+      fetchAgents(); // Fetch the updated list from the server
     } catch (error) {
       setError(error.message);
       console.error('Error updating agent:', error);
@@ -153,13 +154,13 @@ const ViewAgents2 = () => {
   };
 
   const openEditModal = (agent) => {
-    console.log('Opening edit modal for agent:', agent); // Debug log
+    console.log('Opening edit modal for agent:', agent);
     setEditingAgent(agent);
     setShowEditModal(true);
   };
 
-  console.log('Rendering ViewAgents2 component'); // Debug log
-  console.log('Current state:', { agents, tenants, loading, error, hasMore }); // Debug log
+  console.log('Rendering ViewAgents2 component');
+  console.log('Current state:', { agents, tenants, loading, error, hasMore });
 
   return (
     <div className="container-fluid" style={{minHeight: '100vh', paddingTop: '60px'}}>
