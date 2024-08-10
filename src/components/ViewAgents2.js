@@ -8,29 +8,40 @@ const ViewAgents2 = () => {
   const [selectedAgents, setSelectedAgents] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-const fetchAgents = useCallback(async () => {
-  setLoading(true);
-  try {
-    const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
-    const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+  const fetchAgents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch agents');
       }
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch agents');
+      const data = await response.json();
+      if (Array.isArray(data.agents)) {
+        setAgents(prevAgents => [...prevAgents, ...data.agents]);
+        setPage(prevPage => prevPage + 1);
+      } else {
+        console.error('Unexpected API response:', data);
+        setError('Unexpected API response format');
+      }
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      setError(error.message);
     }
-    const data = await response.json();
-    setAgents(prevAgents => [...prevAgents, ...(data.agents || [])]);
-    setPage(prevPage => prevPage + 1);
-  } catch (error) {
-    console.error('Error fetching agents:', error);
-  }
-  setLoading(false);
-}, [page, searchQuery]);
+    setLoading(false);
+  }, [page, searchQuery]);
 
-  
+  useEffect(() => {
+    fetchAgents();
+  }, [fetchAgents]);
+
   const handleSearch = (query) => {
     setSearchQuery(query);
     setAgents([]);
@@ -44,18 +55,27 @@ const fetchAgents = useCallback(async () => {
     }
   };
 
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="view-agents-container">
       <FixedHeader 
         onSearch={handleSearch} 
         selectedCount={selectedAgents.length}
       />
-      <AgentTable 
-        agents={agents}
-        onScroll={handleScroll}
-        selectedAgents={selectedAgents}
-        setSelectedAgents={setSelectedAgents}
-      />
+      {agents.length > 0 ? (
+        <AgentTable 
+          agents={agents}
+          onScroll={handleScroll}
+          selectedAgents={selectedAgents}
+          setSelectedAgents={setSelectedAgents}
+        />
+      ) : (
+        <div>No agents found</div>
+      )}
+      {loading && <div>Loading...</div>}
     </div>
   );
 };
