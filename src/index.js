@@ -37,17 +37,25 @@ try {
 console.log('React index.js execution completed');
 
 // Hide loading spinner after React app is rendered
-document.getElementById('loading-spinner').style.display = 'none';
+const loadingSpinner = document.getElementById('loading-spinner');
+if (loadingSpinner) {
+  loadingSpinner.style.display = 'none';
+} else {
+  console.warn('Loading spinner element not found');
+}
 
 // Handle route changes
 function handleRouteChange() {
   const path = window.location.pathname;
   const staticContent = document.getElementById('static-content');
-
-  if (path === '/' || path === '/index.html') {
-    staticContent.style.display = 'block';
+  if (staticContent) {
+    if (path === '/' || path === '/index.html') {
+      staticContent.style.display = 'block';
+    } else {
+      staticContent.style.display = 'none';
+    }
   } else {
-    staticContent.style.display = 'none';
+    console.warn('Static content element not found');
   }
 }
 
