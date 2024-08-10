@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import FixedHeader from './FixedHeader';
 import AgentTable from './AgentTable';
 import AddAgentModal from './AddAgentModal';
+import EditAgentModal from './EditAgentModal';
 // import { handleApiError } from '../utils/apiHandler';
 
 const ViewAgents2 = () => {
@@ -13,6 +14,8 @@ const ViewAgents2 = () => {
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingAgent, setEditingAgent] = useState(null);
 
   const fetchAgents = useCallback(async () => {
     if (!hasMore || loading) return;
@@ -94,6 +97,38 @@ const ViewAgents2 = () => {
     }
   };
 
+  const handleEditAgent = async (agentId, updatedAgent) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/agents/${agentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedAgent)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update agent');
+      }
+
+      // Refresh the agent list
+      setAgents(agents.map(agent => 
+        agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
+      ));
+    } catch (error) {
+      // await handleApiError(error);
+      setError(error.message);
+      console.error('Error updating agent:', error);
+    }
+  };
+
+  const openEditModal = (agent) => {
+    setEditingAgent(agent);
+    setShowEditModal(true);
+  };
+
   return (
     <div className="container-fluid" style={{minHeight: '100vh', paddingTop: '60px'}}>
       <nav className="navbar navbar-light bg-light fixed-top">
@@ -115,6 +150,7 @@ const ViewAgents2 = () => {
             onScroll={handleScroll}
             selectedAgents={selectedAgents}
             setSelectedAgents={setSelectedAgents}
+            onEditAgent={openEditModal}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
           {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
@@ -125,6 +161,12 @@ const ViewAgents2 = () => {
         show={showAddModal}
         onClose={() => setShowAddModal(false)}
         onAddAgent={handleAddAgent}
+      />
+      <EditAgentModal
+        show={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onEditAgent={handleEditAgent}
+        agent={editingAgent}
       />
     </div>
   );
