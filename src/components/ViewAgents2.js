@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import FixedHeader from './FixedHeader';
 import AgentTable from './AgentTable';
 import AddAgentModal from './AddAgentModal';
-import { handleApiError } from '../utils/apiHandler';
+// import { handleApiError } from '../utils/apiHandler';
 
 const ViewAgents2 = () => {
   const [agents, setAgents] = useState([]);
@@ -40,7 +40,7 @@ const ViewAgents2 = () => {
         throw new Error('Unexpected API response format');
       }
     } catch (error) {
-      await handleApiError(error);
+      // await handleApiError(error);
       setError(error.message);
       console.error('Error fetching agents:', error);
     }
@@ -49,7 +49,7 @@ const ViewAgents2 = () => {
 
   useEffect(() => {
     fetchAgents();
-  }, []);
+  }, [fetchAgents]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -88,7 +88,7 @@ const ViewAgents2 = () => {
       setHasMore(true);
       fetchAgents();
     } catch (error) {
-      await handleApiError(error);
+      // await handleApiError(error);
       setError(error.message);
       console.error('Error adding agent:', error);
     }
