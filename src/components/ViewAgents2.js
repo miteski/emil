@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import FixedHeader from './FixedHeader';
 import AgentTable from './AgentTable';
+import AddAgentModal from './AddAgentModal';
+import { handleApiError } from '../utils/apiHandler';
 
 const ViewAgents2 = () => {
   const [agents, setAgents] = useState([]);
@@ -10,22 +12,20 @@ const ViewAgents2 = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const fetchAgents = useCallback(async () => {
     if (!hasMore || loading) return;
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+      const token = localStorage.getItem('token');
       const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
         headers: {
-          'Authorization': `Bearer ${token}` // Include the token in the request headers
+          'Authorization': `Bearer ${token}`
         }
       });
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Unauthorized: Please log in again');
-        }
         throw new Error('Failed to fetch agents');
       }
       const data = await response.json();
@@ -40,6 +40,7 @@ const ViewAgents2 = () => {
         throw new Error('Unexpected API response format');
       }
     } catch (error) {
+      await handleApiError(error);
       setError(error.message);
       console.error('Error fetching agents:', error);
     }
@@ -55,21 +56,41 @@ const ViewAgents2 = () => {
     setAgents([]);
     setPage(1);
     setHasMore(true);
+    fetchAgents();
   };
-
-  useEffect(() => {
-    if (searchQuery) {
-      const delayDebounceFn = setTimeout(() => {
-        fetchAgents();
-      }, 300);
-      return () => clearTimeout(delayDebounceFn);
-    }
-  }, [searchQuery, fetchAgents]);
 
   const handleScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight * 1.5 && !loading && hasMore) {
+    if (scrollHeight - scrollTop <= clientHeight + 10 && !loading && hasMore) {
       fetchAgents();
+    }
+  };
+
+  const handleAddAgent = async (newAgent) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/agents', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newAgent)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add agent');
+      }
+
+      // Refresh the agent list
+      setAgents([]);
+      setPage(1);
+      setHasMore(true);
+      fetchAgents();
+    } catch (error) {
+      await handleApiError(error);
+      setError(error.message);
+      console.error('Error adding agent:', error);
     }
   };
 
@@ -86,6 +107,7 @@ const ViewAgents2 = () => {
           <FixedHeader 
             onSearch={handleSearch} 
             selectedCount={selectedAgents.length}
+            onAddAgent={() => setShowAddModal(true)}
           />
           {error && <div className="alert alert-danger">{error}</div>}
           <AgentTable 
@@ -99,6 +121,11 @@ const ViewAgents2 = () => {
           {!hasMore && agents.length === 0 && <div className="text-center mt-3">No agents found</div>}
         </div>
       </div>
+      <AddAgentModal
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onAddAgent={handleAddAgent}
+      />
     </div>
   );
 };
