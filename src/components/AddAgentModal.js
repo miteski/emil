@@ -7,8 +7,13 @@ const AddAgentModal = ({ show, onClose, onAddAgent, tenants }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submitting new agent:', { Fullname: fullname, Email: email, TenantID: tenantId });
-    onAddAgent({ Fullname: fullname, Email: email, TenantID: tenantId });
+    const newAgent = {
+      Fullname: fullname,
+      Email: email,
+      TenantID: tenantId
+    };
+    console.log('Submitting new agent from modal:', newAgent);
+    onAddAgent(newAgent);
     setFullname('');
     setEmail('');
     setTenantId('');
