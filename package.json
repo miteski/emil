@@ -7,13 +7,10 @@
     "start": "node api/index.js",
     "dev": "nodemon api/index.js",
     "react-start": "react-scripts start",
-    "react-build": "react-scripts build",
     "react-test": "react-scripts test",
     "react-eject": "react-scripts eject",
-    "build": "npm run react-build",
-    "vercel-build": "echo 'Node version:' && node --version && echo 'NPM version:' && npm --version && npm install && npm run react-build",
-     "build": "react-scripts build && cp public/react-app.html build/",
-    "vercel-build": "npm run build"
+    "build": "react-scripts build && cp public/react-app.html build/",
+    "vercel-build": "echo 'Node version:' && node --version && echo 'NPM version:' && npm --version && npm install && npm run build"
   },
   "dependencies": {
     "express": "^4.17.1",
@@ -53,4 +50,3 @@
     ]
   }
 }
-
