@@ -17,16 +17,6 @@ const ViewAgents2 = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState(null);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('No token found in localStorage');
-      setError('You are not authenticated. Please log in.');
-    } else {
-      console.log('Token found in localStorage');
-    }
-  }, []);
-
   const fetchAgents = useCallback(async () => {
     console.log('Fetching agents...');
     if (!hasMore || loading) return;
@@ -34,16 +24,13 @@ const ViewAgents2 = () => {
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      console.log('Using token:', token);
       const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Error fetching agents:', errorData);
-        throw new Error(errorData.error || 'Failed to fetch agents');
+        throw new Error('Failed to fetch agents');
       }
       const data = await response.json();
       console.log('Fetched agents data:', data);
@@ -86,30 +73,25 @@ const ViewAgents2 = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Component mounted, fetching data...');
     fetchAgents();
     fetchTenants();
   }, [fetchAgents, fetchTenants]);
 
   const handleSearch = (query) => {
-    console.log('Search query:', query);
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
     setHasMore(true);
-    fetchAgents();
   };
 
   const handleScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
     if (scrollHeight - scrollTop <= clientHeight + 10 && !loading && hasMore) {
-      console.log('Triggering fetch on scroll');
       fetchAgents();
     }
   };
 
   const handleAddAgent = async (newAgent) => {
-    console.log('Received new agent data in ViewAgents2:', newAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/agents', {
@@ -127,12 +109,8 @@ const ViewAgents2 = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error response from server:', errorData);
         throw new Error(errorData.error || 'Failed to add agent');
       }
-
-      const responseData = await response.json();
-      console.log('Server response after adding agent:', responseData);
 
       setAgents([]);
       setPage(1);
@@ -145,7 +123,6 @@ const ViewAgents2 = () => {
   };
 
   const handleEditAgent = async (agentId, updatedAgent) => {
-    console.log('Editing agent:', agentId, updatedAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/agents/${agentId}`, {
@@ -166,7 +143,6 @@ const ViewAgents2 = () => {
         throw new Error(errorData.error || 'Failed to update agent');
       }
 
-      console.log('Agent updated successfully');
       setAgents(agents.map(agent => 
         agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
       ));
@@ -178,13 +154,9 @@ const ViewAgents2 = () => {
   };
 
   const openEditModal = (agent) => {
-    console.log('Opening edit modal for agent:', agent);
     setEditingAgent(agent);
     setShowEditModal(true);
   };
-
-  console.log('Rendering ViewAgents2 component');
-  console.log('Current state:', { agents, tenants, loading, error, hasMore });
 
   return (
     <div className="container-fluid" style={{minHeight: '100vh', paddingTop: '60px'}}>
@@ -202,18 +174,14 @@ const ViewAgents2 = () => {
             onAddAgent={() => setShowAddModal(true)}
           />
           {error && <div className="alert alert-danger">{error}</div>}
-          {agents.length > 0 ? (
-            <AgentTable 
-              agents={agents}
-              onScroll={handleScroll}
-              selectedAgents={selectedAgents}
-              setSelectedAgents={setSelectedAgents}
-              onEditAgent={openEditModal}
-              tenants={tenants}
-            />
-          ) : (
-            <div>No agents to display</div>
-          )}
+          <AgentTable 
+            agents={agents}
+            onScroll={handleScroll}
+            selectedAgents={selectedAgents}
+            setSelectedAgents={setSelectedAgents}
+            onEditAgent={openEditModal}
+            tenants={tenants}
+          />
           {loading && <div className="text-center mt-3">Loading...</div>}
           {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
           {!hasMore && agents.length === 0 && <div className="text-center mt-3">No agents found</div>}
