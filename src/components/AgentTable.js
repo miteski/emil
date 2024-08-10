@@ -1,10 +1,6 @@
 import React from 'react';
 
 const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
-  console.log('Rendering AgentTable component'); // Debug log
-  console.log('Agents:', agents); // Debug log
-  console.log('Tenants:', tenants); // Debug log
-
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -17,17 +13,10 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
     return (str && str.length > n) ? str.substr(0, n-1) + '...' : str;
   };
 
-const getTenantName = (tenantId) => {
-  console.log('Getting tenant name for ID:', tenantId);
-  console.log('Available tenants:', tenants);
-  const tenant = tenants.find(t => t.TenantID === tenantId);
-  if (tenant) {
-    return tenant.Name;
-  } else {
-    console.log('Tenant not found for ID:', tenantId);
-    return 'N/A';
-  }
-};
+  const getTenantName = (tenantId) => {
+    const tenant = tenants.find(t => t.TenantID === tenantId);
+    return tenant ? tenant.Name : 'N/A';
+  };
 
   return (
     <div className="table-responsive" onScroll={onScroll} style={{maxHeight: '600px', overflowY: 'auto'}}>
