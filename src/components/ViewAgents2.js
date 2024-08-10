@@ -95,34 +95,37 @@ const ViewAgents2 = () => {
     }
   };
 
-  const handleAddAgent = async (newAgent) => {
-    console.log('Adding new agent:', newAgent);
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/agents', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(newAgent)
-      });
+const handleAddAgent = async (newAgent) => {
+  console.log('Received new agent data in ViewAgents2:', newAgent);
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('/api/agents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(newAgent)
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to add agent');
-      }
-
-      console.log('Agent added successfully');
-      setAgents([]);
-      setPage(1);
-      setHasMore(true);
-      fetchAgents();
-    } catch (error) {
-      setError(error.message);
-      console.error('Error adding agent:', error);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Error response from server:', errorData);
+      throw new Error(errorData.error || 'Failed to add agent');
     }
-  };
+
+    const responseData = await response.json();
+    console.log('Server response after adding agent:', responseData);
+
+    setAgents([]);
+    setPage(1);
+    setHasMore(true);
+    fetchAgents();
+  } catch (error) {
+    setError(error.message);
+    console.error('Error adding agent:', error);
+  }
+};
 
   const handleEditAgent = async (agentId, updatedAgent) => {
     console.log('Editing agent:', agentId, updatedAgent);
