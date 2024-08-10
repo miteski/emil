@@ -64,3 +64,13 @@ handleRouteChange();
 
 // Listen for route changes (if using client-side routing)
 window.addEventListener('popstate', handleRouteChange);
+
+// Additional debug information for route changes
+window.addEventListener('popstate', () => {
+  addDebugInfo('Route changed: ' + window.location.pathname);
+});
+
+// Log when the document is fully loaded
+window.addEventListener('load', () => {
+  addDebugInfo('Document fully loaded');
+});
