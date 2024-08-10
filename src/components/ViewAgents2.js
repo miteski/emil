@@ -16,8 +16,16 @@ const ViewAgents2 = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`);
+      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+      const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
+        headers: {
+          'Authorization': `Bearer ${token}` // Include the token in the request headers
+        }
+      });
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized: Please log in again');
+        }
         throw new Error('Failed to fetch agents');
       }
       const data = await response.json();
@@ -33,6 +41,7 @@ const ViewAgents2 = () => {
       }
     } catch (error) {
       setError(error.message);
+      console.error('Error fetching agents:', error);
     }
     setLoading(false);
   }, [page, searchQuery, hasMore, loading]);
