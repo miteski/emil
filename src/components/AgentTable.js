@@ -1,6 +1,8 @@
 import React from 'react';
 
 const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents }) => {
+  console.log('AgentTable rendered, agents:', agents.length, 'selectedAgents:', selectedAgents.length);
+
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -28,7 +30,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents }) => 
                     setSelectedAgents([]);
                   }
                 }}
-                checked={selectedAgents.length === agents.length}
+                checked={selectedAgents.length === agents.length && agents.length > 0}
               />
             </th>
             <th>Name</th>
