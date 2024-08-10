@@ -9,10 +9,12 @@ const ViewAgents2 = () => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
 
   console.log('ViewAgents2 component rendered');
 
   const fetchAgents = useCallback(async () => {
+    if (!hasMore || loading) return;
     console.log('Fetching agents...');
     setLoading(true);
     setError(null);
@@ -29,8 +31,12 @@ const ViewAgents2 = () => {
       const data = await response.json();
       console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
-        setAgents(prevAgents => [...prevAgents, ...data.agents]);
-        setPage(prevPage => prevPage + 1);
+        if (data.agents.length === 0) {
+          setHasMore(false);
+        } else {
+          setAgents(prevAgents => [...prevAgents, ...data.agents]);
+          setPage(prevPage => prevPage + 1);
+        }
       } else {
         console.error('Unexpected API response:', data);
         setError('Unexpected API response format');
@@ -40,22 +46,24 @@ const ViewAgents2 = () => {
       setError(error.message);
     }
     setLoading(false);
-  }, [page, searchQuery]);
+  }, [page, searchQuery, hasMore, loading]);
 
   useEffect(() => {
     fetchAgents();
-  }, [fetchAgents]);
+  }, []);  // Only run on mount
 
   const handleSearch = (query) => {
     console.log('Search query:', query);
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
+    setHasMore(true);
+    fetchAgents();
   };
 
   const handleScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop === clientHeight && !loading) {
+    if (scrollHeight - scrollTop <= clientHeight * 1.5 && !loading && hasMore) {
       fetchAgents();
     }
   };
@@ -75,17 +83,14 @@ const ViewAgents2 = () => {
             selectedCount={selectedAgents.length}
           />
           {error && <div className="alert alert-danger">{error}</div>}
-          {agents.length > 0 ? (
-            <AgentTable 
-              agents={agents}
-              onScroll={handleScroll}
-              selectedAgents={selectedAgents}
-              setSelectedAgents={setSelectedAgents}
-            />
-          ) : (
-            <div className="alert alert-info">No agents found</div>
-          )}
+          <AgentTable 
+            agents={agents}
+            onScroll={handleScroll}
+            selectedAgents={selectedAgents}
+            setSelectedAgents={setSelectedAgents}
+          />
           {loading && <div className="text-center mt-3">Loading...</div>}
+          {!hasMore && <div className="text-center mt-3">No more agents to load</div>}
         </div>
       </div>
     </div>
