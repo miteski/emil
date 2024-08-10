@@ -10,7 +10,7 @@
     "react-test": "react-scripts test",
     "react-eject": "react-scripts eject",
     "build": "react-scripts build && cp public/react-app.html build/",
-    "vercel-build": "echo 'Node version:' && node --version && echo 'NPM version:' && npm --version && npm install && npm run build"
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "express": "^4.17.1",
