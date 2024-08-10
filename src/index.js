@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-console.log('React script is running');
-
 function addDebugInfo(message) {
   if (typeof document !== 'undefined') {
     const debugElement = document.getElementById('debug');
@@ -14,9 +12,10 @@ function addDebugInfo(message) {
   console.log(message);
 }
 
-addDebugInfo('React script started');
+addDebugInfo('React index.js loaded');
 
 try {
+  addDebugInfo('Attempting to render React app');
   const rootElement = document.getElementById('root');
   if (rootElement) {
     addDebugInfo('Root element found');
@@ -31,6 +30,6 @@ try {
     addDebugInfo('Root element not found');
   }
 } catch (error) {
-  console.error('Error rendering React app:', error);
   addDebugInfo('Error rendering React app: ' + error.message);
+  console.error('Error details:', error);
 }
