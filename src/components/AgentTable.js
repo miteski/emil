@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent }) => {
+const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -10,7 +10,12 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
   };
 
   const truncate = (str, n) => {
-    return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+    return (str && str.length > n) ? str.substr(0, n-1) + '...' : str;
+  };
+
+  const getTenantName = (tenantId) => {
+    const tenant = tenants.find(t => t.TenantID === tenantId);
+    return tenant ? tenant.Name : 'N/A';
   };
 
   return (
@@ -51,7 +56,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
               </td>
               <td>{truncate(agent.Fullname, 30)}</td>
               <td>{truncate(agent.Email, 30)}</td>
-              <td>{truncate(agent.TenantName, 20)}</td>
+              <td>{truncate(getTenantName(agent.TenantID), 20)}</td>
               <td className="text-center">
                 {agent.hasBankingInfo ? 
                   <span className="badge bg-success">✓</span> : 
