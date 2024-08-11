@@ -164,8 +164,18 @@ const ViewAgents2 = () => {
       }
       const updatedData = await response.json();
       console.log('Updated agent data from server:', updatedData);
-      setAgents(agents.map(agent => 
-        agent.AgentID === agentId ? { ...agent, ...updatedData } : agent
+      
+      // Update the agents state with the new data
+      setAgents(prevAgents => prevAgents.map(agent => 
+        agent.AgentID === agentId 
+          ? { 
+              ...agent, 
+              Fullname: updatedData.Fullname || updatedAgent.Fullname,
+              Email: updatedData.Email || updatedAgent.Email,
+              TenantID: updatedData.TenantID || updatedAgent.TenantID,
+              TenantName: tenants.find(t => t.TenantID.toString() === updatedData.TenantID?.toString())?.Name || agent.TenantName
+            } 
+          : agent
       ));
     } catch (error) {
       setError(error.message);
