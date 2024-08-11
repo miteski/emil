@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 
-const AgentTable = memo(({ agents, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
+const AgentTable = memo(({ agents, selectedAgents, setSelectedAgents, onEditAgent, onDeleteAgent, tenants }) => {
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -72,7 +72,7 @@ const AgentTable = memo(({ agents, selectedAgents, setSelectedAgents, onEditAgen
                     <button className="btn btn-sm btn-outline-info">Banking</button>
                     <button className="btn btn-sm btn-outline-warning">Commission</button>
                     <button className="btn btn-sm btn-outline-success">Report</button>
-                    <button className="btn btn-sm btn-outline-danger">Delete</button>
+                    <button className="btn btn-sm btn-outline-danger" onClick={() => onDeleteAgent(agent.AgentID)}>Delete</button>
                   </div>
                 </td>
               </tr>
