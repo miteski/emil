@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent, tenants, tenantsKey }) => {
+const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -21,7 +21,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
   }, [tenants]);
 
   const getTenantName = (tenantId) => {
-    return tenantsMap[tenantId] || 'N/A';
+    return tenantsMap[tenantId] || 'Loading...';
   };
 
   console.log('Rendering AgentTable with tenants:', tenants);
