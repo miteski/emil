@@ -167,7 +167,6 @@ const ViewAgents2 = () => {
       const addedAgent = await response.json();
       console.log('Added agent:', addedAgent);
       
-      // Create a new agent object that matches the structure of existing agents
       const newAgentForState = {
         AgentID: addedAgent.agentId,
         Fullname: newAgent.Fullname,
@@ -225,6 +224,57 @@ const ViewAgents2 = () => {
     }
   };
 
+  const handleDeleteAgent = async (agentId) => {
+    if (window.confirm('Are you sure you want to delete this agent?')) {
+      try {
+        const response = await fetchWithAuth(`/api/agents/${agentId}`, {
+          method: 'DELETE',
+        });
+        if (!response) return;
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to delete agent');
+        }
+        const result = await response.json();
+        console.log(result.message);
+        setAgents(prevAgents => prevAgents.filter(agent => agent.AgentID !== agentId));
+      } catch (error) {
+        setError(error.message);
+        console.error('Error deleting agent:', error);
+      }
+    }
+  };
+
+  const handleBulkDeleteAgents = async () => {
+    if (selectedAgents.length === 0) {
+      alert('Please select agents to delete');
+      return;
+    }
+    if (window.confirm(`Are you sure you want to delete ${selectedAgents.length} agent(s)?`)) {
+      try {
+        const response = await fetchWithAuth('/api/agents/bulk-delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ agentIds: selectedAgents }),
+        });
+        if (!response) return;
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to delete agents');
+        }
+        const result = await response.json();
+        console.log(result.message);
+        setAgents(prevAgents => prevAgents.filter(agent => !selectedAgents.includes(agent.AgentID)));
+        setSelectedAgents([]);
+      } catch (error) {
+        setError(error.message);
+        console.error('Error deleting agents:', error);
+      }
+    }
+  };
+
   const openEditModal = useCallback((agent) => {
     console.log('Opening edit modal for agent:', agent);
     setEditingAgent(agent);
@@ -245,6 +295,7 @@ const ViewAgents2 = () => {
             onSearch={handleSearch} 
             selectedCount={selectedAgents.length}
             onAddAgent={() => setShowAddModal(true)}
+            onBulkDelete={handleBulkDeleteAgents}
           />
           {error && <div className="alert alert-danger">{error}</div>}
           <AgentTable 
@@ -252,6 +303,7 @@ const ViewAgents2 = () => {
             selectedAgents={selectedAgents}
             setSelectedAgents={setSelectedAgents}
             onEditAgent={openEditModal}
+            onDeleteAgent={handleDeleteAgent}
             tenants={tenants}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
