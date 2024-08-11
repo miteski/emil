@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FixedHeader from './FixedHeader';
 import AgentTable from './AgentTable';
 import AddAgentModal from './AddAgentModal';
 import EditAgentModal from './EditAgentModal';
 
 const ViewAgents2 = () => {
+  const navigate = useNavigate();
   const [agents, setAgents] = useState([]);
   const [tenants, setTenants] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -21,16 +23,42 @@ const ViewAgents2 = () => {
   const fetchingAgents = useRef(false);
   const fetchingTenants = useRef(false);
 
+  const handleTokenExpiration = useCallback(() => {
+    localStorage.removeItem('token');
+    navigate('/login', { state: { from: '/view-agents2' } });
+  }, [navigate]);
+
+  const fetchWithAuth = useCallback(async (url, options = {}) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      handleTokenExpiration();
+      return null;
+    }
+
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (response.status === 401) {
+      handleTokenExpiration();
+      return null;
+    }
+
+    return response;
+  }, [handleTokenExpiration]);
+
   const fetchAgents = useCallback(async () => {
     if (!hasMore || loading || fetchingAgents.current) return;
     fetchingAgents.current = true;
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       console.log('Fetching agents with URL:', `/api/agents?page=${page}&pageSize=10&search=${searchQuery}`);
-      const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetchWithAuth(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`);
+      if (!response) return;
       if (!response.ok) throw new Error('Failed to fetch agents');
       const data = await response.json();
       console.log('Fetched agents data:', data);
@@ -53,17 +81,15 @@ const ViewAgents2 = () => {
       setLoading(false);
       fetchingAgents.current = false;
     }
-  }, [page, searchQuery, hasMore, loading]);
+  }, [page, searchQuery, hasMore, loading, fetchWithAuth]);
 
   const fetchTenants = useCallback(async () => {
     if (fetchingTenants.current) return;
     fetchingTenants.current = true;
     try {
-      const token = localStorage.getItem('token');
       console.log('Fetching tenants...');
-      const response = await fetch('/api/tenants', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await fetchWithAuth('/api/tenants');
+      if (!response) return;
       if (!response.ok) throw new Error('Failed to fetch tenants');
       const data = await response.json();
       console.log('Fetched tenants:', data);
@@ -74,7 +100,7 @@ const ViewAgents2 = () => {
     } finally {
       fetchingTenants.current = false;
     }
-  }, []);
+  }, [fetchWithAuth]);
 
   useEffect(() => {
     fetchTenants();
@@ -122,15 +148,14 @@ const ViewAgents2 = () => {
   const handleAddAgent = async (newAgent) => {
     console.log('Adding new agent:', newAgent);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/agents', {
+      const response = await fetchWithAuth('/api/agents', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(newAgent)
       });
+      if (!response) return;
       if (!response.ok) throw new Error('Failed to add agent');
       setAgents([]);
       setPage(1);
@@ -145,12 +170,10 @@ const ViewAgents2 = () => {
   const handleEditAgent = async (agentId, updatedAgent) => {
     console.log('Editing agent:', agentId, updatedAgent);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/agents/${agentId}`, {
+      const response = await fetchWithAuth(`/api/agents/${agentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           fullname: updatedAgent.Fullname,
@@ -158,6 +181,7 @@ const ViewAgents2 = () => {
           tenantId: updatedAgent.TenantID
         })
       });
+      if (!response) return;
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update agent');
