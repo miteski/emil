@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const FixedHeader = ({ onSearch, selectedCount, onAddAgent }) => {
+const FixedHeader = ({ onSearch, selectedCount, onAddAgent, onBulkDelete }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchSubmit = (event) => {
@@ -17,7 +17,11 @@ const FixedHeader = ({ onSearch, selectedCount, onAddAgent }) => {
     <div className="mb-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <button className="btn btn-primary" onClick={onAddAgent}>Add Agent</button>
-        <button className="btn btn-danger" disabled={selectedCount === 0}>
+        <button 
+          className="btn btn-danger" 
+          disabled={selectedCount === 0}
+          onClick={onBulkDelete}
+        >
           Bulk Delete ({selectedCount})
         </button>
       </div>
