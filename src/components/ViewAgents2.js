@@ -102,13 +102,14 @@ const ViewAgents2 = () => {
     setTotalPages(1);
   };
 
-  const handleScroll = (event) => {
+  const handleScroll = useCallback((event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
+    console.log('Scroll event triggered', { scrollTop, clientHeight, scrollHeight, hasMore, loading });
     if (scrollHeight - scrollTop <= clientHeight + 100 && !loading && hasMore && !fetchingAgents.current) {
       console.log('Triggering fetch for next page');
       fetchAgents();
     }
-  };
+  }, [fetchAgents, hasMore, loading]);
 
   const handleAddAgent = async (newAgent) => {
     try {
