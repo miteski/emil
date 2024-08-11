@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import FixedHeader from './FixedHeader';
 import AgentTable from './AgentTable';
 import AddAgentModal from './AddAgentModal';
@@ -16,10 +16,13 @@ const ViewAgents2 = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState(null);
+  
+  const fetchingAgents = useRef(false);
+  const fetchingTenants = useRef(false);
 
   const fetchAgents = useCallback(async () => {
-    console.log('Fetching agents...');
-    if (!hasMore || loading) return;
+    if (!hasMore || loading || fetchingAgents.current) return;
+    fetchingAgents.current = true;
     setLoading(true);
     setError(null);
     try {
@@ -36,7 +39,7 @@ const ViewAgents2 = () => {
       console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
         setAgents(prevAgents => [...prevAgents, ...data.agents]);
-        setHasMore(data.agents.length > 0);
+        setHasMore(data.currentPage < data.totalPages);
         setPage(prevPage => prevPage + 1);
       } else {
         throw new Error('Unexpected API response format');
@@ -44,11 +47,15 @@ const ViewAgents2 = () => {
     } catch (error) {
       setError(error.message);
       console.error('Error fetching agents:', error);
+    } finally {
+      setLoading(false);
+      fetchingAgents.current = false;
     }
-    setLoading(false);
   }, [page, searchQuery, hasMore, loading]);
 
   const fetchTenants = useCallback(async () => {
+    if (fetchingTenants.current) return;
+    fetchingTenants.current = true;
     console.log('Fetching tenants...');
     try {
       const token = localStorage.getItem('token');
@@ -70,6 +77,8 @@ const ViewAgents2 = () => {
     } catch (error) {
       console.error('Error fetching tenants:', error);
       setError('Failed to fetch tenants');
+    } finally {
+      fetchingTenants.current = false;
     }
   }, []);
 
@@ -86,10 +95,6 @@ const ViewAgents2 = () => {
     }
   }, [fetchAgents, tenants, searchQuery]);
 
-  useEffect(() => {
-    console.log('Tenants state updated:', tenants);
-  }, [tenants]);
-
   const handleSearch = (query) => {
     setSearchQuery(query);
     setAgents([]);
@@ -99,7 +104,7 @@ const ViewAgents2 = () => {
 
   const handleScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight + 10 && !loading && hasMore) {
+    if (scrollHeight - scrollTop <= clientHeight + 10 && !loading && hasMore && !fetchingAgents.current) {
       fetchAgents();
     }
   };
