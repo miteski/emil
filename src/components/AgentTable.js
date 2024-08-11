@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-const AgentTable = ({ agents, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
+const AgentTable = memo(({ agents, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -82,6 +82,6 @@ const AgentTable = ({ agents, selectedAgents, setSelectedAgents, onEditAgent, te
       </table>
     </div>
   );
-};
+});
 
 export default AgentTable;
