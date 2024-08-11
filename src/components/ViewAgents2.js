@@ -156,11 +156,14 @@ const ViewAgents2 = () => {
         body: JSON.stringify(newAgent)
       });
       if (!response) return;
-      if (!response.ok) throw new Error('Failed to add agent');
-      setAgents([]);
-      setPage(1);
-      setHasMore(true);
-      fetchAgents();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add agent');
+      }
+      const addedAgent = await response.json();
+      console.log('Added agent:', addedAgent);
+      setAgents(prevAgents => [...prevAgents, addedAgent]);
+      setShowAddModal(false);
     } catch (error) {
       setError(error.message);
       console.error('Error adding agent:', error);
