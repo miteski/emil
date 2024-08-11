@@ -35,12 +35,9 @@ const ViewAgents2 = () => {
       const data = await response.json();
       console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
-        if (data.agents.length === 0) {
-          setHasMore(false);
-        } else {
-          setAgents(prevAgents => [...prevAgents, ...data.agents]);
-          setPage(prevPage => prevPage + 1);
-        }
+        setAgents(prevAgents => [...prevAgents, ...data.agents]);
+        setHasMore(data.agents.length > 0);
+        setPage(prevPage => prevPage + 1);
       } else {
         throw new Error('Unexpected API response format');
       }
@@ -77,9 +74,17 @@ const ViewAgents2 = () => {
   }, []);
 
   useEffect(() => {
-    fetchAgents();
     fetchTenants();
-  }, [fetchAgents, fetchTenants]);
+  }, [fetchTenants]);
+
+  useEffect(() => {
+    if (tenants.length > 0) {
+      setAgents([]);
+      setPage(1);
+      setHasMore(true);
+      fetchAgents();
+    }
+  }, [fetchAgents, tenants, searchQuery]);
 
   useEffect(() => {
     console.log('Tenants state updated:', tenants);
@@ -189,7 +194,6 @@ const ViewAgents2 = () => {
             setSelectedAgents={setSelectedAgents}
             onEditAgent={openEditModal}
             tenants={tenants}
-            tenantsKey={tenants.length}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
           {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
