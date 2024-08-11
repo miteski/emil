@@ -104,7 +104,8 @@ const ViewAgents2 = () => {
 
   const handleScroll = (event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight + 10 && !loading && hasMore && !fetchingAgents.current) {
+    if (scrollHeight - scrollTop <= clientHeight + 100 && !loading && hasMore && !fetchingAgents.current) {
+      console.log('Triggering fetch for next page');
       fetchAgents();
     }
   };
