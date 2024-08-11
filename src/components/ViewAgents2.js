@@ -153,7 +153,11 @@ const ViewAgents2 = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newAgent)
+        body: JSON.stringify({
+          fullname: newAgent.Fullname,
+          email: newAgent.Email,
+          tenantId: newAgent.TenantID
+        })
       });
       if (!response) return;
       if (!response.ok) {
@@ -162,7 +166,19 @@ const ViewAgents2 = () => {
       }
       const addedAgent = await response.json();
       console.log('Added agent:', addedAgent);
-      setAgents(prevAgents => [...prevAgents, addedAgent]);
+      
+      // Create a new agent object that matches the structure of existing agents
+      const newAgentForState = {
+        AgentID: addedAgent.agentId,
+        Fullname: newAgent.Fullname,
+        Email: newAgent.Email,
+        TenantID: newAgent.TenantID,
+        TenantName: tenants.find(t => t.TenantID.toString() === newAgent.TenantID)?.Name || 'Unknown',
+        hasBankingInfo: 0,
+        hasCommissionRules: 0
+      };
+      
+      setAgents(prevAgents => [...prevAgents, newAgentForState]);
       setShowAddModal(false);
     } catch (error) {
       setError(error.message);
