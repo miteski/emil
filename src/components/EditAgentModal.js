@@ -8,15 +8,16 @@ const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
   });
 
   useEffect(() => {
-    if (agent) {
+    if (agent && tenants.length > 0) {
       console.log('Agent data received in modal:', agent);
       console.log('Current tenants:', tenants);
+      const tenantID = tenants.find(t => t.Name === agent.TenantName)?.TenantID?.toString() || '';
+      console.log('Found TenantID:', tenantID);
       setEditedAgent({
         Fullname: agent.Fullname || '',
         Email: agent.Email || '',
-        TenantID: tenants.find(t => t.Name === agent.TenantName)?.TenantID?.toString() || ''
+        TenantID: tenantID
       });
-      console.log('Initialized editedAgent state:', editedAgent);
     }
   }, [agent, tenants]);
 
