@@ -79,14 +79,22 @@ const ViewAgents2 = () => {
     setAgents([]);
     setPage(1);
     setHasMore(true);
+    fetchAgents();
   };
 
   const handleScroll = useCallback((event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
     if (scrollHeight - scrollTop <= clientHeight + 100 && !loading && hasMore && !fetchingAgents.current) {
+      console.log('Triggering fetch for next page');
       fetchAgents();
     }
   }, [fetchAgents, hasMore, loading]);
+
+  const handleLoadMore = () => {
+    if (!loading && hasMore && !fetchingAgents.current) {
+      fetchAgents();
+    }
+  };
 
   const handleAddAgent = async (newAgent) => {
     try {
@@ -161,6 +169,11 @@ const ViewAgents2 = () => {
             tenants={tenants}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
+          {!loading && hasMore && (
+            <div className="text-center mt-3">
+              <button className="btn btn-primary" onClick={handleLoadMore}>Load More</button>
+            </div>
+          )}
           {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
           {!hasMore && agents.length === 0 && <div className="text-center mt-3">No agents found</div>}
         </div>
