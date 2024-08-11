@@ -165,7 +165,6 @@ const ViewAgents2 = () => {
       const updatedData = await response.json();
       console.log('Updated agent data from server:', updatedData);
       
-      // Update the agents state with the new data
       setAgents(prevAgents => prevAgents.map(agent => 
         agent.AgentID === agentId 
           ? { 
@@ -183,11 +182,11 @@ const ViewAgents2 = () => {
     }
   };
 
-  const openEditModal = (agent) => {
+  const openEditModal = useCallback((agent) => {
     console.log('Opening edit modal for agent:', agent);
     setEditingAgent(agent);
     setShowEditModal(true);
-  };
+  }, []);
 
   return (
     <div className="container-fluid" style={{minHeight: '100vh', paddingTop: '60px'}}>
