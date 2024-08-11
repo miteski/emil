@@ -21,10 +21,10 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
   }, [tenants]);
 
   const getTenantName = (tenantId) => {
-    return tenantsMap[tenantId] || 'Loading...';
+    return tenantsMap[tenantId] || 'N/A';
   };
 
-  console.log('Rendering AgentTable with tenants:', tenants);
+  console.log('Rendering AgentTable with agents:', agents.length, 'tenants:', tenants.length);
 
   return (
     <div className="table-responsive" onScroll={onScroll} style={{maxHeight: '600px', overflowY: 'auto'}}>
@@ -78,10 +78,10 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
               <td>
                 <div className="btn-group" role="group">
                   <button className="btn btn-sm btn-outline-primary" onClick={() => onEditAgent(agent)}>Edit</button>
-                  <button className="btn btn-sm btn-outline-info" onClick={() => {/* Edit banking info */}}>Banking</button>
-                  <button className="btn btn-sm btn-outline-warning" onClick={() => {/* Edit commission rules */}}>Commission</button>
-                  <button className="btn btn-sm btn-outline-success" onClick={() => {/* Send commission report */}}>Report</button>
-                  <button className="btn btn-sm btn-outline-danger" onClick={() => {/* Delete agent */}}>Delete</button>
+                  <button className="btn btn-sm btn-outline-info">Banking</button>
+                  <button className="btn btn-sm btn-outline-warning">Commission</button>
+                  <button className="btn btn-sm btn-outline-success">Report</button>
+                  <button className="btn btn-sm btn-outline-danger">Delete</button>
                 </div>
               </td>
             </tr>
