@@ -1,30 +1,100 @@
-const handleEditAgent = async (agentId, updatedAgent) => {
-  console.log('Editing agent:', agentId, updatedAgent);
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`/api/agents/${agentId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        fullname: updatedAgent.Fullname,
-        email: updatedAgent.Email,
-        tenantId: updatedAgent.TenantID
-      })
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to update agent');
+import React, { useState, useEffect } from 'react';
+
+const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
+  const [editedAgent, setEditedAgent] = useState({
+    Fullname: '',
+    Email: '',
+    TenantID: ''
+  });
+
+  useEffect(() => {
+    if (agent) {
+      console.log('Agent data received in modal:', agent);
+      setEditedAgent({
+        Fullname: agent.Fullname || '',
+        Email: agent.Email || '',
+        TenantID: agent.TenantID ? agent.TenantID.toString() : ''
+      });
     }
-    const updatedData = await response.json();
-    setAgents(agents.map(agent => 
-      agent.AgentID === agentId ? { ...agent, ...updatedData } : agent
-    ));
-    console.log('Agent updated successfully:', updatedData);
-  } catch (error) {
-    setError(error.message);
-    console.error('Error updating agent:', error);
+  }, [agent]);
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setEditedAgent(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log('Submitting edited agent:', editedAgent);
+    onEditAgent(agent.AgentID, editedAgent);
+    onClose();
+  };
+
+  if (!show) {
+    return null;
   }
+
+  return (
+    <div className="modal" style={{display: 'block', backgroundColor: 'rgba(0,0,0,0.5)'}}>
+      <div className="modal-dialog">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">Edit Agent</h5>
+            <button type="button" className="close" onClick={onClose}>
+              <span>&times;</span>
+            </button>
+          </div>
+          <div className="modal-body">
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="Fullname"
+                  value={editedAgent.Fullname}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  name="Email"
+                  value={editedAgent.Email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Tenant</label>
+                <select
+                  className="form-control"
+                  name="TenantID"
+                  value={editedAgent.TenantID}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Select a tenant</option>
+                  {tenants.map(tenant => (
+                    <option key={tenant.TenantID} value={tenant.TenantID.toString()}>
+                      {tenant.Name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>
+                <button type="submit" className="btn btn-primary">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
+
+export default EditAgentModal;
