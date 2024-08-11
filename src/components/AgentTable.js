@@ -21,7 +21,10 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
   }, [tenants]);
 
   const getTenantName = (tenantId) => {
-    return tenantsMap[tenantId] || 'N/A';
+    console.log('Getting tenant name for ID:', tenantId);
+    const name = tenantsMap[tenantId] || 'N/A';
+    console.log('Tenant name result:', name);
+    return name;
   };
 
   console.log('Rendering AgentTable with agents:', agents.length, 'tenants:', tenants.length);
@@ -54,39 +57,42 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
           </tr>
         </thead>
         <tbody>
-          {agents.map(agent => (
-            <tr key={agent.AgentID}>
-              <td>
-                <input 
-                  type="checkbox" 
-                  checked={selectedAgents.includes(agent.AgentID)}
-                  onChange={() => handleSelectAgent(agent.AgentID)}
-                />
-              </td>
-              <td>{truncate(agent.Fullname, 30)}</td>
-              <td>{truncate(agent.Email, 30)}</td>
-              <td>{truncate(getTenantName(agent.TenantID), 20)}</td>
-              <td className="text-center">
-                {agent.hasBankingInfo ? 
-                  <span className="badge bg-success">✓</span> : 
-                  <span className="badge bg-danger">✗</span>}
-              </td>
-              <td className="text-center">
-                {agent.hasCommissionRules ? 
-                  <span className="badge bg-success">✓</span> : 
-                  <span className="badge bg-danger">✗</span>}
-              </td>
-              <td>
-                <div className="btn-group" role="group">
-                  <button className="btn btn-sm btn-outline-primary" onClick={() => onEditAgent(agent)}>Edit</button>
-                  <button className="btn btn-sm btn-outline-info">Banking</button>
-                  <button className="btn btn-sm btn-outline-warning">Commission</button>
-                  <button className="btn btn-sm btn-outline-success">Report</button>
-                  <button className="btn btn-sm btn-outline-danger">Delete</button>
-                </div>
-              </td>
-            </tr>
-          ))}
+          {agents.map(agent => {
+            console.log('Agent:', agent);
+            return (
+              <tr key={agent.AgentID}>
+                <td>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedAgents.includes(agent.AgentID)}
+                    onChange={() => handleSelectAgent(agent.AgentID)}
+                  />
+                </td>
+                <td>{truncate(agent.Fullname, 30)}</td>
+                <td>{truncate(agent.Email, 30)}</td>
+                <td>{truncate(getTenantName(agent.TenantID), 20)}</td>
+                <td className="text-center">
+                  {agent.hasBankingInfo ? 
+                    <span className="badge bg-success">✓</span> : 
+                    <span className="badge bg-danger">✗</span>}
+                </td>
+                <td className="text-center">
+                  {agent.hasCommissionRules ? 
+                    <span className="badge bg-success">✓</span> : 
+                    <span className="badge bg-danger">✗</span>}
+                </td>
+                <td>
+                  <div className="btn-group" role="group">
+                    <button className="btn btn-sm btn-outline-primary" onClick={() => onEditAgent(agent)}>Edit</button>
+                    <button className="btn btn-sm btn-outline-info">Banking</button>
+                    <button className="btn btn-sm btn-outline-warning">Commission</button>
+                    <button className="btn btn-sm btn-outline-success">Report</button>
+                    <button className="btn btn-sm btn-outline-danger">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
