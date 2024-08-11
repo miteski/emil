@@ -16,12 +16,13 @@ const ViewAgents2 = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingAgent, setEditingAgent] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
   
   const fetchingAgents = useRef(false);
   const fetchingTenants = useRef(false);
 
   const fetchAgents = useCallback(async () => {
-    if (!hasMore || loading || fetchingAgents.current) return;
+    if (!hasMore || loading || fetchingAgents.current || page > totalPages) return;
     fetchingAgents.current = true;
     setLoading(true);
     setError(null);
@@ -39,7 +40,8 @@ const ViewAgents2 = () => {
       console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
         setAgents(prevAgents => [...prevAgents, ...data.agents]);
-        setHasMore(data.currentPage < data.totalPages);
+        setTotalPages(data.totalPages);
+        setHasMore(page < data.totalPages);
         setPage(prevPage => prevPage + 1);
       } else {
         throw new Error('Unexpected API response format');
@@ -51,7 +53,7 @@ const ViewAgents2 = () => {
       setLoading(false);
       fetchingAgents.current = false;
     }
-  }, [page, searchQuery, hasMore, loading]);
+  }, [page, searchQuery, hasMore, loading, totalPages]);
 
   const fetchTenants = useCallback(async () => {
     if (fetchingTenants.current) return;
@@ -87,19 +89,17 @@ const ViewAgents2 = () => {
   }, [fetchTenants]);
 
   useEffect(() => {
-    if (tenants.length > 0) {
-      setAgents([]);
-      setPage(1);
-      setHasMore(true);
+    if (tenants.length > 0 && page === 1) {
       fetchAgents();
     }
-  }, [fetchAgents, tenants, searchQuery]);
+  }, [fetchAgents, tenants, page]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
     setHasMore(true);
+    setTotalPages(1);
   };
 
   const handleScroll = (event) => {
@@ -133,6 +133,7 @@ const ViewAgents2 = () => {
       setAgents([]);
       setPage(1);
       setHasMore(true);
+      setTotalPages(1);
       fetchAgents();
     } catch (error) {
       setError(error.message);
@@ -164,7 +165,6 @@ const ViewAgents2 = () => {
       setAgents(agents.map(agent => 
         agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
       ));
-      fetchAgents();
     } catch (error) {
       setError(error.message);
       console.error('Error updating agent:', error);
