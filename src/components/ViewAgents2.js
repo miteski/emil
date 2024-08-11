@@ -22,12 +22,14 @@ const ViewAgents2 = () => {
   const fetchingTenants = useRef(false);
 
   const fetchAgents = useCallback(async () => {
+    console.log('fetchAgents called', { hasMore, loading, fetchingAgents: fetchingAgents.current, page, totalPages });
     if (!hasMore || loading || fetchingAgents.current || page > totalPages) return;
     fetchingAgents.current = true;
     setLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
+      console.log('Fetching agents with URL:', `/api/agents?page=${page}&pageSize=10&search=${searchQuery}`);
       const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -39,9 +41,6 @@ const ViewAgents2 = () => {
       const data = await response.json();
       console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
-        data.agents.forEach(agent => {
-          console.log('Agent object structure:', JSON.stringify(agent, null, 2));
-        });
         setAgents(prevAgents => [...prevAgents, ...data.agents]);
         setTotalPages(data.totalPages);
         setHasMore(page < data.totalPages);
@@ -92,12 +91,16 @@ const ViewAgents2 = () => {
   }, [fetchTenants]);
 
   useEffect(() => {
-    if (tenants.length > 0 && page === 1) {
+    if (tenants.length > 0) {
+      setAgents([]);
+      setPage(1);
+      setHasMore(true);
       fetchAgents();
     }
-  }, [fetchAgents, tenants, page]);
+  }, [fetchAgents, tenants, searchQuery]);
 
   const handleSearch = (query) => {
+    console.log('Search query changed:', query);
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
@@ -107,14 +110,22 @@ const ViewAgents2 = () => {
 
   const handleScroll = useCallback((event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    console.log('Scroll event triggered', { scrollTop, clientHeight, scrollHeight, hasMore, loading });
+    console.log('Scroll event', { scrollTop, clientHeight, scrollHeight, hasMore, loading });
     if (scrollHeight - scrollTop <= clientHeight + 100 && !loading && hasMore && !fetchingAgents.current) {
       console.log('Triggering fetch for next page');
       fetchAgents();
     }
   }, [fetchAgents, hasMore, loading]);
 
+  const handleLoadMore = useCallback(() => {
+    console.log('Load more button clicked');
+    if (!loading && hasMore && !fetchingAgents.current) {
+      fetchAgents();
+    }
+  }, [fetchAgents, hasMore, loading]);
+
   const handleAddAgent = async (newAgent) => {
+    console.log('Adding new agent:', newAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/agents', {
@@ -147,6 +158,7 @@ const ViewAgents2 = () => {
   };
 
   const handleEditAgent = async (agentId, updatedAgent) => {
+    console.log('Editing agent:', agentId, updatedAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/agents/${agentId}`, {
@@ -177,6 +189,7 @@ const ViewAgents2 = () => {
   };
 
   const openEditModal = (agent) => {
+    console.log('Opening edit modal for agent:', agent);
     setEditingAgent(agent);
     setShowEditModal(true);
   };
@@ -203,9 +216,13 @@ const ViewAgents2 = () => {
             selectedAgents={selectedAgents}
             setSelectedAgents={setSelectedAgents}
             onEditAgent={openEditModal}
-            tenants={tenants}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
+          {hasMore && !loading && (
+            <div className="text-center mt-3">
+              <button className="btn btn-primary" onClick={handleLoadMore}>Load More</button>
+            </div>
+          )}
           {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
           {!hasMore && agents.length === 0 && <div className="text-center mt-3">No agents found</div>}
         </div>
