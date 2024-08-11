@@ -25,6 +25,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
   };
 
   console.log('Rendering AgentTable with agents:', agents.length, 'tenants:', tenants.length);
+  console.log('Tenants map:', tenantsMap);
 
   return (
     <div className="table-responsive" onScroll={onScroll} style={{maxHeight: '600px', overflowY: 'auto'}}>
