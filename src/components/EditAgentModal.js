@@ -10,16 +10,23 @@ const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
   useEffect(() => {
     if (agent) {
       console.log('Agent data received in modal:', agent);
+      console.log('Current tenants:', tenants);
       setEditedAgent({
         Fullname: agent.Fullname || '',
         Email: agent.Email || '',
         TenantID: agent.TenantID ? agent.TenantID.toString() : ''
       });
+      console.log('Initialized editedAgent state:', editedAgent);
     }
-  }, [agent]);
+  }, [agent, tenants]);
+
+  useEffect(() => {
+    console.log('Current editedAgent state:', editedAgent);
+  }, [editedAgent]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
+    console.log(`Changing ${name} to:`, value);
     setEditedAgent(prev => ({ ...prev, [name]: value }));
   };
 
