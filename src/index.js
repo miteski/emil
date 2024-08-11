@@ -44,32 +44,6 @@ if (loadingSpinner) {
   console.warn('Loading spinner element not found');
 }
 
-// Handle route changes
-function handleRouteChange() {
-  const path = window.location.pathname;
-  const staticContent = document.getElementById('static-content');
-  if (staticContent) {
-    if (path === '/' || path === '/index.html') {
-      staticContent.style.display = 'block';
-    } else {
-      staticContent.style.display = 'none';
-    }
-  } else {
-    console.warn('Static content element not found');
-  }
-}
-
-// Initial call
-handleRouteChange();
-
-// Listen for route changes (if using client-side routing)
-window.addEventListener('popstate', handleRouteChange);
-
-// Additional debug information for route changes
-window.addEventListener('popstate', () => {
-  addDebugInfo('Route changed: ' + window.location.pathname);
-});
-
 // Log when the document is fully loaded
 window.addEventListener('load', () => {
   addDebugInfo('Document fully loaded');
