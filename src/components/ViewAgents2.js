@@ -172,7 +172,7 @@ const ViewAgents2 = () => {
               Fullname: updatedData.Fullname || updatedAgent.Fullname,
               Email: updatedData.Email || updatedAgent.Email,
               TenantID: updatedData.TenantID || updatedAgent.TenantID,
-              TenantName: tenants.find(t => t.TenantID.toString() === updatedData.TenantID?.toString())?.Name || agent.TenantName
+              TenantName: tenants.find(t => t.TenantID.toString() === (updatedData.TenantID || updatedAgent.TenantID))?.Name || agent.TenantName
             } 
           : agent
       ));
