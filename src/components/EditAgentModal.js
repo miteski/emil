@@ -14,7 +14,7 @@ const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
       setEditedAgent({
         Fullname: agent.Fullname || '',
         Email: agent.Email || '',
-        TenantID: agent.TenantID ? agent.TenantID.toString() : ''
+        TenantID: tenants.find(t => t.Name === agent.TenantName)?.TenantID?.toString() || ''
       });
       console.log('Initialized editedAgent state:', editedAgent);
     }
