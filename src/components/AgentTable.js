@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent }) => {
+const AgentTable = ({ agents, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -13,10 +13,10 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
     return (str && str.length > n) ? str.substr(0, n-1) + '...' : str;
   };
 
-  console.log('Rendering AgentTable with agents:', agents.length);
+  console.log('Rendering AgentTable with agents:', agents.length, 'tenants:', tenants.length);
 
   return (
-    <div className="table-responsive" onScroll={onScroll} style={{maxHeight: '600px', overflowY: 'auto'}}>
+    <div className="table-responsive">
       <table className="table table-striped table-hover">
         <thead className="sticky-top bg-light">
           <tr>
