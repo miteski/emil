@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form } from 'react-bootstrap';
 
 const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
   const [editedAgent, setEditedAgent] = useState({
@@ -14,7 +13,7 @@ const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
       setEditedAgent({
         Fullname: agent.Fullname || '',
         Email: agent.Email || '',
-        TenantID: agent.TenantID || ''  // Note: This might need to be adjusted based on your API response
+        TenantID: agent.TenantID || ''
       });
     }
   }, [agent]);
@@ -31,55 +30,70 @@ const EditAgentModal = ({ show, onClose, onEditAgent, agent, tenants }) => {
     onClose();
   };
 
+  if (!show) {
+    return null;
+  }
+
   return (
-    <Modal show={show} onHide={onClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Edit Agent</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
-            <Form.Label>Full Name</Form.Label>
-            <Form.Control
-              type="text"
-              name="Fullname"
-              value={editedAgent.Fullname}
-              onChange={handleInputChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
-              type="email"
-              name="Email"
-              value={editedAgent.Email}
-              onChange={handleInputChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group className="mb-3">
-            <Form.Label>Tenant</Form.Label>
-            <Form.Select
-              name="TenantID"
-              value={editedAgent.TenantID}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Select a tenant</option>
-              {tenants.map(tenant => (
-                <option key={tenant.TenantID} value={tenant.TenantID}>
-                  {tenant.Name}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-          <Button variant="primary" type="submit">
-            Save Changes
-          </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
+    <div className="modal" style={{display: 'block', backgroundColor: 'rgba(0,0,0,0.5)'}}>
+      <div className="modal-dialog">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">Edit Agent</h5>
+            <button type="button" className="close" onClick={onClose}>
+              <span>&times;</span>
+            </button>
+          </div>
+          <div className="modal-body">
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="Fullname"
+                  value={editedAgent.Fullname}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  name="Email"
+                  value={editedAgent.Email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Tenant</label>
+                <select
+                  className="form-control"
+                  name="TenantID"
+                  value={editedAgent.TenantID}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Select a tenant</option>
+                  {tenants.map(tenant => (
+                    <option key={tenant.TenantID} value={tenant.TenantID}>
+                      {tenant.Name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={onClose}>Close</button>
+                <button type="submit" className="btn btn-primary">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
