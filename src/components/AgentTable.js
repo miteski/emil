@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
-const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent, tenants }) => {
+const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEditAgent }) => {
   const handleSelectAgent = (agentId) => {
     setSelectedAgents(prev => 
       prev.includes(agentId) 
@@ -13,22 +13,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
     return (str && str.length > n) ? str.substr(0, n-1) + '...' : str;
   };
 
-  const tenantsMap = useMemo(() => {
-    return tenants.reduce((acc, tenant) => {
-      acc[tenant.TenantID] = tenant.Name;
-      return acc;
-    }, {});
-  }, [tenants]);
-
-  const getTenantName = (tenantId) => {
-    console.log('Getting tenant name for ID:', tenantId);
-    const name = tenantsMap[tenantId] || 'N/A';
-    console.log('Tenant name result:', name);
-    return name;
-  };
-
-  console.log('Rendering AgentTable with agents:', agents.length, 'tenants:', tenants.length);
-  console.log('Tenants map:', tenantsMap);
+  console.log('Rendering AgentTable with agents:', agents.length);
 
   return (
     <div className="table-responsive" onScroll={onScroll} style={{maxHeight: '600px', overflowY: 'auto'}}>
@@ -58,7 +43,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
         </thead>
         <tbody>
           {agents.map(agent => {
-            console.log('Agent:', agent);
+            console.log('Rendering agent:', agent);
             return (
               <tr key={agent.AgentID}>
                 <td>
@@ -70,7 +55,7 @@ const AgentTable = ({ agents, onScroll, selectedAgents, setSelectedAgents, onEdi
                 </td>
                 <td>{truncate(agent.Fullname, 30)}</td>
                 <td>{truncate(agent.Email, 30)}</td>
-                <td>{truncate(getTenantName(agent.TenantID), 20)}</td>
+                <td>{truncate(agent.TenantName, 20)}</td>
                 <td className="text-center">
                   {agent.hasBankingInfo ? 
                     <span className="badge bg-success">✓</span> : 
