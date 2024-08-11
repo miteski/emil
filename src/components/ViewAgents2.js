@@ -22,32 +22,20 @@ const ViewAgents2 = () => {
   const fetchingTenants = useRef(false);
 
   const fetchAgents = useCallback(async () => {
-    console.log('fetchAgents called', { hasMore, loading, fetchingAgents: fetchingAgents.current, page, totalPages });
-    if (!hasMore || loading || fetchingAgents.current || page > totalPages) return;
+    if (!hasMore || loading || fetchingAgents.current) return;
     fetchingAgents.current = true;
     setLoading(true);
-    setError(null);
     try {
       const token = localStorage.getItem('token');
-      console.log('Fetching agents with URL:', `/api/agents?page=${page}&pageSize=10&search=${searchQuery}`);
       const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!response.ok) {
-        throw new Error('Failed to fetch agents');
-      }
+      if (!response.ok) throw new Error('Failed to fetch agents');
       const data = await response.json();
-      console.log('Fetched agents data:', data);
-      if (Array.isArray(data.agents)) {
-        setAgents(prevAgents => [...prevAgents, ...data.agents]);
-        setTotalPages(data.totalPages);
-        setHasMore(page < data.totalPages);
-        setPage(prevPage => prevPage + 1);
-      } else {
-        throw new Error('Unexpected API response format');
-      }
+      setAgents(prevAgents => [...prevAgents, ...data.agents]);
+      setTotalPages(data.totalPages);
+      setHasMore(page < data.totalPages);
+      setPage(prevPage => prevPage + 1);
     } catch (error) {
       setError(error.message);
       console.error('Error fetching agents:', error);
@@ -55,29 +43,19 @@ const ViewAgents2 = () => {
       setLoading(false);
       fetchingAgents.current = false;
     }
-  }, [page, searchQuery, hasMore, loading, totalPages]);
+  }, [page, searchQuery, hasMore, loading]);
 
   const fetchTenants = useCallback(async () => {
     if (fetchingTenants.current) return;
     fetchingTenants.current = true;
-    console.log('Fetching tenants...');
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/tenants', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!response.ok) {
-        throw new Error('Failed to fetch tenants');
-      }
+      if (!response.ok) throw new Error('Failed to fetch tenants');
       const data = await response.json();
-      console.log('Fetched tenants:', data);
-      if (Array.isArray(data) && data.length > 0) {
-        setTenants(data);
-      } else {
-        console.warn('Unexpected tenants data format:', data);
-      }
+      setTenants(data);
     } catch (error) {
       console.error('Error fetching tenants:', error);
       setError('Failed to fetch tenants');
@@ -91,41 +69,26 @@ const ViewAgents2 = () => {
   }, [fetchTenants]);
 
   useEffect(() => {
-    if (tenants.length > 0) {
-      setAgents([]);
-      setPage(1);
-      setHasMore(true);
+    if (tenants.length > 0 && agents.length === 0) {
       fetchAgents();
     }
-  }, [fetchAgents, tenants, searchQuery]);
+  }, [fetchAgents, tenants, agents.length]);
 
   const handleSearch = (query) => {
-    console.log('Search query changed:', query);
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
     setHasMore(true);
-    setTotalPages(1);
   };
 
   const handleScroll = useCallback((event) => {
     const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    console.log('Scroll event', { scrollTop, clientHeight, scrollHeight, hasMore, loading });
     if (scrollHeight - scrollTop <= clientHeight + 100 && !loading && hasMore && !fetchingAgents.current) {
-      console.log('Triggering fetch for next page');
-      fetchAgents();
-    }
-  }, [fetchAgents, hasMore, loading]);
-
-  const handleLoadMore = useCallback(() => {
-    console.log('Load more button clicked');
-    if (!loading && hasMore && !fetchingAgents.current) {
       fetchAgents();
     }
   }, [fetchAgents, hasMore, loading]);
 
   const handleAddAgent = async (newAgent) => {
-    console.log('Adding new agent:', newAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/agents', {
@@ -134,22 +97,12 @@ const ViewAgents2 = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          fullname: newAgent.Fullname,
-          email: newAgent.Email,
-          tenantId: newAgent.TenantID
-        })
+        body: JSON.stringify(newAgent)
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to add agent');
-      }
-
+      if (!response.ok) throw new Error('Failed to add agent');
       setAgents([]);
       setPage(1);
       setHasMore(true);
-      setTotalPages(1);
       fetchAgents();
     } catch (error) {
       setError(error.message);
@@ -158,7 +111,6 @@ const ViewAgents2 = () => {
   };
 
   const handleEditAgent = async (agentId, updatedAgent) => {
-    console.log('Editing agent:', agentId, updatedAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/agents/${agentId}`, {
@@ -167,18 +119,9 @@ const ViewAgents2 = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          fullname: updatedAgent.Fullname,
-          email: updatedAgent.Email,
-          tenantId: updatedAgent.TenantID
-        })
+        body: JSON.stringify(updatedAgent)
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update agent');
-      }
-
+      if (!response.ok) throw new Error('Failed to update agent');
       setAgents(agents.map(agent => 
         agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
       ));
@@ -189,7 +132,6 @@ const ViewAgents2 = () => {
   };
 
   const openEditModal = (agent) => {
-    console.log('Opening edit modal for agent:', agent);
     setEditingAgent(agent);
     setShowEditModal(true);
   };
@@ -216,13 +158,9 @@ const ViewAgents2 = () => {
             selectedAgents={selectedAgents}
             setSelectedAgents={setSelectedAgents}
             onEditAgent={openEditModal}
+            tenants={tenants}
           />
           {loading && <div className="text-center mt-3">Loading...</div>}
-          {hasMore && !loading && (
-            <div className="text-center mt-3">
-              <button className="btn btn-primary" onClick={handleLoadMore}>Load More</button>
-            </div>
-          )}
           {!hasMore && agents.length > 0 && <div className="text-center mt-3">No more agents to load</div>}
           {!hasMore && agents.length === 0 && <div className="text-center mt-3">No agents found</div>}
         </div>
