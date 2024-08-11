@@ -27,15 +27,25 @@ const ViewAgents2 = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
+      console.log('Fetching agents with URL:', `/api/agents?page=${page}&pageSize=10&search=${searchQuery}`);
       const response = await fetch(`/api/agents?page=${page}&pageSize=10&search=${searchQuery}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!response.ok) throw new Error('Failed to fetch agents');
       const data = await response.json();
-      setAgents(prevAgents => [...prevAgents, ...data.agents]);
-      setTotalPages(data.totalPages);
-      setHasMore(page < data.totalPages);
-      setPage(prevPage => prevPage + 1);
+      console.log('Fetched agents data:', data);
+      if (Array.isArray(data.agents)) {
+        setAgents(prevAgents => {
+          const newAgents = [...prevAgents, ...data.agents];
+          console.log('Updated agents state:', newAgents);
+          return newAgents;
+        });
+        setTotalPages(data.totalPages);
+        setHasMore(page < data.totalPages);
+        setPage(prevPage => prevPage + 1);
+      } else {
+        throw new Error('Unexpected API response format');
+      }
     } catch (error) {
       setError(error.message);
       console.error('Error fetching agents:', error);
@@ -50,11 +60,13 @@ const ViewAgents2 = () => {
     fetchingTenants.current = true;
     try {
       const token = localStorage.getItem('token');
+      console.log('Fetching tenants...');
       const response = await fetch('/api/tenants', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!response.ok) throw new Error('Failed to fetch tenants');
       const data = await response.json();
+      console.log('Fetched tenants:', data);
       setTenants(data);
     } catch (error) {
       console.error('Error fetching tenants:', error);
@@ -75,6 +87,7 @@ const ViewAgents2 = () => {
   }, [fetchAgents, tenants, agents.length]);
 
   const handleSearch = (query) => {
+    console.log('Search query changed:', query);
     setSearchQuery(query);
     setAgents([]);
     setPage(1);
@@ -107,6 +120,7 @@ const ViewAgents2 = () => {
   };
 
   const handleAddAgent = async (newAgent) => {
+    console.log('Adding new agent:', newAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/agents', {
@@ -129,6 +143,7 @@ const ViewAgents2 = () => {
   };
 
   const handleEditAgent = async (agentId, updatedAgent) => {
+    console.log('Editing agent:', agentId, updatedAgent);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/agents/${agentId}`, {
@@ -137,11 +152,20 @@ const ViewAgents2 = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(updatedAgent)
+        body: JSON.stringify({
+          fullname: updatedAgent.Fullname,
+          email: updatedAgent.Email,
+          tenantId: updatedAgent.TenantID
+        })
       });
-      if (!response.ok) throw new Error('Failed to update agent');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update agent');
+      }
+      const updatedData = await response.json();
+      console.log('Updated agent data from server:', updatedData);
       setAgents(agents.map(agent => 
-        agent.AgentID === agentId ? { ...agent, ...updatedAgent } : agent
+        agent.AgentID === agentId ? { ...agent, ...updatedData } : agent
       ));
     } catch (error) {
       setError(error.message);
@@ -150,6 +174,7 @@ const ViewAgents2 = () => {
   };
 
   const openEditModal = (agent) => {
+    console.log('Opening edit modal for agent:', agent);
     setEditingAgent(agent);
     setShowEditModal(true);
   };
