@@ -82,13 +82,23 @@ const ViewAgents2 = () => {
     fetchAgents();
   };
 
-  const handleScroll = useCallback((event) => {
-    const { scrollTop, clientHeight, scrollHeight } = event.currentTarget;
-    if (scrollHeight - scrollTop <= clientHeight + 100 && !loading && hasMore && !fetchingAgents.current) {
+  const handleScroll = useCallback(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop
+      >= document.documentElement.offsetHeight - 100
+      && !loading
+      && hasMore
+      && !fetchingAgents.current
+    ) {
       console.log('Triggering fetch for next page');
       fetchAgents();
     }
   }, [fetchAgents, hasMore, loading]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const handleLoadMore = () => {
     if (!loading && hasMore && !fetchingAgents.current) {
@@ -162,7 +172,6 @@ const ViewAgents2 = () => {
           {error && <div className="alert alert-danger">{error}</div>}
           <AgentTable 
             agents={agents}
-            onScroll={handleScroll}
             selectedAgents={selectedAgents}
             setSelectedAgents={setSelectedAgents}
             onEditAgent={openEditModal}
