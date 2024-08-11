@@ -39,6 +39,9 @@ const ViewAgents2 = () => {
       const data = await response.json();
       console.log('Fetched agents data:', data);
       if (Array.isArray(data.agents)) {
+        data.agents.forEach(agent => {
+          console.log('Agent object structure:', JSON.stringify(agent, null, 2));
+        });
         setAgents(prevAgents => [...prevAgents, ...data.agents]);
         setTotalPages(data.totalPages);
         setHasMore(page < data.totalPages);
