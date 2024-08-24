@@ -192,6 +192,7 @@ async function getAgents(req, res) {
             LEFT JOIN Agent_Coverage_Commission acc ON a.AgentID = acc.AgentID
             WHERE a.Fullname LIKE ? OR a.Email LIKE ?
             GROUP BY a.AgentID
+            ORDER BY a.AgentID DESC  -- Add this line to sort by AgentID in descending order
             LIMIT ? OFFSET ?
         `;
         let countQuery = `
